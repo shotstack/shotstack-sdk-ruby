@@ -13,30 +13,22 @@ OpenAPI Generator version: 4.2.1
 require 'date'
 
 module Shotstack
-  # An edit defines the content of the video in a timeline and the output format.
-  class Edit
-    attr_accessor :timeline
-
-    attr_accessor :output
-
-    # An optional webhook callback URL used to receive status notifications when a render completes or fails.
-    attr_accessor :callback
+  # Generate a poster image for the video at a specific point from the timeline. The poster image size will match the size of the output video.
+  class Poster
+    # The point on the timeline in seconds to capture a single frame to use as the poster image.
+    attr_accessor :capture
 
     # Attribute mapping from ruby-style variable name to JSON key.
     def self.attribute_map
       {
-        :'timeline' => :'timeline',
-        :'output' => :'output',
-        :'callback' => :'callback'
+        :'capture' => :'capture'
       }
     end
 
     # Attribute type mapping.
     def self.openapi_types
       {
-        :'timeline' => :'Timeline',
-        :'output' => :'Output',
-        :'callback' => :'String'
+        :'capture' => :'Float'
       }
     end
 
@@ -50,27 +42,19 @@ module Shotstack
     # @param [Hash] attributes Model attributes in the form of hash
     def initialize(attributes = {})
       if (!attributes.is_a?(Hash))
-        fail ArgumentError, "The input argument (attributes) must be a hash in `Shotstack::Edit` initialize method"
+        fail ArgumentError, "The input argument (attributes) must be a hash in `Shotstack::Poster` initialize method"
       end
 
       # check to see if the attribute exists and convert string to symbol for hash key
       attributes = attributes.each_with_object({}) { |(k, v), h|
         if (!self.class.attribute_map.key?(k.to_sym))
-          fail ArgumentError, "`#{k}` is not a valid attribute in `Shotstack::Edit`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
+          fail ArgumentError, "`#{k}` is not a valid attribute in `Shotstack::Poster`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
         end
         h[k.to_sym] = v
       }
 
-      if attributes.key?(:'timeline')
-        self.timeline = attributes[:'timeline']
-      end
-
-      if attributes.key?(:'output')
-        self.output = attributes[:'output']
-      end
-
-      if attributes.key?(:'callback')
-        self.callback = attributes[:'callback']
+      if attributes.key?(:'capture')
+        self.capture = attributes[:'capture']
       end
     end
 
@@ -78,12 +62,8 @@ module Shotstack
     # @return Array for valid properties with the reasons
     def list_invalid_properties
       invalid_properties = Array.new
-      if @timeline.nil?
-        invalid_properties.push('invalid value for "timeline", timeline cannot be nil.')
-      end
-
-      if @output.nil?
-        invalid_properties.push('invalid value for "output", output cannot be nil.')
+      if @capture.nil?
+        invalid_properties.push('invalid value for "capture", capture cannot be nil.')
       end
 
       invalid_properties
@@ -92,8 +72,7 @@ module Shotstack
     # Check to see if the all the properties in the model are valid
     # @return true if the model is valid
     def valid?
-      return false if @timeline.nil?
-      return false if @output.nil?
+      return false if @capture.nil?
       true
     end
 
@@ -102,9 +81,7 @@ module Shotstack
     def ==(o)
       return true if self.equal?(o)
       self.class == o.class &&
-          timeline == o.timeline &&
-          output == o.output &&
-          callback == o.callback
+          capture == o.capture
     end
 
     # @see the `==` method
@@ -116,7 +93,7 @@ module Shotstack
     # Calculates hash code according to all attributes.
     # @return [Integer] Hash code
     def hash
-      [timeline, output, callback].hash
+      [capture].hash
     end
 
     # Builds the object from hash

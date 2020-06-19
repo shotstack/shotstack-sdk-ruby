@@ -13,30 +13,27 @@ OpenAPI Generator version: 4.2.1
 require 'date'
 
 module Shotstack
-  # An edit defines the content of the video in a timeline and the output format.
-  class Edit
-    attr_accessor :timeline
+  # Offsets the position of an asset horizontally or vertically by a relative distance.
+  class Offset
+    # Offset an asset on the horizontal axis (left or right), range varies from -1 to 1. Positive numbers move the asset right, negative left. For all assets except titles the distance moved is relative to the width  of the viewport - i.e. an X offset of 0.5 will move the asset half the  screen width to the right.
+    attr_accessor :x
 
-    attr_accessor :output
-
-    # An optional webhook callback URL used to receive status notifications when a render completes or fails.
-    attr_accessor :callback
+    # Offset an asset on the vertical axis (up or down), range varies from -1 to 1. Positive numbers move the asset up, negative down. For all assets except titles the distance moved is relative to the height  of the viewport - i.e. an Y offset of 0.5 will move the asset up half the  screen height.
+    attr_accessor :y
 
     # Attribute mapping from ruby-style variable name to JSON key.
     def self.attribute_map
       {
-        :'timeline' => :'timeline',
-        :'output' => :'output',
-        :'callback' => :'callback'
+        :'x' => :'x',
+        :'y' => :'y'
       }
     end
 
     # Attribute type mapping.
     def self.openapi_types
       {
-        :'timeline' => :'Timeline',
-        :'output' => :'Output',
-        :'callback' => :'String'
+        :'x' => :'Float',
+        :'y' => :'Float'
       }
     end
 
@@ -50,27 +47,23 @@ module Shotstack
     # @param [Hash] attributes Model attributes in the form of hash
     def initialize(attributes = {})
       if (!attributes.is_a?(Hash))
-        fail ArgumentError, "The input argument (attributes) must be a hash in `Shotstack::Edit` initialize method"
+        fail ArgumentError, "The input argument (attributes) must be a hash in `Shotstack::Offset` initialize method"
       end
 
       # check to see if the attribute exists and convert string to symbol for hash key
       attributes = attributes.each_with_object({}) { |(k, v), h|
         if (!self.class.attribute_map.key?(k.to_sym))
-          fail ArgumentError, "`#{k}` is not a valid attribute in `Shotstack::Edit`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
+          fail ArgumentError, "`#{k}` is not a valid attribute in `Shotstack::Offset`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
         end
         h[k.to_sym] = v
       }
 
-      if attributes.key?(:'timeline')
-        self.timeline = attributes[:'timeline']
+      if attributes.key?(:'x')
+        self.x = attributes[:'x']
       end
 
-      if attributes.key?(:'output')
-        self.output = attributes[:'output']
-      end
-
-      if attributes.key?(:'callback')
-        self.callback = attributes[:'callback']
+      if attributes.key?(:'y')
+        self.y = attributes[:'y']
       end
     end
 
@@ -78,12 +71,20 @@ module Shotstack
     # @return Array for valid properties with the reasons
     def list_invalid_properties
       invalid_properties = Array.new
-      if @timeline.nil?
-        invalid_properties.push('invalid value for "timeline", timeline cannot be nil.')
+      if !@x.nil? && @x > 1
+        invalid_properties.push('invalid value for "x", must be smaller than or equal to 1.')
       end
 
-      if @output.nil?
-        invalid_properties.push('invalid value for "output", output cannot be nil.')
+      if !@x.nil? && @x < -1
+        invalid_properties.push('invalid value for "x", must be greater than or equal to -1.')
+      end
+
+      if !@y.nil? && @y > 1
+        invalid_properties.push('invalid value for "y", must be smaller than or equal to 1.')
+      end
+
+      if !@y.nil? && @y < -1
+        invalid_properties.push('invalid value for "y", must be greater than or equal to -1.')
       end
 
       invalid_properties
@@ -92,9 +93,39 @@ module Shotstack
     # Check to see if the all the properties in the model are valid
     # @return true if the model is valid
     def valid?
-      return false if @timeline.nil?
-      return false if @output.nil?
+      return false if !@x.nil? && @x > 1
+      return false if !@x.nil? && @x < -1
+      return false if !@y.nil? && @y > 1
+      return false if !@y.nil? && @y < -1
       true
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] x Value to be assigned
+    def x=(x)
+      if !x.nil? && x > 1
+        fail ArgumentError, 'invalid value for "x", must be smaller than or equal to 1.'
+      end
+
+      if !x.nil? && x < -1
+        fail ArgumentError, 'invalid value for "x", must be greater than or equal to -1.'
+      end
+
+      @x = x
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] y Value to be assigned
+    def y=(y)
+      if !y.nil? && y > 1
+        fail ArgumentError, 'invalid value for "y", must be smaller than or equal to 1.'
+      end
+
+      if !y.nil? && y < -1
+        fail ArgumentError, 'invalid value for "y", must be greater than or equal to -1.'
+      end
+
+      @y = y
     end
 
     # Checks equality by comparing each attribute.
@@ -102,9 +133,8 @@ module Shotstack
     def ==(o)
       return true if self.equal?(o)
       self.class == o.class &&
-          timeline == o.timeline &&
-          output == o.output &&
-          callback == o.callback
+          x == o.x &&
+          y == o.y
     end
 
     # @see the `==` method
@@ -116,7 +146,7 @@ module Shotstack
     # Calculates hash code according to all attributes.
     # @return [Integer] Hash code
     def hash
-      [timeline, output, callback].hash
+      [x, y].hash
     end
 
     # Builds the object from hash
