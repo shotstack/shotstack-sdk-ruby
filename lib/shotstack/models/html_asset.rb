@@ -11,25 +11,31 @@ OpenAPI Generator version: 4.2.1
 =end
 
 require 'date'
+require_relative 'asset'
 
 module Shotstack
-  # The video output format.
-  class Output
-    # `mp4`, `webm` video or animated `gif`
-    attr_accessor :format
+  # The HtmlAsset clip type lets you create text based layout and formatting using HTML and CSS. You can also set the height and width of a bounding box for the HTML content to sit within. Text and elements will wrap within the bounding box.
+  class HtmlAsset < Asset
+    # The type of asset - set to <b>html</b> for HTML.
+    attr_accessor :type
 
-    # The output resolution of the video. <ul>   <li>`preview` - 512px x 288px @ 15fps</li>   <li>`mobile` - 640px x 360px @ 25fps</li>   <li>`sd` - 1024px x 576px @ 25fps</li>   <li>`hd` - 1280px x 720px @ 25fps</li>   <li>`1080` - 1920px x 1080px @ 25fps</li> </ul>
-    attr_accessor :resolution
+    # The HTML text string.
+    attr_accessor :html
 
-    # The aspect ratio (shape) of the video. Useful for social media sites. Options are: <ul>   <li>`16:9` - regular landscape/horizontal aspect ratio (default)</li>   <li>`9:16` - vertical/portrait aspect ratio.</li>   <li>`1:1` - square aspect ratio.</li> </ul>
-    attr_accessor :aspect_ratio
+    # The CSS text string to apply styling to the HTML.
+    attr_accessor :css
 
-    # Override the resolution and scale the video to render at a different size. When using scaleTo the video should be edited at the resolution dimensions, i.e. use font sizes that look best at HD, then use scaleTo to output the video at SD and the text will be scaled to the correct size. This is useful if you want to create multiple video sizes. <ul>   <li>`preview` - 512px x 288px @ 15fps</li>   <li>`mobile` - 640px x 360px @ 25fps</li>   <li>`sd` - 1024px x 576px @25fps</li>   <li>`hd` - 1280px x 720px @25fps</li>   <li>`1080` - 1920px x 1080px @25fps</li> </ul>
-    attr_accessor :scale_to
+    # Set the width of the HTML asset bounding box. Text will wrap to fill the bounding box.
+    attr_accessor :width
 
-    attr_accessor :poster
+    # Set the width of the HTML asset bounding box. Text and elements will be masked if they exceed the  height of the bounding box.
+    attr_accessor :height
 
-    attr_accessor :thumbnail
+    # Apply a background color behind the HTML bounding box using. Set the text color using hexadecimal  color notation. Transparency is supported by setting the first two characters of the hex string  (opposite to HTML), i.e. #80ffffff will be white with 50% transparency.
+    attr_accessor :background
+
+    # Place the HTML in one of nine predefined positions within the HTML area.
+    attr_accessor :position
 
     class EnumAttributeValidator
       attr_reader :datatype
@@ -56,24 +62,26 @@ module Shotstack
     # Attribute mapping from ruby-style variable name to JSON key.
     def self.attribute_map
       {
-        :'format' => :'format',
-        :'resolution' => :'resolution',
-        :'aspect_ratio' => :'aspectRatio',
-        :'scale_to' => :'scaleTo',
-        :'poster' => :'poster',
-        :'thumbnail' => :'thumbnail'
+        :'type' => :'type',
+        :'html' => :'html',
+        :'css' => :'css',
+        :'width' => :'width',
+        :'height' => :'height',
+        :'background' => :'background',
+        :'position' => :'position'
       }
     end
 
     # Attribute type mapping.
     def self.openapi_types
       {
-        :'format' => :'String',
-        :'resolution' => :'String',
-        :'aspect_ratio' => :'String',
-        :'scale_to' => :'String',
-        :'poster' => :'Poster',
-        :'thumbnail' => :'Thumbnail'
+        :'type' => :'String',
+        :'html' => :'String',
+        :'css' => :'String',
+        :'width' => :'Float',
+        :'height' => :'Float',
+        :'background' => :'String',
+        :'position' => :'String'
       }
     end
 
@@ -87,39 +95,49 @@ module Shotstack
     # @param [Hash] attributes Model attributes in the form of hash
     def initialize(attributes = {})
       if (!attributes.is_a?(Hash))
-        fail ArgumentError, "The input argument (attributes) must be a hash in `Shotstack::Output` initialize method"
+        fail ArgumentError, "The input argument (attributes) must be a hash in `Shotstack::HtmlAsset` initialize method"
       end
 
       # check to see if the attribute exists and convert string to symbol for hash key
       attributes = attributes.each_with_object({}) { |(k, v), h|
         if (!self.class.attribute_map.key?(k.to_sym))
-          fail ArgumentError, "`#{k}` is not a valid attribute in `Shotstack::Output`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
+          fail ArgumentError, "`#{k}` is not a valid attribute in `Shotstack::HtmlAsset`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
         end
         h[k.to_sym] = v
       }
 
-      if attributes.key?(:'format')
-        self.format = attributes[:'format']
+      if attributes.key?(:'type')
+        self.type = attributes[:'type']
+      else
+        self.type = 'html'
       end
 
-      if attributes.key?(:'resolution')
-        self.resolution = attributes[:'resolution']
+      if attributes.key?(:'html')
+        self.html = attributes[:'html']
       end
 
-      if attributes.key?(:'aspect_ratio')
-        self.aspect_ratio = attributes[:'aspect_ratio']
+      if attributes.key?(:'css')
+        self.css = attributes[:'css']
       end
 
-      if attributes.key?(:'scale_to')
-        self.scale_to = attributes[:'scale_to']
+      if attributes.key?(:'width')
+        self.width = attributes[:'width']
       end
 
-      if attributes.key?(:'poster')
-        self.poster = attributes[:'poster']
+      if attributes.key?(:'height')
+        self.height = attributes[:'height']
       end
 
-      if attributes.key?(:'thumbnail')
-        self.thumbnail = attributes[:'thumbnail']
+      if attributes.key?(:'background')
+        self.background = attributes[:'background']
+      else
+        self.background = 'transparent'
+      end
+
+      if attributes.key?(:'position')
+        self.position = attributes[:'position']
+      else
+        self.position = 'center'
       end
     end
 
@@ -127,12 +145,12 @@ module Shotstack
     # @return Array for valid properties with the reasons
     def list_invalid_properties
       invalid_properties = Array.new
-      if @format.nil?
-        invalid_properties.push('invalid value for "format", format cannot be nil.')
+      if @type.nil?
+        invalid_properties.push('invalid value for "type", type cannot be nil.')
       end
 
-      if @resolution.nil?
-        invalid_properties.push('invalid value for "resolution", resolution cannot be nil.')
+      if @html.nil?
+        invalid_properties.push('invalid value for "html", html cannot be nil.')
       end
 
       invalid_properties
@@ -141,57 +159,21 @@ module Shotstack
     # Check to see if the all the properties in the model are valid
     # @return true if the model is valid
     def valid?
-      return false if @format.nil?
-      format_validator = EnumAttributeValidator.new('String', ["mp4", "webm", "gif"])
-      return false unless format_validator.valid?(@format)
-      return false if @resolution.nil?
-      resolution_validator = EnumAttributeValidator.new('String', ["preview", "mobile", "sd", "hd", "1080"])
-      return false unless resolution_validator.valid?(@resolution)
-      aspect_ratio_validator = EnumAttributeValidator.new('String', ["16:9", "9:16", "1:1"])
-      return false unless aspect_ratio_validator.valid?(@aspect_ratio)
-      scale_to_validator = EnumAttributeValidator.new('String', ["preview", "mobile", "sd", "hd", "1080"])
-      return false unless scale_to_validator.valid?(@scale_to)
+      return false if @type.nil?
+      return false if @html.nil?
+      position_validator = EnumAttributeValidator.new('String', ["top", "topRight", "right", "bottomRight", "bottom", "bottomLeft", "left", "topLeft", "center"])
+      return false unless position_validator.valid?(@position)
       true
     end
 
     # Custom attribute writer method checking allowed values (enum).
-    # @param [Object] format Object to be assigned
-    def format=(format)
-      validator = EnumAttributeValidator.new('String', ["mp4", "webm", "gif"])
-      unless validator.valid?(format)
-        fail ArgumentError, "invalid value for \"format\", must be one of #{validator.allowable_values}."
+    # @param [Object] position Object to be assigned
+    def position=(position)
+      validator = EnumAttributeValidator.new('String', ["top", "topRight", "right", "bottomRight", "bottom", "bottomLeft", "left", "topLeft", "center"])
+      unless validator.valid?(position)
+        fail ArgumentError, "invalid value for \"position\", must be one of #{validator.allowable_values}."
       end
-      @format = format
-    end
-
-    # Custom attribute writer method checking allowed values (enum).
-    # @param [Object] resolution Object to be assigned
-    def resolution=(resolution)
-      validator = EnumAttributeValidator.new('String', ["preview", "mobile", "sd", "hd", "1080"])
-      unless validator.valid?(resolution)
-        fail ArgumentError, "invalid value for \"resolution\", must be one of #{validator.allowable_values}."
-      end
-      @resolution = resolution
-    end
-
-    # Custom attribute writer method checking allowed values (enum).
-    # @param [Object] aspect_ratio Object to be assigned
-    def aspect_ratio=(aspect_ratio)
-      validator = EnumAttributeValidator.new('String', ["16:9", "9:16", "1:1"])
-      unless validator.valid?(aspect_ratio)
-        fail ArgumentError, "invalid value for \"aspect_ratio\", must be one of #{validator.allowable_values}."
-      end
-      @aspect_ratio = aspect_ratio
-    end
-
-    # Custom attribute writer method checking allowed values (enum).
-    # @param [Object] scale_to Object to be assigned
-    def scale_to=(scale_to)
-      validator = EnumAttributeValidator.new('String', ["preview", "mobile", "sd", "hd", "1080"])
-      unless validator.valid?(scale_to)
-        fail ArgumentError, "invalid value for \"scale_to\", must be one of #{validator.allowable_values}."
-      end
-      @scale_to = scale_to
+      @position = position
     end
 
     # Checks equality by comparing each attribute.
@@ -199,12 +181,13 @@ module Shotstack
     def ==(o)
       return true if self.equal?(o)
       self.class == o.class &&
-          format == o.format &&
-          resolution == o.resolution &&
-          aspect_ratio == o.aspect_ratio &&
-          scale_to == o.scale_to &&
-          poster == o.poster &&
-          thumbnail == o.thumbnail
+          type == o.type &&
+          html == o.html &&
+          css == o.css &&
+          width == o.width &&
+          height == o.height &&
+          background == o.background &&
+          position == o.position
     end
 
     # @see the `==` method
@@ -216,7 +199,7 @@ module Shotstack
     # Calculates hash code according to all attributes.
     # @return [Integer] Hash code
     def hash
-      [format, resolution, aspect_ratio, scale_to, poster, thumbnail].hash
+      [type, html, css, width, height, background, position].hash
     end
 
     # Builds the object from hash

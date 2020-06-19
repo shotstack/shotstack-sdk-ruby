@@ -11,32 +11,40 @@ OpenAPI Generator version: 4.2.1
 =end
 
 require 'date'
+require_relative 'asset'
 
 module Shotstack
-  # An edit defines the content of the video in a timeline and the output format.
-  class Edit
-    attr_accessor :timeline
+  # The AudioAsset is used to add sound effects and audio at specific intervals on the timeline. The src must be a publicly accessible URL to an audio resource such  as an mp3 file.
+  class AudioAsset < Asset
+    # The type of asset - set to <b>audio</b> for audio assets.
+    attr_accessor :type
 
-    attr_accessor :output
+    # The audio source URL. The URL must be publicly accessible or include credentials.
+    attr_accessor :src
 
-    # An optional webhook callback URL used to receive status notifications when a render completes or fails.
-    attr_accessor :callback
+    # The start trim point of the audio clip, in seconds (defaults to 0). Audio will start from the in trim point. The audio will play until the file ends or the Clip length is reached.
+    attr_accessor :trim
+
+    # Set the volume for the audio clip between 0 and 1 where 0 is muted and 1 is full volume (defaults to 1).
+    attr_accessor :volume
 
     # Attribute mapping from ruby-style variable name to JSON key.
     def self.attribute_map
       {
-        :'timeline' => :'timeline',
-        :'output' => :'output',
-        :'callback' => :'callback'
+        :'type' => :'type',
+        :'src' => :'src',
+        :'trim' => :'trim',
+        :'volume' => :'volume'
       }
     end
 
     # Attribute type mapping.
     def self.openapi_types
       {
-        :'timeline' => :'Timeline',
-        :'output' => :'Output',
-        :'callback' => :'String'
+        :'type' => :'String',
+        :'src' => :'String',
+        :'trim' => :'Float',
+        :'volume' => :'Float'
       }
     end
 
@@ -50,27 +58,33 @@ module Shotstack
     # @param [Hash] attributes Model attributes in the form of hash
     def initialize(attributes = {})
       if (!attributes.is_a?(Hash))
-        fail ArgumentError, "The input argument (attributes) must be a hash in `Shotstack::Edit` initialize method"
+        fail ArgumentError, "The input argument (attributes) must be a hash in `Shotstack::AudioAsset` initialize method"
       end
 
       # check to see if the attribute exists and convert string to symbol for hash key
       attributes = attributes.each_with_object({}) { |(k, v), h|
         if (!self.class.attribute_map.key?(k.to_sym))
-          fail ArgumentError, "`#{k}` is not a valid attribute in `Shotstack::Edit`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
+          fail ArgumentError, "`#{k}` is not a valid attribute in `Shotstack::AudioAsset`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
         end
         h[k.to_sym] = v
       }
 
-      if attributes.key?(:'timeline')
-        self.timeline = attributes[:'timeline']
+      if attributes.key?(:'type')
+        self.type = attributes[:'type']
+      else
+        self.type = 'audio'
       end
 
-      if attributes.key?(:'output')
-        self.output = attributes[:'output']
+      if attributes.key?(:'src')
+        self.src = attributes[:'src']
       end
 
-      if attributes.key?(:'callback')
-        self.callback = attributes[:'callback']
+      if attributes.key?(:'trim')
+        self.trim = attributes[:'trim']
+      end
+
+      if attributes.key?(:'volume')
+        self.volume = attributes[:'volume']
       end
     end
 
@@ -78,12 +92,12 @@ module Shotstack
     # @return Array for valid properties with the reasons
     def list_invalid_properties
       invalid_properties = Array.new
-      if @timeline.nil?
-        invalid_properties.push('invalid value for "timeline", timeline cannot be nil.')
+      if @type.nil?
+        invalid_properties.push('invalid value for "type", type cannot be nil.')
       end
 
-      if @output.nil?
-        invalid_properties.push('invalid value for "output", output cannot be nil.')
+      if @src.nil?
+        invalid_properties.push('invalid value for "src", src cannot be nil.')
       end
 
       invalid_properties
@@ -92,8 +106,8 @@ module Shotstack
     # Check to see if the all the properties in the model are valid
     # @return true if the model is valid
     def valid?
-      return false if @timeline.nil?
-      return false if @output.nil?
+      return false if @type.nil?
+      return false if @src.nil?
       true
     end
 
@@ -102,9 +116,10 @@ module Shotstack
     def ==(o)
       return true if self.equal?(o)
       self.class == o.class &&
-          timeline == o.timeline &&
-          output == o.output &&
-          callback == o.callback
+          type == o.type &&
+          src == o.src &&
+          trim == o.trim &&
+          volume == o.volume
     end
 
     # @see the `==` method
@@ -116,7 +131,7 @@ module Shotstack
     # Calculates hash code according to all attributes.
     # @return [Integer] Hash code
     def hash
-      [timeline, output, callback].hash
+      [type, src, trim, volume].hash
     end
 
     # Builds the object from hash
