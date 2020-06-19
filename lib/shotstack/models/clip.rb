@@ -88,7 +88,7 @@ module Shotstack
     # Attribute type mapping.
     def self.openapi_types
       {
-        :'asset' => :'OneOfTitleAssetImageAssetVideoAssetHtmlAssetAudioAssetLumaAsset',
+        :'asset' => :'Asset',
         :'start' => :'Float',
         :'length' => :'Float',
         :'fit' => :'String',
