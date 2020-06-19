@@ -1,21 +1,26 @@
 # Shotstack Ruby SDK
 
-Ruby SDK for Shotstack, the cloud video editing API.
+Ruby SDK for [Shotstack](http://shotstack.io), the cloud video editing API.
 
-## Build Instructions
+Shotstack is a cloud based video editing platform that enables the editing of videos using code.
 
-First make sure the version in `shotstack/version.rb` is correct.
+The platform uses an API and a JSON format for specifying how videos should be edited and what assets and titles should be used.
 
-Then, to build as a gem:
+A server based render farm takes care of rendering the videos allowing multiple videos to be created simultaneously.
 
-```bash
-rm shotstack-*.gem
-gem build shotstack
-gem push shotstack-*.*.*.gem   # use the correct version number
+For examples of how to use the SDK to create videos using code checkout the Ruby demo repo: https://github.com/shotstack/ruby-demos
+
+## Installation
+
+```
+bundle install
 ```
 
-For local development install the gem:
+## Documentation
 
-```bash
-sudo gem install shotstack
-```
+- [Getting Started Guide](https://shotstack.gitbook.io/docs/guides/getting-started)
+- [API Reference](https://shotstack.restlet.io/)
+- [Examples](https://github.com/shotstack/ruby-demos)
+- [Shotstack Website](http://shotstack.io)
+
+###
