@@ -30,17 +30,17 @@ module Shotstack
     # Scale the asset to a fraction of the viewport size - i.e. setting the scale to 0.5 will scale asset to half the size of the viewport. This is useful for picture-in-picture video and  scaling images such as logos and watermarks.
     attr_accessor :scale
 
-    # Place the asset in one of nine predefined positions of the viewport. This is most effective for when the asset is scaled and you want to position the element to a specific position.
+    # Place the asset in one of nine predefined positions of the viewport. This is most effective for when the asset is scaled and you want to position the element to a specific position. <ul>   <li>`top` - top (center)</li>   <li>`topRight` - top right</li>   <li>`right` - right (center)</li>   <li>`bottomRight` - bottom right</li>   <li>`bottom` - bottom (center)</li>   <li>`bottomLeft` - bottom left</li>   <li>`left` - left (center)</li>   <li>`topLeft` - top left</li>   <li>`center` - center</li> </ul>
     attr_accessor :position
 
     attr_accessor :offset
 
     attr_accessor :transition
 
-    # A motion effect to apply to the Clip.
+    # A motion effect to apply to the Clip. <ul>   <li>`zoomIn` - slow zoom in</li>   <li>`zoomOut` - slow zoom out</li>   <li>`slideLeft` - slow slide (pan) left</li>   <li>`slideRight` - slow slide (pan) right</li>   <li>`slideUp` - slow slide (pan) up</li>   <li>`slideDown` - slow slide (pan) down</li> </ul>
     attr_accessor :effect
 
-    # A filter effect to apply to the Clip.
+    # A filter effect to apply to the Clip. <ul>   <li>`blur` - blurs the image or video</li>   <li>`boost` - boost contrast and saturation</li>   <li>`contrast` - increase contrast</li>   <li>`darken` - darken the scene</li>   <li>`greyscale` - remove colour</li>   <li>`lighten` - lighten the scene</li>   <li>`muted` - reduce saturation and contrast</li>   <li>`invert` - invert colors</li> </ul>
     attr_accessor :filter
 
     # Sets the opacity of the Clip where 1 is opaque and 0 is transparent.
@@ -169,6 +169,8 @@ module Shotstack
 
       if attributes.key?(:'opacity')
         self.opacity = attributes[:'opacity']
+      else
+        self.opacity = 1
       end
     end
 
@@ -203,7 +205,7 @@ module Shotstack
       return false unless position_validator.valid?(@position)
       effect_validator = EnumAttributeValidator.new('String', ["zoomIn", "zoomOut", "slideLeft", "slideRight", "slideUp", "slideDown"])
       return false unless effect_validator.valid?(@effect)
-      filter_validator = EnumAttributeValidator.new('String', ["boost", "contrast", "darken", "greyscale", "lighten", "muted", "negative"])
+      filter_validator = EnumAttributeValidator.new('String', ["blur", "boost", "contrast", "darken", "greyscale", "lighten", "muted", "negative"])
       return false unless filter_validator.valid?(@filter)
       true
     end
@@ -241,7 +243,7 @@ module Shotstack
     # Custom attribute writer method checking allowed values (enum).
     # @param [Object] filter Object to be assigned
     def filter=(filter)
-      validator = EnumAttributeValidator.new('String', ["boost", "contrast", "darken", "greyscale", "lighten", "muted", "negative"])
+      validator = EnumAttributeValidator.new('String', ["blur", "boost", "contrast", "darken", "greyscale", "lighten", "muted", "negative"])
       unless validator.valid?(filter)
         fail ArgumentError, "invalid value for \"filter\", must be one of #{validator.allowable_values}."
       end

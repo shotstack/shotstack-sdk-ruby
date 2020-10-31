@@ -15,10 +15,10 @@ require 'date'
 module Shotstack
   # In and out transitions for a clip - i.e. fade in and fade out
   class Transition
-    # The transition in
+    # The transition in. Available transitions are:   <ul>     <li>`fade` - fade in</li>     <li>`reveal` - reveal from left to right</li>     <li>`wipeLeft` - fade across screen to the left</li>     <li>`wipeRight` - fade across screen to the right</li>     <li>`slideLeft` - move slightly left and fade in</li>     <li>`slideRight` - move slightly right and fade in</li>     <li>`slideUp` - move slightly up and fade in</li>     <li>`slideDown` - move slightly down and fade in</li>     <li>`carouselLeft` - slide in from right to left</li>     <li>`carouselRight` - slide in from left to right</li>     <li>`carouselUp` - slide in from bottom to top</li>     <li>`carouselDown` - slide in from top  to bottom</li>     <li>`zoom` - fast zoom in</li>   </ul>
     attr_accessor :_in
 
-    # The transition out
+    # The transition out. Available transitions are:   <ul>     <li>`fade` - fade out</li>     <li>`reveal` - reveal from right to left</li>     <li>`wipeLeft` - fade across screen to the left</li>     <li>`wipeRight` - fade across screen to the right</li>     <li>`slideLeft` - move slightly left and fade out</li>     <li>`slideRight` - move slightly right and fade out</li>     <li>`slideUp` - move slightly up and fade out</li>     <li>`slideDown` - move slightly down and fade out</li>     <li>`carouselLeft` - slide out from right to left</li>     <li>`carouselRight` - slide out from left to right</li>     <li>`carouselUp` - slide out from bottom to top</li>     <li>`carouselDown` - slide out from top  to bottom</li>     <li>`zoom` - fast zoom out</li>   </ul>
     attr_accessor :out
 
     class EnumAttributeValidator
@@ -99,9 +99,9 @@ module Shotstack
     # Check to see if the all the properties in the model are valid
     # @return true if the model is valid
     def valid?
-      _in_validator = EnumAttributeValidator.new('String', ["fade", "reveal", "wipeLeft", "wipeRight"])
+      _in_validator = EnumAttributeValidator.new('String', ["fade", "reveal", "wipeLeft", "wipeRight", "slideLeft", "slideRight", "slideUp", "slideDown", "carouselLeft", "carouselRight", "carouselUp", "carouselDown", "zoom"])
       return false unless _in_validator.valid?(@_in)
-      out_validator = EnumAttributeValidator.new('String', ["fade", "reveal", "wipeLeft", "wipeRight"])
+      out_validator = EnumAttributeValidator.new('String', ["fade", "reveal", "wipeLeft", "wipeRight", "slideLeft", "slideRight", "slideUp", "slideDown", "carouselLeft", "carouselRight", "carouselUp", "carouselDown", "zoom"])
       return false unless out_validator.valid?(@out)
       true
     end
@@ -109,7 +109,7 @@ module Shotstack
     # Custom attribute writer method checking allowed values (enum).
     # @param [Object] _in Object to be assigned
     def _in=(_in)
-      validator = EnumAttributeValidator.new('String', ["fade", "reveal", "wipeLeft", "wipeRight"])
+      validator = EnumAttributeValidator.new('String', ["fade", "reveal", "wipeLeft", "wipeRight", "slideLeft", "slideRight", "slideUp", "slideDown", "carouselLeft", "carouselRight", "carouselUp", "carouselDown", "zoom"])
       unless validator.valid?(_in)
         fail ArgumentError, "invalid value for \"_in\", must be one of #{validator.allowable_values}."
       end
@@ -119,7 +119,7 @@ module Shotstack
     # Custom attribute writer method checking allowed values (enum).
     # @param [Object] out Object to be assigned
     def out=(out)
-      validator = EnumAttributeValidator.new('String', ["fade", "reveal", "wipeLeft", "wipeRight"])
+      validator = EnumAttributeValidator.new('String', ["fade", "reveal", "wipeLeft", "wipeRight", "slideLeft", "slideRight", "slideUp", "slideDown", "carouselLeft", "carouselRight", "carouselUp", "carouselDown", "zoom"])
       unless validator.valid?(out)
         fail ArgumentError, "invalid value for \"out\", must be one of #{validator.allowable_values}."
       end

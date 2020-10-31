@@ -16,7 +16,7 @@ require_relative 'asset'
 module Shotstack
   # The HtmlAsset clip type lets you create text based layout and formatting using HTML and CSS. You can also set the height and width of a bounding box for the HTML content to sit within. Text and elements will wrap within the bounding box.
   class HtmlAsset < Asset
-    # The type of asset - set to <b>html</b> for HTML.
+    # The type of asset - set to `html` for HTML.
     attr_accessor :type
 
     # The HTML text string.
@@ -34,7 +34,7 @@ module Shotstack
     # Apply a background color behind the HTML bounding box using. Set the text color using hexadecimal  color notation. Transparency is supported by setting the first two characters of the hex string  (opposite to HTML), i.e. #80ffffff will be white with 50% transparency.
     attr_accessor :background
 
-    # Place the HTML in one of nine predefined positions within the HTML area.
+    # Place the HTML in one of nine predefined positions within the HTML area. <ul>   <li>`top` - top (center)</li>   <li>`topRight` - top right</li>   <li>`right` - right (center)</li>   <li>`bottomRight` - bottom right</li>   <li>`bottom` - bottom (center)</li>   <li>`bottomLeft` - bottom left</li>   <li>`left` - left (center)</li>   <li>`topLeft` - top left</li>   <li>`center` - center</li> </ul>
     attr_accessor :position
 
     class EnumAttributeValidator

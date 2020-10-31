@@ -16,25 +16,25 @@ require_relative 'asset'
 module Shotstack
   # The TitleAsset clip type lets you create video titles from a text string and apply styling and positioning.
   class TitleAsset < Asset
-    # The type of asset - set to <b>title</b> for titles.
+    # The type of asset - set to `title` for titles.
     attr_accessor :type
 
     # The title text string - i.e. \"My Title\".
     attr_accessor :text
 
-    # Uses a preset to apply font properties and styling to the title.
+    # Uses a preset to apply font properties and styling to the title. <ul>   <li>`minimal`</li>   <li>`blockbuster`</li>   <li>`vogue`</li>   <li>`sketchy`</li>   <li>`skinny`</li>   <li>`chunk`</li>   <li>`chunkLight`</li>   <li>`marker`</li>   <li>`future`</li>   <li>`subtitle`</li> </ul>
     attr_accessor :style
 
     # Set the text color using hexadecimal color notation. Transparency is supported by setting the first two characters of the hex string (opposite to HTML),  i.e. #80ffffff will be white with  50% transparency.
     attr_accessor :color
 
-    # Set the relative size of the text using predefined sizes from xx-small to xx-large.
+    # Set the relative size of the text using predefined sizes from xx-small to xx-large. <ul>   <li>`xx-small`</li>   <li>`x-small`</li>   <li>`small`</li>   <li>`medium`</li>   <li>`large`</li>   <li>`x-large`</li>   <li>`xx-large`</li> </ul>
     attr_accessor :size
 
-    # Apply a background color behind the text. Set the text color using hexadecimal color notation. Transparency is supported by setting the first two characters of the hex string (opposite to HTML),  i.e. #80ffffff will be white with 50% transparency.
+    # Apply a background color behind the text. Set the text color using hexadecimal color notation. Transparency is supported by setting the first two characters of the hex string (opposite to HTML),  i.e. #80ffffff will be white with 50% transparency. Omit to use transparent background.
     attr_accessor :background
 
-    # Place the title in one of nine predefined positions of the viewport.
+    # Place the title in one of nine predefined positions of the viewport. <ul>   <li>`top` - top (center)</li>   <li>`topRight` - top right</li>   <li>`right` - right (center)</li>   <li>`bottomRight` - bottom right</li>   <li>`bottom` - bottom (center)</li>   <li>`bottomLeft` - bottom left</li>   <li>`left` - left (center)</li>   <li>`topLeft` - top left</li>   <li>`center` - center</li> </ul>
     attr_accessor :position
 
     attr_accessor :offset
