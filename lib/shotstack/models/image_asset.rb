@@ -19,7 +19,7 @@ module Shotstack
     # The type of asset - set to <b>image</b> for images.
     attr_accessor :type
 
-    # The image source URL. The URL must be publicly accessible or include credentials. 
+    # The image source URL. The URL must be publicly accessible or include credentials.
     attr_accessor :src
 
     # Attribute mapping from ruby-style variable name to JSON key.

@@ -14,10 +14,10 @@ require 'date'
 
 module Shotstack
   class QueuedResponseData
-    # Success response message
+    # Success response message or error details.
     attr_accessor :message
 
-    # The id of the render task in UUID format
+    # The id of the render task in UUID format.
     attr_accessor :id
 
     # Attribute mapping from ruby-style variable name to JSON key.

@@ -14,8 +14,10 @@ require 'date'
 
 module Shotstack
   class QueuedResponse
+    # `true` if successfully queued, else `false`.
     attr_accessor :success
 
+    # `Created`, `Bad Request` or an error message.
     attr_accessor :message
 
     attr_accessor :response

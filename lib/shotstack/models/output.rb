@@ -15,7 +15,7 @@ require 'date'
 module Shotstack
   # The video output format.
   class Output
-    # `mp4`, `webm` video or animated `gif`
+    # `mp4` video or animated `gif`
     attr_accessor :format
 
     # The output resolution of the video. <ul>   <li>`preview` - 512px x 288px @ 15fps</li>   <li>`mobile` - 640px x 360px @ 25fps</li>   <li>`sd` - 1024px x 576px @ 25fps</li>   <li>`hd` - 1280px x 720px @ 25fps</li>   <li>`1080` - 1920px x 1080px @ 25fps</li> </ul>
@@ -142,7 +142,7 @@ module Shotstack
     # @return true if the model is valid
     def valid?
       return false if @format.nil?
-      format_validator = EnumAttributeValidator.new('String', ["mp4", "webm", "gif"])
+      format_validator = EnumAttributeValidator.new('String', ["mp4", "gif"])
       return false unless format_validator.valid?(@format)
       return false if @resolution.nil?
       resolution_validator = EnumAttributeValidator.new('String', ["preview", "mobile", "sd", "hd", "1080"])
@@ -157,7 +157,7 @@ module Shotstack
     # Custom attribute writer method checking allowed values (enum).
     # @param [Object] format Object to be assigned
     def format=(format)
-      validator = EnumAttributeValidator.new('String', ["mp4", "webm", "gif"])
+      validator = EnumAttributeValidator.new('String', ["mp4", "gif"])
       unless validator.valid?(format)
         fail ArgumentError, "invalid value for \"format\", must be one of #{validator.allowable_values}."
       end

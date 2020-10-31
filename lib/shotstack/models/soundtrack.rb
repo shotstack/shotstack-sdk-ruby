@@ -18,7 +18,7 @@ module Shotstack
     # The URL of the mp3 audio file. The URL must be publicly accessible or include credentials.
     attr_accessor :src
 
-    # The effect to apply to the audio file
+    # The effect to apply to the audio file <ul>   <li>`fadeIn` - fade volume in only</li>   <li>`fadeOut` - fade volume out only</li>   <li>`fadeInFadeOut` - fade volume in and out</li> </ul>
     attr_accessor :effect
 
     # Set the volume for the soundtrack between 0 and 1 where 0 is muted and 1 is full volume (defaults to 1).
@@ -95,6 +95,8 @@ module Shotstack
 
       if attributes.key?(:'volume')
         self.volume = attributes[:'volume']
+      else
+        self.volume = 1
       end
     end
 

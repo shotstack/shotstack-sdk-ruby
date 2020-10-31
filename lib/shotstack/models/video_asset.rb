@@ -16,7 +16,7 @@ require_relative 'asset'
 module Shotstack
   # The VideoAsset is used to create video sequences from video files. The src must be a publicly accessible URL to a video resource such as an mp4 file.
   class VideoAsset < Asset
-    # The type of asset - set to <b>video</b> for videos.
+    # The type of asset - set to `video` for videos.
     attr_accessor :type
 
     # The video source URL. The URL must be publicly accessible or include credentials.

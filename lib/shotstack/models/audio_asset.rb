@@ -16,7 +16,7 @@ require_relative 'asset'
 module Shotstack
   # The AudioAsset is used to add sound effects and audio at specific intervals on the timeline. The src must be a publicly accessible URL to an audio resource such  as an mp3 file.
   class AudioAsset < Asset
-    # The type of asset - set to <b>audio</b> for audio assets.
+    # The type of asset - set to `audio` for audio assets.
     attr_accessor :type
 
     # The audio source URL. The URL must be publicly accessible or include credentials.
@@ -85,6 +85,8 @@ module Shotstack
 
       if attributes.key?(:'volume')
         self.volume = attributes[:'volume']
+      else
+        self.volume = 1
       end
     end
 

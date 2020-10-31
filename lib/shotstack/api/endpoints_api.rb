@@ -19,6 +19,7 @@ module Shotstack
     def initialize(api_client = ApiClient.default)
       @api_client = api_client
     end
+    # Get Render Status
     # Get the rendering status, video url and details of a timeline by ID.
     # @param id [String] The id of the timeline render task in UUID format
     # @param [Hash] opts the optional parameters
@@ -28,6 +29,7 @@ module Shotstack
       data
     end
 
+    # Get Render Status
     # Get the rendering status, video url and details of a timeline by ID.
     # @param id [String] The id of the timeline render task in UUID format
     # @param [Hash] opts the optional parameters
@@ -84,18 +86,22 @@ module Shotstack
       return data, status_code, headers
     end
 
-    # Render the contents of a timeline as a video file.
-    # @param edit [Edit] 
+    # Render Video
+    # Queue and render the contents of a timeline as a video file.
+    # @param edit [Edit] The video edit specified using JSON.
     # @param [Hash] opts the optional parameters
+    # @option opts [String] :x_api_queue_id The id of a dedicated queue (enterprise customers only).
     # @return [QueuedResponse]
     def post_render(edit, opts = {})
       data, _status_code, _headers = post_render_with_http_info(edit, opts)
       data
     end
 
-    # Render the contents of a timeline as a video file.
-    # @param edit [Edit] 
+    # Render Video
+    # Queue and render the contents of a timeline as a video file.
+    # @param edit [Edit] The video edit specified using JSON.
     # @param [Hash] opts the optional parameters
+    # @option opts [String] :x_api_queue_id The id of a dedicated queue (enterprise customers only).
     # @return [Array<(QueuedResponse, Integer, Hash)>] QueuedResponse data, response status code and response headers
     def post_render_with_http_info(edit, opts = {})
       if @api_client.config.debugging
@@ -117,6 +123,7 @@ module Shotstack
       header_params['Accept'] = @api_client.select_header_accept(['application/json'])
       # HTTP header 'Content-Type'
       header_params['Content-Type'] = @api_client.select_header_content_type(['application/json'])
+      header_params[:'x-api-queue-id'] = opts[:'x_api_queue_id'] if !opts[:'x_api_queue_id'].nil?
 
       # form parameters
       form_params = opts[:form_params] || {}

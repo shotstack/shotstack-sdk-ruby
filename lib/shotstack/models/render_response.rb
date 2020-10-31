@@ -14,8 +14,10 @@ require 'date'
 
 module Shotstack
   class RenderResponse
+    # `true` if status available, else `false`.
     attr_accessor :success
 
+    # `OK` or an error message.
     attr_accessor :message
 
     attr_accessor :response

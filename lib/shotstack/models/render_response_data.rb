@@ -14,24 +14,42 @@ require 'date'
 
 module Shotstack
   class RenderResponseData
-    # The status of the render task
-    attr_accessor :status
-
-    # The id of the render task in UUID format
+    # The id of the render task in UUID format.
     attr_accessor :id
 
-    # The owner id of the render task
+    # The owner id of the render task.
     attr_accessor :owner
+
+    # The customer subscription plan.
+    attr_accessor :plan
+
+    # The status of the render task. <ul>   <li>`queued` - render is queued waiting to be rendered</li>   <li>`fetching` - assets are being fetched</li>   <li>`rendering` - the video is being rendered</li>   <li>`saving` - the final video is being saved to storage</li>   <li>`done` - the video is ready to be downloaded</li>   <li>`failed` - there was an error rendering the video</li> </ul>
+    attr_accessor :status
+
+    # An error message, only displayed if an error occurred.
+    attr_accessor :error
+
+    # The output video length in seconds.
+    attr_accessor :duration
+
+    # The time taken to render the video in milliseconds.
+    attr_accessor :render_time
 
     # The URL of the final video. This will only be available if status is done.
     attr_accessor :url
 
+    # The URL of the poster image if requested. This will only be available if status is done.
+    attr_accessor :poster
+
+    # The URL of the thumbnail image if requested. This will only be available if status is done.
+    attr_accessor :thumbnail
+
     attr_accessor :data
 
-    # The time the render task was initially queued
+    # The time the render task was initially queued.
     attr_accessor :created
 
-    # The time the render status was last updated
+    # The time the render status was last updated.
     attr_accessor :updated
 
     class EnumAttributeValidator
@@ -59,10 +77,16 @@ module Shotstack
     # Attribute mapping from ruby-style variable name to JSON key.
     def self.attribute_map
       {
-        :'status' => :'status',
         :'id' => :'id',
         :'owner' => :'owner',
+        :'plan' => :'plan',
+        :'status' => :'status',
+        :'error' => :'error',
+        :'duration' => :'duration',
+        :'render_time' => :'renderTime',
         :'url' => :'url',
+        :'poster' => :'poster',
+        :'thumbnail' => :'thumbnail',
         :'data' => :'data',
         :'created' => :'created',
         :'updated' => :'updated'
@@ -72,10 +96,16 @@ module Shotstack
     # Attribute type mapping.
     def self.openapi_types
       {
-        :'status' => :'String',
         :'id' => :'String',
         :'owner' => :'String',
+        :'plan' => :'String',
+        :'status' => :'String',
+        :'error' => :'String',
+        :'duration' => :'Float',
+        :'render_time' => :'Float',
         :'url' => :'String',
+        :'poster' => :'String',
+        :'thumbnail' => :'String',
         :'data' => :'Edit',
         :'created' => :'String',
         :'updated' => :'String'
@@ -103,10 +133,6 @@ module Shotstack
         h[k.to_sym] = v
       }
 
-      if attributes.key?(:'status')
-        self.status = attributes[:'status']
-      end
-
       if attributes.key?(:'id')
         self.id = attributes[:'id']
       end
@@ -115,8 +141,36 @@ module Shotstack
         self.owner = attributes[:'owner']
       end
 
+      if attributes.key?(:'plan')
+        self.plan = attributes[:'plan']
+      end
+
+      if attributes.key?(:'status')
+        self.status = attributes[:'status']
+      end
+
+      if attributes.key?(:'error')
+        self.error = attributes[:'error']
+      end
+
+      if attributes.key?(:'duration')
+        self.duration = attributes[:'duration']
+      end
+
+      if attributes.key?(:'render_time')
+        self.render_time = attributes[:'render_time']
+      end
+
       if attributes.key?(:'url')
         self.url = attributes[:'url']
+      end
+
+      if attributes.key?(:'poster')
+        self.poster = attributes[:'poster']
+      end
+
+      if attributes.key?(:'thumbnail')
+        self.thumbnail = attributes[:'thumbnail']
       end
 
       if attributes.key?(:'data')
@@ -136,16 +190,16 @@ module Shotstack
     # @return Array for valid properties with the reasons
     def list_invalid_properties
       invalid_properties = Array.new
-      if @status.nil?
-        invalid_properties.push('invalid value for "status", status cannot be nil.')
-      end
-
       if @id.nil?
         invalid_properties.push('invalid value for "id", id cannot be nil.')
       end
 
       if @owner.nil?
         invalid_properties.push('invalid value for "owner", owner cannot be nil.')
+      end
+
+      if @status.nil?
+        invalid_properties.push('invalid value for "status", status cannot be nil.')
       end
 
       if @data.nil?
@@ -166,11 +220,11 @@ module Shotstack
     # Check to see if the all the properties in the model are valid
     # @return true if the model is valid
     def valid?
+      return false if @id.nil?
+      return false if @owner.nil?
       return false if @status.nil?
       status_validator = EnumAttributeValidator.new('String', ["queued", "fetching", "rendering", "saving", "done", "failed"])
       return false unless status_validator.valid?(@status)
-      return false if @id.nil?
-      return false if @owner.nil?
       return false if @data.nil?
       return false if @created.nil?
       return false if @updated.nil?
@@ -192,10 +246,16 @@ module Shotstack
     def ==(o)
       return true if self.equal?(o)
       self.class == o.class &&
-          status == o.status &&
           id == o.id &&
           owner == o.owner &&
+          plan == o.plan &&
+          status == o.status &&
+          error == o.error &&
+          duration == o.duration &&
+          render_time == o.render_time &&
           url == o.url &&
+          poster == o.poster &&
+          thumbnail == o.thumbnail &&
           data == o.data &&
           created == o.created &&
           updated == o.updated
@@ -210,7 +270,7 @@ module Shotstack
     # Calculates hash code according to all attributes.
     # @return [Integer] Hash code
     def hash
-      [status, id, owner, url, data, created, updated].hash
+      [id, owner, plan, status, error, duration, render_time, url, poster, thumbnail, data, created, updated].hash
     end
 
     # Builds the object from hash
