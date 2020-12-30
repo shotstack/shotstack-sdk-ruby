@@ -128,7 +128,7 @@ module Shotstack
       if attributes.key?(:'fps')
         self.fps = attributes[:'fps']
       else
-        self.fps = FPS::N25
+        self.fps = 25
       end
 
       if attributes.key?(:'scale_to')
