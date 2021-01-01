@@ -190,9 +190,9 @@ module Shotstack
     # Returns base URL for specified operation based on server settings
     def base_url(operation = nil)
       index = server_operation_index.fetch(operation, server_index)
-      return "#{scheme}://#{[host, base_path].join('/').gsub(/\/+/, '/')}".sub(/\/+\z/, '') if index == nil
+      return "#{scheme}://#{[host, base_path].join('/').gsub(/\/+/, '/')}".sub(/\/+\z/, '') # if index == nil
 
-      server_url(index, server_operation_variables.fetch(operation, server_variables), operation_server_settings[operation])
+      #server_url(index, server_operation_variables.fetch(operation, server_variables), operation_server_settings[operation])
     end
 
     # Gets API key (with prefix if set).
