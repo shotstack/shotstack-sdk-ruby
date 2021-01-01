@@ -14,26 +14,27 @@ require 'date'
 require 'time'
 
 module Shotstack
-  # A timeline represents the contents of a video edit over time, in seconds. A timeline consists of layers called tracks. Tracks are composed of titles, images or video segments referred to as clips which are placed along the track at specific starting point and lasting for a specific amount of time.
-  class Timeline
-    attr_accessor :soundtrack
+  # Crop the sides of an asset by a relative amount. The size of the crop is specified using a scale between 0 and 1, relative to the screen width - i.e a left crop of 0.5 will crop half of the asset from the left, a top crop  of 0.25 will crop the top by quarter of the asset.
+  class Crop
+    # Crop from the top of the asset
+    attr_accessor :top
 
-    # A hexadecimal value for the timeline background colour. Defaults to #000000 (black).
-    attr_accessor :background
+    # Crop from the bottom of the asset
+    attr_accessor :bottom
 
-    # An array of custom fonts to be downloaded for use by the HTML assets.
-    attr_accessor :fonts
+    # Crop from the left of the asset
+    attr_accessor :left
 
-    # A timeline consists of an array of tracks, each track containing clips. Tracks are layered on top of each other in the same order they are added to the array with the top most track layered over the top of those below it. Ensure that a track containing titles is the top most track so that it is displayed above videos and images.
-    attr_accessor :tracks
+    # Crop from the left of the asset
+    attr_accessor :right
 
     # Attribute mapping from ruby-style variable name to JSON key.
     def self.attribute_map
       {
-        :'soundtrack' => :'soundtrack',
-        :'background' => :'background',
-        :'fonts' => :'fonts',
-        :'tracks' => :'tracks'
+        :'top' => :'top',
+        :'bottom' => :'bottom',
+        :'left' => :'left',
+        :'right' => :'right'
       }
     end
 
@@ -45,10 +46,10 @@ module Shotstack
     # Attribute type mapping.
     def self.openapi_types
       {
-        :'soundtrack' => :'Soundtrack',
-        :'background' => :'String',
-        :'fonts' => :'Array<Font>',
-        :'tracks' => :'Array<Track>'
+        :'top' => :'Float',
+        :'bottom' => :'Float',
+        :'left' => :'Float',
+        :'right' => :'Float'
       }
     end
 
@@ -62,37 +63,31 @@ module Shotstack
     # @param [Hash] attributes Model attributes in the form of hash
     def initialize(attributes = {})
       if (!attributes.is_a?(Hash))
-        fail ArgumentError, "The input argument (attributes) must be a hash in `Shotstack::Timeline` initialize method"
+        fail ArgumentError, "The input argument (attributes) must be a hash in `Shotstack::Crop` initialize method"
       end
 
       # check to see if the attribute exists and convert string to symbol for hash key
       attributes = attributes.each_with_object({}) { |(k, v), h|
         if (!self.class.attribute_map.key?(k.to_sym))
-          fail ArgumentError, "`#{k}` is not a valid attribute in `Shotstack::Timeline`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
+          fail ArgumentError, "`#{k}` is not a valid attribute in `Shotstack::Crop`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
         end
         h[k.to_sym] = v
       }
 
-      if attributes.key?(:'soundtrack')
-        self.soundtrack = attributes[:'soundtrack']
+      if attributes.key?(:'top')
+        self.top = attributes[:'top']
       end
 
-      if attributes.key?(:'background')
-        self.background = attributes[:'background']
-      else
-        self.background = '#000000'
+      if attributes.key?(:'bottom')
+        self.bottom = attributes[:'bottom']
       end
 
-      if attributes.key?(:'fonts')
-        if (value = attributes[:'fonts']).is_a?(Array)
-          self.fonts = value
-        end
+      if attributes.key?(:'left')
+        self.left = attributes[:'left']
       end
 
-      if attributes.key?(:'tracks')
-        if (value = attributes[:'tracks']).is_a?(Array)
-          self.tracks = value
-        end
+      if attributes.key?(:'right')
+        self.right = attributes[:'right']
       end
     end
 
@@ -100,8 +95,36 @@ module Shotstack
     # @return Array for valid properties with the reasons
     def list_invalid_properties
       invalid_properties = Array.new
-      if @tracks.nil?
-        invalid_properties.push('invalid value for "tracks", tracks cannot be nil.')
+      if !@top.nil? && @top > 1
+        invalid_properties.push('invalid value for "top", must be smaller than or equal to 1.')
+      end
+
+      if !@top.nil? && @top < 0
+        invalid_properties.push('invalid value for "top", must be greater than or equal to 0.')
+      end
+
+      if !@bottom.nil? && @bottom > 1
+        invalid_properties.push('invalid value for "bottom", must be smaller than or equal to 1.')
+      end
+
+      if !@bottom.nil? && @bottom < 0
+        invalid_properties.push('invalid value for "bottom", must be greater than or equal to 0.')
+      end
+
+      if !@left.nil? && @left > 1
+        invalid_properties.push('invalid value for "left", must be smaller than or equal to 1.')
+      end
+
+      if !@left.nil? && @left < 0
+        invalid_properties.push('invalid value for "left", must be greater than or equal to 0.')
+      end
+
+      if !@right.nil? && @right > 1
+        invalid_properties.push('invalid value for "right", must be smaller than or equal to 1.')
+      end
+
+      if !@right.nil? && @right < 0
+        invalid_properties.push('invalid value for "right", must be greater than or equal to 0.')
       end
 
       invalid_properties
@@ -110,8 +133,71 @@ module Shotstack
     # Check to see if the all the properties in the model are valid
     # @return true if the model is valid
     def valid?
-      return false if @tracks.nil?
+      return false if !@top.nil? && @top > 1
+      return false if !@top.nil? && @top < 0
+      return false if !@bottom.nil? && @bottom > 1
+      return false if !@bottom.nil? && @bottom < 0
+      return false if !@left.nil? && @left > 1
+      return false if !@left.nil? && @left < 0
+      return false if !@right.nil? && @right > 1
+      return false if !@right.nil? && @right < 0
       true
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] top Value to be assigned
+    def top=(top)
+      if !top.nil? && top > 1
+        fail ArgumentError, 'invalid value for "top", must be smaller than or equal to 1.'
+      end
+
+      if !top.nil? && top < 0
+        fail ArgumentError, 'invalid value for "top", must be greater than or equal to 0.'
+      end
+
+      @top = top
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] bottom Value to be assigned
+    def bottom=(bottom)
+      if !bottom.nil? && bottom > 1
+        fail ArgumentError, 'invalid value for "bottom", must be smaller than or equal to 1.'
+      end
+
+      if !bottom.nil? && bottom < 0
+        fail ArgumentError, 'invalid value for "bottom", must be greater than or equal to 0.'
+      end
+
+      @bottom = bottom
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] left Value to be assigned
+    def left=(left)
+      if !left.nil? && left > 1
+        fail ArgumentError, 'invalid value for "left", must be smaller than or equal to 1.'
+      end
+
+      if !left.nil? && left < 0
+        fail ArgumentError, 'invalid value for "left", must be greater than or equal to 0.'
+      end
+
+      @left = left
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] right Value to be assigned
+    def right=(right)
+      if !right.nil? && right > 1
+        fail ArgumentError, 'invalid value for "right", must be smaller than or equal to 1.'
+      end
+
+      if !right.nil? && right < 0
+        fail ArgumentError, 'invalid value for "right", must be greater than or equal to 0.'
+      end
+
+      @right = right
     end
 
     # Checks equality by comparing each attribute.
@@ -119,10 +205,10 @@ module Shotstack
     def ==(o)
       return true if self.equal?(o)
       self.class == o.class &&
-          soundtrack == o.soundtrack &&
-          background == o.background &&
-          fonts == o.fonts &&
-          tracks == o.tracks
+          top == o.top &&
+          bottom == o.bottom &&
+          left == o.left &&
+          right == o.right
     end
 
     # @see the `==` method
@@ -134,7 +220,7 @@ module Shotstack
     # Calculates hash code according to all attributes.
     # @return [Integer] Hash code
     def hash
-      [soundtrack, background, fonts, tracks].hash
+      [top, bottom, left, right].hash
     end
 
     # Builds the object from hash
