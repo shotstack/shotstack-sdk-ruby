@@ -1,7 +1,7 @@
 =begin
 #Shotstack
 
-#The Shotstack API is a video editing service that allows for the automated creation of videos using JSON. You can configure an edit and POST it to the Shotstack API which will render your video and provide a file location when complete. For more details check https://shotstack.io
+#The Shotstack API is a video editing service that allows for the automated creation of videos using JSON. You can configure an edit and POST it to the Shotstack API which will render your video and provide a file location when complete. For more details visit [shotstack.io](https://shotstack.io) or checkout our [getting started](https://shotstack.gitbook.io/docs/guides/getting-started) documentation.
 
 The version of the OpenAPI document: v1
 
@@ -20,15 +20,41 @@ module Shotstack
 
     attr_accessor :output
 
-    # An optional webhook callback URL used to receive status notifications when a render completes or fails.
+    # An optional webhook callback URL used to receive status notifications when a render completes or fails. See [webhooks](https://shotstack.gitbook.io/docs/guides/architecting-an-application/webhooks) for  more details.
     attr_accessor :callback
+
+    # The disk type to use for storing footage and assets for each render. See [disk types](https://shotstack.gitbook.io/docs/guides/architecting-an-application/disk-types) for more details. <ul>   <li>`local` - optimised for high speed rendering with up to 512MB storage</li>   <li>`mount` - optimised for larger file sizes and longer videos with 5GB for source footage and 512MB for output render</li> </ul>
+    attr_accessor :disk
+
+    class EnumAttributeValidator
+      attr_reader :datatype
+      attr_reader :allowable_values
+
+      def initialize(datatype, allowable_values)
+        @allowable_values = allowable_values.map do |value|
+          case datatype.to_s
+          when /Integer/i
+            value.to_i
+          when /Float/i
+            value.to_f
+          else
+            value
+          end
+        end
+      end
+
+      def valid?(value)
+        !value || allowable_values.include?(value)
+      end
+    end
 
     # Attribute mapping from ruby-style variable name to JSON key.
     def self.attribute_map
       {
         :'timeline' => :'timeline',
         :'output' => :'output',
-        :'callback' => :'callback'
+        :'callback' => :'callback',
+        :'disk' => :'disk'
       }
     end
 
@@ -42,7 +68,8 @@ module Shotstack
       {
         :'timeline' => :'Timeline',
         :'output' => :'Output',
-        :'callback' => :'String'
+        :'callback' => :'String',
+        :'disk' => :'String'
       }
     end
 
@@ -78,6 +105,12 @@ module Shotstack
       if attributes.key?(:'callback')
         self.callback = attributes[:'callback']
       end
+
+      if attributes.key?(:'disk')
+        self.disk = attributes[:'disk']
+      else
+        self.disk = 'local'
+      end
     end
 
     # Show invalid properties with the reasons. Usually used together with valid?
@@ -100,7 +133,19 @@ module Shotstack
     def valid?
       return false if @timeline.nil?
       return false if @output.nil?
+      disk_validator = EnumAttributeValidator.new('String', ["local", "mount"])
+      return false unless disk_validator.valid?(@disk)
       true
+    end
+
+    # Custom attribute writer method checking allowed values (enum).
+    # @param [Object] disk Object to be assigned
+    def disk=(disk)
+      validator = EnumAttributeValidator.new('String', ["local", "mount"])
+      unless validator.valid?(disk)
+        fail ArgumentError, "invalid value for \"disk\", must be one of #{validator.allowable_values}."
+      end
+      @disk = disk
     end
 
     # Checks equality by comparing each attribute.
@@ -110,7 +155,8 @@ module Shotstack
       self.class == o.class &&
           timeline == o.timeline &&
           output == o.output &&
-          callback == o.callback
+          callback == o.callback &&
+          disk == o.disk
     end
 
     # @see the `==` method
@@ -122,7 +168,7 @@ module Shotstack
     # Calculates hash code according to all attributes.
     # @return [Integer] Hash code
     def hash
-      [timeline, output, callback].hash
+      [timeline, output, callback, disk].hash
     end
 
     # Builds the object from hash

@@ -1,7 +1,7 @@
 =begin
 #Shotstack
 
-#The Shotstack API is a video editing service that allows for the automated creation of videos using JSON. You can configure an edit and POST it to the Shotstack API which will render your video and provide a file location when complete. For more details check https://shotstack.io
+#The Shotstack API is a video editing service that allows for the automated creation of videos using JSON. You can configure an edit and POST it to the Shotstack API which will render your video and provide a file location when complete. For more details visit [shotstack.io](https://shotstack.io) or checkout our [getting started](https://shotstack.gitbook.io/docs/guides/getting-started) documentation.
 
 The version of the OpenAPI document: v1
 
@@ -27,13 +27,17 @@ module Shotstack
     # A timeline consists of an array of tracks, each track containing clips. Tracks are layered on top of each other in the same order they are added to the array with the top most track layered over the top of those below it. Ensure that a track containing titles is the top most track so that it is displayed above videos and images.
     attr_accessor :tracks
 
+    # Disable the caching of ingested source footage and assets. See  [caching](https://shotstack.gitbook.io/docs/guides/architecting-an-application/caching) for more details.
+    attr_accessor :cache
+
     # Attribute mapping from ruby-style variable name to JSON key.
     def self.attribute_map
       {
         :'soundtrack' => :'soundtrack',
         :'background' => :'background',
         :'fonts' => :'fonts',
-        :'tracks' => :'tracks'
+        :'tracks' => :'tracks',
+        :'cache' => :'cache'
       }
     end
 
@@ -48,7 +52,8 @@ module Shotstack
         :'soundtrack' => :'Soundtrack',
         :'background' => :'String',
         :'fonts' => :'Array<Font>',
-        :'tracks' => :'Array<Track>'
+        :'tracks' => :'Array<Track>',
+        :'cache' => :'Boolean'
       }
     end
 
@@ -94,6 +99,12 @@ module Shotstack
           self.tracks = value
         end
       end
+
+      if attributes.key?(:'cache')
+        self.cache = attributes[:'cache']
+      else
+        self.cache = true
+      end
     end
 
     # Show invalid properties with the reasons. Usually used together with valid?
@@ -122,7 +133,8 @@ module Shotstack
           soundtrack == o.soundtrack &&
           background == o.background &&
           fonts == o.fonts &&
-          tracks == o.tracks
+          tracks == o.tracks &&
+          cache == o.cache
     end
 
     # @see the `==` method
@@ -134,7 +146,7 @@ module Shotstack
     # Calculates hash code according to all attributes.
     # @return [Integer] Hash code
     def hash
-      [soundtrack, background, fonts, tracks].hash
+      [soundtrack, background, fonts, tracks, cache].hash
     end
 
     # Builds the object from hash

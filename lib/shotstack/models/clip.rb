@@ -1,7 +1,7 @@
 =begin
 #Shotstack
 
-#The Shotstack API is a video editing service that allows for the automated creation of videos using JSON. You can configure an edit and POST it to the Shotstack API which will render your video and provide a file location when complete. For more details check https://shotstack.io
+#The Shotstack API is a video editing service that allows for the automated creation of videos using JSON. You can configure an edit and POST it to the Shotstack API which will render your video and provide a file location when complete. For more details visit [shotstack.io](https://shotstack.io) or checkout our [getting started](https://shotstack.gitbook.io/docs/guides/getting-started) documentation.
 
 The version of the OpenAPI document: v1
 
@@ -211,7 +211,7 @@ module Shotstack
       return false unless position_validator.valid?(@position)
       effect_validator = EnumAttributeValidator.new('String', ["zoomIn", "zoomOut", "slideLeft", "slideRight", "slideUp", "slideDown"])
       return false unless effect_validator.valid?(@effect)
-      filter_validator = EnumAttributeValidator.new('String', ["blur", "boost", "contrast", "darken", "greyscale", "lighten", "muted", "negative"])
+      filter_validator = EnumAttributeValidator.new('String', ["boost", "contrast", "darken", "greyscale", "lighten", "muted", "negative"])
       return false unless filter_validator.valid?(@filter)
       true
     end
@@ -249,7 +249,7 @@ module Shotstack
     # Custom attribute writer method checking allowed values (enum).
     # @param [Object] filter Object to be assigned
     def filter=(filter)
-      validator = EnumAttributeValidator.new('String', ["blur", "boost", "contrast", "darken", "greyscale", "lighten", "muted", "negative"])
+      validator = EnumAttributeValidator.new('String', ["boost", "contrast", "darken", "greyscale", "lighten", "muted", "negative"])
       unless validator.valid?(filter)
         fail ArgumentError, "invalid value for \"filter\", must be one of #{validator.allowable_values}."
       end
