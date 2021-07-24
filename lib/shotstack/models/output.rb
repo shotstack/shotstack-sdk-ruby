@@ -167,7 +167,7 @@ module Shotstack
     # @return true if the model is valid
     def valid?
       return false if @format.nil?
-      format_validator = EnumAttributeValidator.new('String', ["mp4", "gif", "mp3"])
+      format_validator = EnumAttributeValidator.new('String', ["mp4", "gif", "mp3", "jpg"])
       return false unless format_validator.valid?(@format)
       return false if @resolution.nil?
       resolution_validator = EnumAttributeValidator.new('String', ["preview", "mobile", "sd", "hd", "1080"])
