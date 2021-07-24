@@ -11,5 +11,5 @@ OpenAPI Generator version: 5.0.0
 =end
 
 module Shotstack
-  VERSION = '0.1.6'
+  VERSION = '0.1.7'
 end

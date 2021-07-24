@@ -167,7 +167,7 @@ module Shotstack
     # @return true if the model is valid
     def valid?
       return false if @format.nil?
-      format_validator = EnumAttributeValidator.new('String', ["mp4", "gif", "mp3", "jpg"])
+      format_validator = EnumAttributeValidator.new('String', ["mp4", "gif", "mp3", "jpg", "png", "bmp"])
       return false unless format_validator.valid?(@format)
       return false if @resolution.nil?
       resolution_validator = EnumAttributeValidator.new('String', ["preview", "mobile", "sd", "hd", "1080"])
@@ -184,7 +184,7 @@ module Shotstack
     # Custom attribute writer method checking allowed values (enum).
     # @param [Object] format Object to be assigned
     def format=(format)
-      validator = EnumAttributeValidator.new('String', ["mp4", "gif", "mp3"])
+      validator = EnumAttributeValidator.new('String', ["mp4", "gif", "mp3", "jpg", "png", "bmp"])
       unless validator.valid?(format)
         fail ArgumentError, "invalid value for \"format\", must be one of #{validator.allowable_values}."
       end
