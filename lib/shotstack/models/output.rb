@@ -1,7 +1,7 @@
 =begin
 #Shotstack
 
-#The Shotstack API is a video editing service that allows for the automated creation of videos using JSON. You can configure an edit and POST it to the Shotstack API which will render your video and provide a file location when complete. For more details visit [shotstack.io](https://shotstack.io) or checkout our [getting started](https://shotstack.gitbook.io/docs/guides/getting-started) documentation.
+#Shotstack is a video, image and audio editing service that allows for the automated generation of videos, images and audio using JSON and a RESTful API.  You arrange and configure an edit and POST it to the API which will render your media and provide a file  location when complete.  For more details visit [shotstack.io](https://shotstack.io) or checkout our [getting started](https://shotstack.gitbook.io/docs/guides/getting-started) documentation. There are two main API's, one for editing and generating assets (Edit API) and one for managing hosted assets (Serve API).  The Edit API base URL is: <b>https://api.shotstack.io/{version}</b>  The Serve API base URL is: <b>https://api.shotstack.io/serve/{version}</b>
 
 The version of the OpenAPI document: v1
 
@@ -16,26 +16,34 @@ require 'time'
 module Shotstack
   # The output format, render range and type of media to generate.
   class Output
-    # The output format and type of media file to generate. <ul>   <li>`mp4` - mp4 video file</li>   <li>`gif` - animated gif</li>   <li>`mp3` - mp3 audio file (no video)</li> </ul>
+    # The output format and type of media file to generate. <ul>   <li>`mp4` - mp4 video file</li>   <li>`gif` - animated gif</li>   <li>`jpg` - jpg image file</li>   <li>`png` - png image file</li>   <li>`bmp` - bmp image file</li>   <li>`mp3` - mp3 audio file (audio only)</li> </ul>
     attr_accessor :format
 
-    # The output resolution of the video. <ul>   <li>`preview` - 512px x 288px @ 15fps</li>   <li>`mobile` - 640px x 360px @ 25fps</li>   <li>`sd` - 1024px x 576px @ 25fps</li>   <li>`hd` - 1280px x 720px @ 25fps</li>   <li>`1080` - 1920px x 1080px @ 25fps</li> </ul>
+    # The output resolution of the video or image. <ul>   <li>`preview` - 512px x 288px @ 15fps</li>   <li>`mobile` - 640px x 360px @ 25fps</li>   <li>`sd` - 1024px x 576px @ 25fps</li>   <li>`hd` - 1280px x 720px @ 25fps</li>   <li>`1080` - 1920px x 1080px @ 25fps</li> </ul>
     attr_accessor :resolution
 
-    # The aspect ratio (shape) of the video. Useful for social media video. Options are: <ul>   <li>`16:9` - regular landscape/horizontal aspect ratio (default)</li>   <li>`9:16` - vertical/portrait aspect ratio</li>   <li>`1:1` - square aspect ratio</li>   <li>`4:5` - short vertical/portrait aspect ratio</li> </ul>
+    # The aspect ratio (shape) of the video or image. Useful for social media output formats. Options are: <ul>   <li>`16:9` - regular landscape/horizontal aspect ratio (default)</li>   <li>`9:16` - vertical/portrait aspect ratio</li>   <li>`1:1` - square aspect ratio</li>   <li>`4:5` - short vertical/portrait aspect ratio</li>   <li>`4:3` - legacy TV aspect ratio</li> </ul>
     attr_accessor :aspect_ratio
+
+    attr_accessor :size
 
     # Override the default frames per second. Useful for when the source footage is recorded at 30fps, i.e. on  mobile devices. Lower frame rates can be used to add cinematic quality (24fps) or to create smaller file size/faster render times or animated gifs (12 or 15fps). Default is 25fps. <ul>   <li>`12` - 12fps</li>   <li>`15` - 15fps</li>   <li>`24` - 24fps</li>   <li>`25` - 25fps</li>   <li>`30` - 30fps</li> </ul>
     attr_accessor :fps
 
-    # Override the resolution and scale the video to render at a different size. When using scaleTo the video should be edited at the resolution dimensions, i.e. use font sizes that look best at HD, then use scaleTo to output the video at SD and the text will be scaled to the correct size. This is useful if you want to create multiple video sizes. <ul>   <li>`preview` - 512px x 288px @ 15fps</li>   <li>`mobile` - 640px x 360px @ 25fps</li>   <li>`sd` - 1024px x 576px @25fps</li>   <li>`hd` - 1280px x 720px @25fps</li>   <li>`1080` - 1920px x 1080px @25fps</li> </ul>
+    # Override the resolution and scale the video or image to render at a different size. When using scaleTo the asset should be edited at the resolution dimensions, i.e. use font sizes that look best at HD, then use scaleTo to output the file at SD and the text will be scaled to the correct size. This is useful if you want to create multiple asset sizes. <ul>   <li>`preview` - 512px x 288px @ 15fps</li>   <li>`mobile` - 640px x 360px @ 25fps</li>   <li>`sd` - 1024px x 576px @25fps</li>   <li>`hd` - 1280px x 720px @25fps</li>   <li>`1080` - 1920px x 1080px @25fps</li> </ul>
     attr_accessor :scale_to
+
+    # Adjust the output quality of the video, image or audio. Adjusting quality affects  render speed, download speeds and storage requirements due to file size. The default `medium` provides the most optimized choice for all three  factors. <ul>   <li>`low` - slightly reduced quality, smaller file size</li>   <li>`medium` - optimized quality, render speeds and file size</li>   <li>`high` - slightly increased quality, larger file size</li> </ul>
+    attr_accessor :quality
 
     attr_accessor :range
 
     attr_accessor :poster
 
     attr_accessor :thumbnail
+
+    # A destination is a location where output files can be sent to for serving or hosting. By default all rendered assets are automatically sent to the Shotstack hosting destination. [DestinationShotstack](/#tocs_shotstackdestination) is currently the only option with plans to add more in the future such as S3, YouTube, Vimeo and Mux. If you do not require hosting you can opt-out using the  `exclude` property.
+    attr_accessor :destinations
 
     class EnumAttributeValidator
       attr_reader :datatype
@@ -65,11 +73,14 @@ module Shotstack
         :'format' => :'format',
         :'resolution' => :'resolution',
         :'aspect_ratio' => :'aspectRatio',
+        :'size' => :'size',
         :'fps' => :'fps',
         :'scale_to' => :'scaleTo',
+        :'quality' => :'quality',
         :'range' => :'range',
         :'poster' => :'poster',
-        :'thumbnail' => :'thumbnail'
+        :'thumbnail' => :'thumbnail',
+        :'destinations' => :'destinations'
       }
     end
 
@@ -84,11 +95,14 @@ module Shotstack
         :'format' => :'String',
         :'resolution' => :'String',
         :'aspect_ratio' => :'String',
+        :'size' => :'Size',
         :'fps' => :'Integer',
         :'scale_to' => :'String',
+        :'quality' => :'String',
         :'range' => :'Range',
         :'poster' => :'Poster',
-        :'thumbnail' => :'Thumbnail'
+        :'thumbnail' => :'Thumbnail',
+        :'destinations' => :'Array<Destinations>'
       }
     end
 
@@ -125,6 +139,10 @@ module Shotstack
         self.aspect_ratio = attributes[:'aspect_ratio']
       end
 
+      if attributes.key?(:'size')
+        self.size = attributes[:'size']
+      end
+
       if attributes.key?(:'fps')
         self.fps = attributes[:'fps']
       else
@@ -133,6 +151,12 @@ module Shotstack
 
       if attributes.key?(:'scale_to')
         self.scale_to = attributes[:'scale_to']
+      end
+
+      if attributes.key?(:'quality')
+        self.quality = attributes[:'quality']
+      else
+        self.quality = 'medium'
       end
 
       if attributes.key?(:'range')
@@ -146,6 +170,12 @@ module Shotstack
       if attributes.key?(:'thumbnail')
         self.thumbnail = attributes[:'thumbnail']
       end
+
+      if attributes.key?(:'destinations')
+        if (value = attributes[:'destinations']).is_a?(Array)
+          self.destinations = value
+        end
+      end
     end
 
     # Show invalid properties with the reasons. Usually used together with valid?
@@ -154,10 +184,6 @@ module Shotstack
       invalid_properties = Array.new
       if @format.nil?
         invalid_properties.push('invalid value for "format", format cannot be nil.')
-      end
-
-      if @resolution.nil?
-        invalid_properties.push('invalid value for "resolution", resolution cannot be nil.')
       end
 
       invalid_properties
@@ -169,15 +195,16 @@ module Shotstack
       return false if @format.nil?
       format_validator = EnumAttributeValidator.new('String', ["mp4", "gif", "mp3", "jpg", "png", "bmp"])
       return false unless format_validator.valid?(@format)
-      return false if @resolution.nil?
       resolution_validator = EnumAttributeValidator.new('String', ["preview", "mobile", "sd", "hd", "1080"])
       return false unless resolution_validator.valid?(@resolution)
-      aspect_ratio_validator = EnumAttributeValidator.new('String', ["16:9", "9:16", "1:1", "4:5"])
+      aspect_ratio_validator = EnumAttributeValidator.new('String', ["16:9", "9:16", "1:1", "4:5", "4:3"])
       return false unless aspect_ratio_validator.valid?(@aspect_ratio)
       fps_validator = EnumAttributeValidator.new('Integer', [12, 15, 24, 25, 30])
       return false unless fps_validator.valid?(@fps)
       scale_to_validator = EnumAttributeValidator.new('String', ["preview", "mobile", "sd", "hd", "1080"])
       return false unless scale_to_validator.valid?(@scale_to)
+      quality_validator = EnumAttributeValidator.new('String', ["low", "medium", "high"])
+      return false unless quality_validator.valid?(@quality)
       true
     end
 
@@ -204,7 +231,7 @@ module Shotstack
     # Custom attribute writer method checking allowed values (enum).
     # @param [Object] aspect_ratio Object to be assigned
     def aspect_ratio=(aspect_ratio)
-      validator = EnumAttributeValidator.new('String', ["16:9", "9:16", "1:1", "4:5"])
+      validator = EnumAttributeValidator.new('String', ["16:9", "9:16", "1:1", "4:5", "4:3"])
       unless validator.valid?(aspect_ratio)
         fail ArgumentError, "invalid value for \"aspect_ratio\", must be one of #{validator.allowable_values}."
       end
@@ -231,6 +258,16 @@ module Shotstack
       @scale_to = scale_to
     end
 
+    # Custom attribute writer method checking allowed values (enum).
+    # @param [Object] quality Object to be assigned
+    def quality=(quality)
+      validator = EnumAttributeValidator.new('String', ["low", "medium", "high"])
+      unless validator.valid?(quality)
+        fail ArgumentError, "invalid value for \"quality\", must be one of #{validator.allowable_values}."
+      end
+      @quality = quality
+    end
+
     # Checks equality by comparing each attribute.
     # @param [Object] Object to be compared
     def ==(o)
@@ -239,11 +276,14 @@ module Shotstack
           format == o.format &&
           resolution == o.resolution &&
           aspect_ratio == o.aspect_ratio &&
+          size == o.size &&
           fps == o.fps &&
           scale_to == o.scale_to &&
+          quality == o.quality &&
           range == o.range &&
           poster == o.poster &&
-          thumbnail == o.thumbnail
+          thumbnail == o.thumbnail &&
+          destinations == o.destinations
     end
 
     # @see the `==` method
@@ -255,7 +295,7 @@ module Shotstack
     # Calculates hash code according to all attributes.
     # @return [Integer] Hash code
     def hash
-      [format, resolution, aspect_ratio, fps, scale_to, range, poster, thumbnail].hash
+      [format, resolution, aspect_ratio, size, fps, scale_to, quality, range, poster, thumbnail, destinations].hash
     end
 
     # Builds the object from hash

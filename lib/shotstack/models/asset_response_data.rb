@@ -14,19 +14,18 @@ require 'date'
 require 'time'
 
 module Shotstack
-  # Offsets the position of an asset horizontally or vertically by a relative distance.
-  class Offset
-    # Offset an asset on the horizontal axis (left or right), range varies from -1 to 1. Positive numbers move the asset right, negative left. For all assets except titles the distance moved is relative to the width  of the viewport - i.e. an X offset of 0.5 will move the asset half the  screen width to the right.
-    attr_accessor :x
+  # The type of resource (an asset) and attributes of the asset.
+  class AssetResponseData
+    # The type of resource, in this case it is an assets.
+    attr_accessor :type
 
-    # Offset an asset on the vertical axis (up or down), range varies from -1 to 1. Positive numbers move the asset up, negative down. For all assets except titles the distance moved is relative to the height  of the viewport - i.e. an Y offset of 0.5 will move the asset up half the  screen height.
-    attr_accessor :y
+    attr_accessor :attributes
 
     # Attribute mapping from ruby-style variable name to JSON key.
     def self.attribute_map
       {
-        :'x' => :'x',
-        :'y' => :'y'
+        :'type' => :'type',
+        :'attributes' => :'attributes'
       }
     end
 
@@ -38,8 +37,8 @@ module Shotstack
     # Attribute type mapping.
     def self.openapi_types
       {
-        :'x' => :'Float',
-        :'y' => :'Float'
+        :'type' => :'String',
+        :'attributes' => :'AssetResponseAttributes'
       }
     end
 
@@ -53,27 +52,23 @@ module Shotstack
     # @param [Hash] attributes Model attributes in the form of hash
     def initialize(attributes = {})
       if (!attributes.is_a?(Hash))
-        fail ArgumentError, "The input argument (attributes) must be a hash in `Shotstack::Offset` initialize method"
+        fail ArgumentError, "The input argument (attributes) must be a hash in `Shotstack::AssetResponseData` initialize method"
       end
 
       # check to see if the attribute exists and convert string to symbol for hash key
       attributes = attributes.each_with_object({}) { |(k, v), h|
         if (!self.class.attribute_map.key?(k.to_sym))
-          fail ArgumentError, "`#{k}` is not a valid attribute in `Shotstack::Offset`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
+          fail ArgumentError, "`#{k}` is not a valid attribute in `Shotstack::AssetResponseData`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
         end
         h[k.to_sym] = v
       }
 
-      if attributes.key?(:'x')
-        self.x = attributes[:'x']
-      else
-        self.x = 0
+      if attributes.key?(:'type')
+        self.type = attributes[:'type']
       end
 
-      if attributes.key?(:'y')
-        self.y = attributes[:'y']
-      else
-        self.y = 0
+      if attributes.key?(:'attributes')
+        self.attributes = attributes[:'attributes']
       end
     end
 
@@ -81,61 +76,13 @@ module Shotstack
     # @return Array for valid properties with the reasons
     def list_invalid_properties
       invalid_properties = Array.new
-      if !@x.nil? && @x > 1
-        invalid_properties.push('invalid value for "x", must be smaller than or equal to 1.')
-      end
-
-      if !@x.nil? && @x < -1
-        invalid_properties.push('invalid value for "x", must be greater than or equal to -1.')
-      end
-
-      if !@y.nil? && @y > 1
-        invalid_properties.push('invalid value for "y", must be smaller than or equal to 1.')
-      end
-
-      if !@y.nil? && @y < -1
-        invalid_properties.push('invalid value for "y", must be greater than or equal to -1.')
-      end
-
       invalid_properties
     end
 
     # Check to see if the all the properties in the model are valid
     # @return true if the model is valid
     def valid?
-      return false if !@x.nil? && @x > 1
-      return false if !@x.nil? && @x < -1
-      return false if !@y.nil? && @y > 1
-      return false if !@y.nil? && @y < -1
       true
-    end
-
-    # Custom attribute writer method with validation
-    # @param [Object] x Value to be assigned
-    def x=(x)
-      if !x.nil? && x > 1
-        fail ArgumentError, 'invalid value for "x", must be smaller than or equal to 1.'
-      end
-
-      if !x.nil? && x < -1
-        fail ArgumentError, 'invalid value for "x", must be greater than or equal to -1.'
-      end
-
-      @x = x
-    end
-
-    # Custom attribute writer method with validation
-    # @param [Object] y Value to be assigned
-    def y=(y)
-      if !y.nil? && y > 1
-        fail ArgumentError, 'invalid value for "y", must be smaller than or equal to 1.'
-      end
-
-      if !y.nil? && y < -1
-        fail ArgumentError, 'invalid value for "y", must be greater than or equal to -1.'
-      end
-
-      @y = y
     end
 
     # Checks equality by comparing each attribute.
@@ -143,8 +90,8 @@ module Shotstack
     def ==(o)
       return true if self.equal?(o)
       self.class == o.class &&
-          x == o.x &&
-          y == o.y
+          type == o.type &&
+          attributes == o.attributes
     end
 
     # @see the `==` method
@@ -156,7 +103,7 @@ module Shotstack
     # Calculates hash code according to all attributes.
     # @return [Integer] Hash code
     def hash
-      [x, y].hash
+      [type, attributes].hash
     end
 
     # Builds the object from hash
