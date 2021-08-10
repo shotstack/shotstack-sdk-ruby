@@ -1,7 +1,7 @@
 =begin
 #Shotstack
 
-#The Shotstack API is a video editing service that allows for the automated creation of videos using JSON. You can configure an edit and POST it to the Shotstack API which will render your video and provide a file location when complete. For more details visit [shotstack.io](https://shotstack.io) or checkout our [getting started](https://shotstack.gitbook.io/docs/guides/getting-started) documentation.
+#Shotstack is a video, image and audio editing service that allows for the automated generation of videos, images and audio using JSON and a RESTful API.  You arrange and configure an edit and POST it to the API which will render your media and provide a file  location when complete.  For more details visit [shotstack.io](https://shotstack.io) or checkout our [getting started](https://shotstack.gitbook.io/docs/guides/getting-started) documentation. There are two main API's, one for editing and generating assets (Edit API) and one for managing hosted assets (Serve API).  The Edit API base URL is: <b>https://api.shotstack.io/{version}</b>  The Serve API base URL is: <b>https://api.shotstack.io/serve/{version}</b>
 
 The version of the OpenAPI document: v1
 
@@ -14,6 +14,7 @@ require 'date'
 require 'time'
 
 module Shotstack
+  # The response data returned with the [RenderResponse](#tocs_renderresponse) including status and URL.
   class RenderResponseData
     # The id of the render task in UUID format.
     attr_accessor :id
@@ -24,19 +25,19 @@ module Shotstack
     # The customer subscription plan.
     attr_accessor :plan
 
-    # The status of the render task. <ul>   <li>`queued` - render is queued waiting to be rendered</li>   <li>`fetching` - assets are being fetched</li>   <li>`rendering` - the video is being rendered</li>   <li>`saving` - the final video is being saved to storage</li>   <li>`done` - the video is ready to be downloaded</li>   <li>`failed` - there was an error rendering the video</li> </ul>
+    # The status of the render task. <ul>   <li>`queued` - render is queued waiting to be rendered</li>   <li>`fetching` - assets are being fetched</li>   <li>`rendering` - the asset is being rendered</li>   <li>`saving` - the final asset is being saved to storage</li>   <li>`done` - the asset is ready to be downloaded</li>   <li>`failed` - there was an error rendering the asset</li> </ul>
     attr_accessor :status
 
     # An error message, only displayed if an error occurred.
     attr_accessor :error
 
-    # The output video length in seconds.
+    # The output video or audio length in seconds.
     attr_accessor :duration
 
-    # The time taken to render the video in milliseconds.
+    # The time taken to render the asset in milliseconds.
     attr_accessor :render_time
 
-    # The URL of the final video. This will only be available if status is done.
+    # The URL of the final asset. This will only be available if status is done. This is a temporary URL and will be deleted after 24 hours. By default all assets are copied to the Shotstack hosting and CDN destination.
     attr_accessor :url
 
     # The URL of the poster image if requested. This will only be available if status is done.

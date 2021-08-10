@@ -1,7 +1,7 @@
 =begin
 #Shotstack
 
-#The Shotstack API is a video editing service that allows for the automated creation of videos using JSON. You can configure an edit and POST it to the Shotstack API which will render your video and provide a file location when complete. For more details visit [shotstack.io](https://shotstack.io) or checkout our [getting started](https://shotstack.gitbook.io/docs/guides/getting-started) documentation.
+#Shotstack is a video, image and audio editing service that allows for the automated generation of videos, images and audio using JSON and a RESTful API.  You arrange and configure an edit and POST it to the API which will render your media and provide a file  location when complete.  For more details visit [shotstack.io](https://shotstack.io) or checkout our [getting started](https://shotstack.gitbook.io/docs/guides/getting-started) documentation. There are two main API's, one for editing and generating assets (Edit API) and one for managing hosted assets (Serve API).  The Edit API base URL is: <b>https://api.shotstack.io/{version}</b>  The Serve API base URL is: <b>https://api.shotstack.io/serve/{version}</b>
 
 The version of the OpenAPI document: v1
 
@@ -14,7 +14,7 @@ require 'date'
 require 'time'
 
 module Shotstack
-  # An edit defines the content of the video in a timeline and the output format.
+  # An edit defines the arrangement of a video on a timeline, an audio edit or an image design and the output format.
   class Edit
     attr_accessor :timeline
 
@@ -23,7 +23,7 @@ module Shotstack
     # An optional webhook callback URL used to receive status notifications when a render completes or fails. See [webhooks](https://shotstack.gitbook.io/docs/guides/architecting-an-application/webhooks) for  more details.
     attr_accessor :callback
 
-    # The disk type to use for storing footage and assets for each render. See [disk types](https://shotstack.gitbook.io/docs/guides/architecting-an-application/disk-types) for more details. <ul>   <li>`local` - optimised for high speed rendering with up to 512MB storage</li>   <li>`mount` - optimised for larger file sizes and longer videos with 5GB for source footage and 512MB for output render</li> </ul>
+    # The disk type to use for storing footage and assets for each render. See [disk types](https://shotstack.gitbook.io/docs/guides/architecting-an-application/disk-types) for more details. <ul>   <li>`local` - optimized for high speed rendering with up to 512MB storage</li>   <li>`mount` - optimized for larger file sizes and longer videos with 5GB for source footage and 512MB for output render</li> </ul>
     attr_accessor :disk
 
     class EnumAttributeValidator

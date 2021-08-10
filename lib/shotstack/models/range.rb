@@ -1,7 +1,7 @@
 =begin
 #Shotstack
 
-#The Shotstack API is a video editing service that allows for the automated creation of videos using JSON. You can configure an edit and POST it to the Shotstack API which will render your video and provide a file location when complete. For more details visit [shotstack.io](https://shotstack.io) or checkout our [getting started](https://shotstack.gitbook.io/docs/guides/getting-started) documentation.
+#Shotstack is a video, image and audio editing service that allows for the automated generation of videos, images and audio using JSON and a RESTful API.  You arrange and configure an edit and POST it to the API which will render your media and provide a file  location when complete.  For more details visit [shotstack.io](https://shotstack.io) or checkout our [getting started](https://shotstack.gitbook.io/docs/guides/getting-started) documentation. There are two main API's, one for editing and generating assets (Edit API) and one for managing hosted assets (Serve API).  The Edit API base URL is: <b>https://api.shotstack.io/{version}</b>  The Serve API base URL is: <b>https://api.shotstack.io/serve/{version}</b>
 
 The version of the OpenAPI document: v1
 
@@ -14,12 +14,12 @@ require 'date'
 require 'time'
 
 module Shotstack
-  # Specify a time range to render, i.e. to render only a portion of a video or audio file. Omit this setting to  export the entire video.
+  # Specify a time range to render, i.e. to render only a portion of a video or audio file. Omit this setting to  export the entire video. Range can also be used to render a frame at a specific time point - setting a range and output format as `jpg` will output a single frame image at the range `start` point.
   class Range
     # The point on the timeline, in seconds, to start the render from - i.e. start at second 3.
     attr_accessor :start
 
-    # The length of the portion of the video to render - i.e. render 6 seconds of the video.
+    # The length of the portion of the video or audio to render - i.e. render 6 seconds of the video.
     attr_accessor :length
 
     # Attribute mapping from ruby-style variable name to JSON key.
