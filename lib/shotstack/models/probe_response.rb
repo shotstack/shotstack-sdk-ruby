@@ -12,25 +12,25 @@ OpenAPI Generator version: 5.0.0
 
 require 'date'
 require 'time'
-require_relative 'asset'
 
 module Shotstack
-  # The ImageAsset is used to create video from images to compose an image. The src must be a publicly accessible URL to an image resource such as a jpg or png file.
-  class ImageAsset < Asset
-    # The type of asset - set to `image` for images.
-    attr_accessor :type
+  # The response received after a [probe request](#inspect-media) is submitted. The probe requests returns data from FFprobe formatted as JSON.
+  class ProbeResponse
+    # `true` if media successfully read, else `false`.
+    attr_accessor :success
 
-    # The image source URL. The URL must be publicly accessible or include credentials.
-    attr_accessor :src
+    # `Created`, `Bad Request` or an error message.
+    attr_accessor :message
 
-    attr_accessor :crop
+    # The response from FFprobe in JSON format
+    attr_accessor :response
 
     # Attribute mapping from ruby-style variable name to JSON key.
     def self.attribute_map
       {
-        :'type' => :'type',
-        :'src' => :'src',
-        :'crop' => :'crop'
+        :'success' => :'success',
+        :'message' => :'message',
+        :'response' => :'response'
       }
     end
 
@@ -42,9 +42,9 @@ module Shotstack
     # Attribute type mapping.
     def self.openapi_types
       {
-        :'type' => :'String',
-        :'src' => :'String',
-        :'crop' => :'Crop'
+        :'success' => :'Boolean',
+        :'message' => :'String',
+        :'response' => :'Object'
       }
     end
 
@@ -58,29 +58,27 @@ module Shotstack
     # @param [Hash] attributes Model attributes in the form of hash
     def initialize(attributes = {})
       if (!attributes.is_a?(Hash))
-        fail ArgumentError, "The input argument (attributes) must be a hash in `Shotstack::ImageAsset` initialize method"
+        fail ArgumentError, "The input argument (attributes) must be a hash in `Shotstack::ProbeResponse` initialize method"
       end
 
       # check to see if the attribute exists and convert string to symbol for hash key
       attributes = attributes.each_with_object({}) { |(k, v), h|
         if (!self.class.attribute_map.key?(k.to_sym))
-          fail ArgumentError, "`#{k}` is not a valid attribute in `Shotstack::ImageAsset`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
+          fail ArgumentError, "`#{k}` is not a valid attribute in `Shotstack::ProbeResponse`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
         end
         h[k.to_sym] = v
       }
 
-      if attributes.key?(:'type')
-        self.type = attributes[:'type']
-      else
-        self.type = 'image'
+      if attributes.key?(:'success')
+        self.success = attributes[:'success']
       end
 
-      if attributes.key?(:'src')
-        self.src = attributes[:'src']
+      if attributes.key?(:'message')
+        self.message = attributes[:'message']
       end
 
-      if attributes.key?(:'crop')
-        self.crop = attributes[:'crop']
+      if attributes.key?(:'response')
+        self.response = attributes[:'response']
       end
     end
 
@@ -88,12 +86,16 @@ module Shotstack
     # @return Array for valid properties with the reasons
     def list_invalid_properties
       invalid_properties = Array.new
-      if @type.nil?
-        invalid_properties.push('invalid value for "type", type cannot be nil.')
+      if @success.nil?
+        invalid_properties.push('invalid value for "success", success cannot be nil.')
       end
 
-      if @src.nil?
-        invalid_properties.push('invalid value for "src", src cannot be nil.')
+      if @message.nil?
+        invalid_properties.push('invalid value for "message", message cannot be nil.')
+      end
+
+      if @response.nil?
+        invalid_properties.push('invalid value for "response", response cannot be nil.')
       end
 
       invalid_properties
@@ -102,8 +104,9 @@ module Shotstack
     # Check to see if the all the properties in the model are valid
     # @return true if the model is valid
     def valid?
-      return false if @type.nil?
-      return false if @src.nil?
+      return false if @success.nil?
+      return false if @message.nil?
+      return false if @response.nil?
       true
     end
 
@@ -112,9 +115,9 @@ module Shotstack
     def ==(o)
       return true if self.equal?(o)
       self.class == o.class &&
-          type == o.type &&
-          src == o.src &&
-          crop == o.crop
+          success == o.success &&
+          message == o.message &&
+          response == o.response
     end
 
     # @see the `==` method
@@ -126,7 +129,7 @@ module Shotstack
     # Calculates hash code according to all attributes.
     # @return [Integer] Hash code
     def hash
-      [type, src, crop].hash
+      [success, message, response].hash
     end
 
     # Builds the object from hash

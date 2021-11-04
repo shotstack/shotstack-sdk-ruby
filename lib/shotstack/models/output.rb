@@ -36,6 +36,9 @@ module Shotstack
     # Adjust the output quality of the video, image or audio. Adjusting quality affects  render speed, download speeds and storage requirements due to file size. The default `medium` provides the most optimized choice for all three  factors. <ul>   <li>`low` - slightly reduced quality, smaller file size</li>   <li>`medium` - optimized quality, render speeds and file size</li>   <li>`high` - slightly increased quality, larger file size</li> </ul>
     attr_accessor :quality
 
+    # Loop settings for gif files. Set to `true` to loop, `false` to play only once.
+    attr_accessor :repeat
+
     attr_accessor :range
 
     attr_accessor :poster
@@ -77,6 +80,7 @@ module Shotstack
         :'fps' => :'fps',
         :'scale_to' => :'scaleTo',
         :'quality' => :'quality',
+        :'repeat' => :'repeat',
         :'range' => :'range',
         :'poster' => :'poster',
         :'thumbnail' => :'thumbnail',
@@ -99,6 +103,7 @@ module Shotstack
         :'fps' => :'Integer',
         :'scale_to' => :'String',
         :'quality' => :'String',
+        :'repeat' => :'Boolean',
         :'range' => :'Range',
         :'poster' => :'Poster',
         :'thumbnail' => :'Thumbnail',
@@ -157,6 +162,12 @@ module Shotstack
         self.quality = attributes[:'quality']
       else
         self.quality = 'medium'
+      end
+
+      if attributes.key?(:'repeat')
+        self.repeat = attributes[:'repeat']
+      else
+        self.repeat = true
       end
 
       if attributes.key?(:'range')
@@ -280,6 +291,7 @@ module Shotstack
           fps == o.fps &&
           scale_to == o.scale_to &&
           quality == o.quality &&
+          repeat == o.repeat &&
           range == o.range &&
           poster == o.poster &&
           thumbnail == o.thumbnail &&
@@ -295,7 +307,7 @@ module Shotstack
     # Calculates hash code according to all attributes.
     # @return [Integer] Hash code
     def hash
-      [format, resolution, aspect_ratio, size, fps, scale_to, quality, range, poster, thumbnail, destinations].hash
+      [format, resolution, aspect_ratio, size, fps, scale_to, quality, repeat, range, poster, thumbnail, destinations].hash
     end
 
     # Builds the object from hash

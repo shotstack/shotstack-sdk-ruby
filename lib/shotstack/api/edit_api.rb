@@ -20,9 +20,11 @@ module Shotstack
       @api_client = api_client
     end
     # Get Render Status
-    # Get the rendering status, temporary asset url and details of a render by ID.  **base URL:** https://api.shotstack.io/{version}
+    # Get the rendering status, temporary asset url and details of a render by ID.  **Base URL:** https://api.shotstack.io/{version}
     # @param id [String] The id of the timeline render task in UUID format
     # @param [Hash] opts the optional parameters
+    # @option opts [Boolean] :data Include the data parameter in the response. The data parameter includes the original timeline, output and other settings sent to the API.&lt;br&gt;&lt;br&gt;&lt;b&gt;Note:&lt;/b&gt; the default is currently &#x60;true&#x60;, this is deprecated and the default will soon be &#x60;false&#x60;. If you rely on the data being returned in the response you should explicitly set the parameter to &#x60;true&#x60;.
+    # @option opts [Boolean] :merged Used when data is set to true, it will show the [merge fields](#tocs_mergefield) merged in to the data response.
     # @return [RenderResponse]
     def get_render(id, opts = {})
       data, _status_code, _headers = get_render_with_http_info(id, opts)
@@ -30,9 +32,11 @@ module Shotstack
     end
 
     # Get Render Status
-    # Get the rendering status, temporary asset url and details of a render by ID.  **base URL:** https://api.shotstack.io/{version}
+    # Get the rendering status, temporary asset url and details of a render by ID.  **Base URL:** https://api.shotstack.io/{version}
     # @param id [String] The id of the timeline render task in UUID format
     # @param [Hash] opts the optional parameters
+    # @option opts [Boolean] :data Include the data parameter in the response. The data parameter includes the original timeline, output and other settings sent to the API.&lt;br&gt;&lt;br&gt;&lt;b&gt;Note:&lt;/b&gt; the default is currently &#x60;true&#x60;, this is deprecated and the default will soon be &#x60;false&#x60;. If you rely on the data being returned in the response you should explicitly set the parameter to &#x60;true&#x60;.
+    # @option opts [Boolean] :merged Used when data is set to true, it will show the [merge fields](#tocs_mergefield) merged in to the data response.
     # @return [Array<(RenderResponse, Integer, Hash)>] RenderResponse data, response status code and response headers
     def get_render_with_http_info(id, opts = {})
       if @api_client.config.debugging
@@ -52,6 +56,8 @@ module Shotstack
 
       # query parameters
       query_params = opts[:query_params] || {}
+      query_params[:'data'] = opts[:'data'] if !opts[:'data'].nil?
+      query_params[:'merged'] = opts[:'merged'] if !opts[:'merged'].nil?
 
       # header parameters
       header_params = opts[:header_params] || {}
@@ -88,8 +94,8 @@ module Shotstack
     end
 
     # Render Asset
-    # Queue and render the contents of a timeline as a video, image or audio file.
-    # @param edit [Edit] The video, image or audio edit specified using JSON.  **base URL:** https://api.shotstack.io/{version}
+    # Queue and render the contents of a timeline as a video, image or audio file.  **Base URL:** https://api.shotstack.io/{version}
+    # @param edit [Edit] The video, image or audio edit specified using JSON.
     # @param [Hash] opts the optional parameters
     # @return [QueuedResponse]
     def post_render(edit, opts = {})
@@ -98,8 +104,8 @@ module Shotstack
     end
 
     # Render Asset
-    # Queue and render the contents of a timeline as a video, image or audio file.
-    # @param edit [Edit] The video, image or audio edit specified using JSON.  **base URL:** https://api.shotstack.io/{version}
+    # Queue and render the contents of a timeline as a video, image or audio file.  **Base URL:** https://api.shotstack.io/{version}
+    # @param edit [Edit] The video, image or audio edit specified using JSON.
     # @param [Hash] opts the optional parameters
     # @return [Array<(QueuedResponse, Integer, Hash)>] QueuedResponse data, response status code and response headers
     def post_render_with_http_info(edit, opts = {})
@@ -148,6 +154,69 @@ module Shotstack
       data, status_code, headers = @api_client.call_api(:POST, local_var_path, new_options)
       if @api_client.config.debugging
         @api_client.config.logger.debug "API called: EditApi#post_render\nData: #{data.inspect}\nStatus code: #{status_code}\nHeaders: #{headers}"
+      end
+      return data, status_code, headers
+    end
+
+    # Inspect Media
+    # Inspects any media asset (image, video, audio) on the internet using a hosted version of [FFprobe](https://ffmpeg.org/ffprobe.html). The probe endpoint returns useful information about an asset such as width, height, duration, rotation, framerate, etc...  **Base URL:** https://api.shotstack.io/{version}
+    # @param url [String] The URL of the media to inspect, must be **URL encoded**.
+    # @param [Hash] opts the optional parameters
+    # @return [ProbeResponse]
+    def probe(url, opts = {})
+      data, _status_code, _headers = probe_with_http_info(url, opts)
+      data
+    end
+
+    # Inspect Media
+    # Inspects any media asset (image, video, audio) on the internet using a hosted version of [FFprobe](https://ffmpeg.org/ffprobe.html). The probe endpoint returns useful information about an asset such as width, height, duration, rotation, framerate, etc...  **Base URL:** https://api.shotstack.io/{version}
+    # @param url [String] The URL of the media to inspect, must be **URL encoded**.
+    # @param [Hash] opts the optional parameters
+    # @return [Array<(ProbeResponse, Integer, Hash)>] ProbeResponse data, response status code and response headers
+    def probe_with_http_info(url, opts = {})
+      if @api_client.config.debugging
+        @api_client.config.logger.debug 'Calling API: EditApi.probe ...'
+      end
+      # verify the required parameter 'url' is set
+      if @api_client.config.client_side_validation && url.nil?
+        fail ArgumentError, "Missing the required parameter 'url' when calling EditApi.probe"
+      end
+      # resource path
+      local_var_path = '/probe/{url}'.sub('{' + 'url' + '}', CGI.escape(url.to_s))
+
+      # query parameters
+      query_params = opts[:query_params] || {}
+
+      # header parameters
+      header_params = opts[:header_params] || {}
+      # HTTP header 'Accept' (if needed)
+      header_params['Accept'] = @api_client.select_header_accept(['application/json'])
+
+      # form parameters
+      form_params = opts[:form_params] || {}
+
+      # http body (model)
+      post_body = opts[:debug_body]
+
+      # return_type
+      return_type = opts[:debug_return_type] || 'ProbeResponse'
+
+      # auth_names
+      auth_names = opts[:debug_auth_names] || ['DeveloperKey']
+
+      new_options = opts.merge(
+        :operation => :"EditApi.probe",
+        :header_params => header_params,
+        :query_params => query_params,
+        :form_params => form_params,
+        :body => post_body,
+        :auth_names => auth_names,
+        :return_type => return_type
+      )
+
+      data, status_code, headers = @api_client.call_api(:GET, local_var_path, new_options)
+      if @api_client.config.debugging
+        @api_client.config.logger.debug "API called: EditApi#probe\nData: #{data.inspect}\nStatus code: #{status_code}\nHeaders: #{headers}"
       end
       return data, status_code, headers
     end

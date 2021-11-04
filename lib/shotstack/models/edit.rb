@@ -20,6 +20,9 @@ module Shotstack
 
     attr_accessor :output
 
+    # An array of key/value pairs that provides an easy way to create templates with placeholders. The placeholders can be used to find and replace keys with values. For example you can search for the placeholder `{{NAME}}` and replace it with the value `Jane`. 
+    attr_accessor :merge
+
     # An optional webhook callback URL used to receive status notifications when a render completes or fails. See [webhooks](https://shotstack.gitbook.io/docs/guides/architecting-an-application/webhooks) for  more details.
     attr_accessor :callback
 
@@ -53,6 +56,7 @@ module Shotstack
       {
         :'timeline' => :'timeline',
         :'output' => :'output',
+        :'merge' => :'merge',
         :'callback' => :'callback',
         :'disk' => :'disk'
       }
@@ -68,6 +72,7 @@ module Shotstack
       {
         :'timeline' => :'Timeline',
         :'output' => :'Output',
+        :'merge' => :'Array<MergeField>',
         :'callback' => :'String',
         :'disk' => :'String'
       }
@@ -100,6 +105,12 @@ module Shotstack
 
       if attributes.key?(:'output')
         self.output = attributes[:'output']
+      end
+
+      if attributes.key?(:'merge')
+        if (value = attributes[:'merge']).is_a?(Array)
+          self.merge = value
+        end
       end
 
       if attributes.key?(:'callback')
@@ -155,6 +166,7 @@ module Shotstack
       self.class == o.class &&
           timeline == o.timeline &&
           output == o.output &&
+          merge == o.merge &&
           callback == o.callback &&
           disk == o.disk
     end
@@ -168,7 +180,7 @@ module Shotstack
     # Calculates hash code according to all attributes.
     # @return [Integer] Hash code
     def hash
-      [timeline, output, callback, disk].hash
+      [timeline, output, merge, callback, disk].hash
     end
 
     # Builds the object from hash
