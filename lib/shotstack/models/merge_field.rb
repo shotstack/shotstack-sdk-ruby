@@ -12,25 +12,21 @@ OpenAPI Generator version: 5.0.0
 
 require 'date'
 require 'time'
-require_relative 'asset'
 
 module Shotstack
-  # The ImageAsset is used to create video from images to compose an image. The src must be a publicly accessible URL to an image resource such as a jpg or png file.
-  class ImageAsset < Asset
-    # The type of asset - set to `image` for images.
-    attr_accessor :type
+  # A merge field consists of a key; `find`, and a value; `replace`. Merge fields can be used to replace placeholders within the JSON edit to create re-usable templates. Placeholders should be a string with double brace delimiters, i.e. `\"{{NAME}}\"`. A placeholder can be used for any value within the JSON edit.
+  class MergeField
+    # The string to find <u>without</u> delimiters.
+    attr_accessor :find
 
-    # The image source URL. The URL must be publicly accessible or include credentials.
-    attr_accessor :src
-
-    attr_accessor :crop
+    # The replacement value. The replacement can be any valid JSON type - string, boolean, number, etc...
+    attr_accessor :replace
 
     # Attribute mapping from ruby-style variable name to JSON key.
     def self.attribute_map
       {
-        :'type' => :'type',
-        :'src' => :'src',
-        :'crop' => :'crop'
+        :'find' => :'find',
+        :'replace' => :'replace'
       }
     end
 
@@ -42,15 +38,15 @@ module Shotstack
     # Attribute type mapping.
     def self.openapi_types
       {
-        :'type' => :'String',
-        :'src' => :'String',
-        :'crop' => :'Crop'
+        :'find' => :'String',
+        :'replace' => :'AnyType'
       }
     end
 
     # List of attributes with nullable: true
     def self.openapi_nullable
       Set.new([
+        :'replace'
       ])
     end
 
@@ -58,29 +54,23 @@ module Shotstack
     # @param [Hash] attributes Model attributes in the form of hash
     def initialize(attributes = {})
       if (!attributes.is_a?(Hash))
-        fail ArgumentError, "The input argument (attributes) must be a hash in `Shotstack::ImageAsset` initialize method"
+        fail ArgumentError, "The input argument (attributes) must be a hash in `Shotstack::MergeField` initialize method"
       end
 
       # check to see if the attribute exists and convert string to symbol for hash key
       attributes = attributes.each_with_object({}) { |(k, v), h|
         if (!self.class.attribute_map.key?(k.to_sym))
-          fail ArgumentError, "`#{k}` is not a valid attribute in `Shotstack::ImageAsset`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
+          fail ArgumentError, "`#{k}` is not a valid attribute in `Shotstack::MergeField`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
         end
         h[k.to_sym] = v
       }
 
-      if attributes.key?(:'type')
-        self.type = attributes[:'type']
-      else
-        self.type = 'image'
+      if attributes.key?(:'find')
+        self.find = attributes[:'find']
       end
 
-      if attributes.key?(:'src')
-        self.src = attributes[:'src']
-      end
-
-      if attributes.key?(:'crop')
-        self.crop = attributes[:'crop']
+      if attributes.key?(:'replace')
+        self.replace = attributes[:'replace']
       end
     end
 
@@ -88,12 +78,8 @@ module Shotstack
     # @return Array for valid properties with the reasons
     def list_invalid_properties
       invalid_properties = Array.new
-      if @type.nil?
-        invalid_properties.push('invalid value for "type", type cannot be nil.')
-      end
-
-      if @src.nil?
-        invalid_properties.push('invalid value for "src", src cannot be nil.')
+      if @find.nil?
+        invalid_properties.push('invalid value for "find", find cannot be nil.')
       end
 
       invalid_properties
@@ -102,8 +88,7 @@ module Shotstack
     # Check to see if the all the properties in the model are valid
     # @return true if the model is valid
     def valid?
-      return false if @type.nil?
-      return false if @src.nil?
+      return false if @find.nil?
       true
     end
 
@@ -112,9 +97,8 @@ module Shotstack
     def ==(o)
       return true if self.equal?(o)
       self.class == o.class &&
-          type == o.type &&
-          src == o.src &&
-          crop == o.crop
+          find == o.find &&
+          replace == o.replace
     end
 
     # @see the `==` method
@@ -126,7 +110,7 @@ module Shotstack
     # Calculates hash code according to all attributes.
     # @return [Integer] Hash code
     def hash
-      [type, src, crop].hash
+      [find, replace].hash
     end
 
     # Builds the object from hash

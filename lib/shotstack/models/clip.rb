@@ -16,7 +16,7 @@ require 'time'
 module Shotstack
   # A clip is a container for a specific type of asset, i.e. a title, image, video, audio or html. You use a Clip to define when an asset will display on the timeline, how long it will play for and transitions, filters and effects to apply to it.
   class Clip
-    # The type of asset to display for the duration of this Clip. Value must be one of <b>TitleAsset</b>, <b>ImageAsset</b>, <b>VideoAsset</b>, <b>HtmlAsset</b>, <b>AudioAsset</b> or <b>LumaAsset</b>
+    # The type of asset to display for the duration of this Clip. Value must be one of:   <ul>     <li><a href=\"#tocs_videoasset\">VideoAsset</a></li>     <li><a href=\"#tocs_imageasset\">ImageAsset</a></li>     <li><a href=\"#tocs_titleasset\">TitleAsset</a></li>     <li><a href=\"#tocs_htmlasset\">HtmlAsset</a></li>     <li><a href=\"#tocs_audioasset\">AudioAsset</a></li>     <li><a href=\"#tocs_lumaasset\">LumaAsset</a></li>   </ul>
     attr_accessor :asset
 
     # The start position of the Clip on the timeline, in seconds.
@@ -46,6 +46,8 @@ module Shotstack
 
     # Sets the opacity of the Clip where 1 is opaque and 0 is transparent.
     attr_accessor :opacity
+
+    attr_accessor :transform
 
     class EnumAttributeValidator
       attr_reader :datatype
@@ -82,7 +84,8 @@ module Shotstack
         :'transition' => :'transition',
         :'effect' => :'effect',
         :'filter' => :'filter',
-        :'opacity' => :'opacity'
+        :'opacity' => :'opacity',
+        :'transform' => :'transform'
       }
     end
 
@@ -104,7 +107,8 @@ module Shotstack
         :'transition' => :'Transition',
         :'effect' => :'String',
         :'filter' => :'String',
-        :'opacity' => :'Float'
+        :'opacity' => :'Float',
+        :'transform' => :'Transformation'
       }
     end
 
@@ -177,6 +181,10 @@ module Shotstack
         self.opacity = attributes[:'opacity']
       else
         self.opacity = 1
+      end
+
+      if attributes.key?(:'transform')
+        self.transform = attributes[:'transform']
       end
     end
 
@@ -271,7 +279,8 @@ module Shotstack
           transition == o.transition &&
           effect == o.effect &&
           filter == o.filter &&
-          opacity == o.opacity
+          opacity == o.opacity &&
+          transform == o.transform
     end
 
     # @see the `==` method
@@ -283,7 +292,7 @@ module Shotstack
     # Calculates hash code according to all attributes.
     # @return [Integer] Hash code
     def hash
-      [asset, start, length, fit, scale, position, offset, transition, effect, filter, opacity].hash
+      [asset, start, length, fit, scale, position, offset, transition, effect, filter, opacity, transform].hash
     end
 
     # Builds the object from hash

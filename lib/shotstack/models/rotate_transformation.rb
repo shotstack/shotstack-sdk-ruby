@@ -12,25 +12,17 @@ OpenAPI Generator version: 5.0.0
 
 require 'date'
 require 'time'
-require_relative 'asset'
 
 module Shotstack
-  # The ImageAsset is used to create video from images to compose an image. The src must be a publicly accessible URL to an image resource such as a jpg or png file.
-  class ImageAsset < Asset
-    # The type of asset - set to `image` for images.
-    attr_accessor :type
-
-    # The image source URL. The URL must be publicly accessible or include credentials.
-    attr_accessor :src
-
-    attr_accessor :crop
+  # Rotate a clip by the specified angle in degrees. Rotation origin is set based on the clips `position`.
+  class RotateTransformation
+    # The angle to rotate the clip. Can be 0 to 360, or 0 to -360. Using a positive number rotates the clip clockwise, negative numbers counter-clockwise.
+    attr_accessor :angle
 
     # Attribute mapping from ruby-style variable name to JSON key.
     def self.attribute_map
       {
-        :'type' => :'type',
-        :'src' => :'src',
-        :'crop' => :'crop'
+        :'angle' => :'angle'
       }
     end
 
@@ -42,9 +34,7 @@ module Shotstack
     # Attribute type mapping.
     def self.openapi_types
       {
-        :'type' => :'String',
-        :'src' => :'String',
-        :'crop' => :'Crop'
+        :'angle' => :'Integer'
       }
     end
 
@@ -58,29 +48,21 @@ module Shotstack
     # @param [Hash] attributes Model attributes in the form of hash
     def initialize(attributes = {})
       if (!attributes.is_a?(Hash))
-        fail ArgumentError, "The input argument (attributes) must be a hash in `Shotstack::ImageAsset` initialize method"
+        fail ArgumentError, "The input argument (attributes) must be a hash in `Shotstack::RotateTransformation` initialize method"
       end
 
       # check to see if the attribute exists and convert string to symbol for hash key
       attributes = attributes.each_with_object({}) { |(k, v), h|
         if (!self.class.attribute_map.key?(k.to_sym))
-          fail ArgumentError, "`#{k}` is not a valid attribute in `Shotstack::ImageAsset`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
+          fail ArgumentError, "`#{k}` is not a valid attribute in `Shotstack::RotateTransformation`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
         end
         h[k.to_sym] = v
       }
 
-      if attributes.key?(:'type')
-        self.type = attributes[:'type']
+      if attributes.key?(:'angle')
+        self.angle = attributes[:'angle']
       else
-        self.type = 'image'
-      end
-
-      if attributes.key?(:'src')
-        self.src = attributes[:'src']
-      end
-
-      if attributes.key?(:'crop')
-        self.crop = attributes[:'crop']
+        self.angle = 0
       end
     end
 
@@ -88,22 +70,12 @@ module Shotstack
     # @return Array for valid properties with the reasons
     def list_invalid_properties
       invalid_properties = Array.new
-      if @type.nil?
-        invalid_properties.push('invalid value for "type", type cannot be nil.')
-      end
-
-      if @src.nil?
-        invalid_properties.push('invalid value for "src", src cannot be nil.')
-      end
-
       invalid_properties
     end
 
     # Check to see if the all the properties in the model are valid
     # @return true if the model is valid
     def valid?
-      return false if @type.nil?
-      return false if @src.nil?
       true
     end
 
@@ -112,9 +84,7 @@ module Shotstack
     def ==(o)
       return true if self.equal?(o)
       self.class == o.class &&
-          type == o.type &&
-          src == o.src &&
-          crop == o.crop
+          angle == o.angle
     end
 
     # @see the `==` method
@@ -126,7 +96,7 @@ module Shotstack
     # Calculates hash code according to all attributes.
     # @return [Integer] Hash code
     def hash
-      [type, src, crop].hash
+      [angle].hash
     end
 
     # Builds the object from hash
