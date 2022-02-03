@@ -8,7 +8,7 @@ The platform uses an API and a JSON format for specifying how videos should be e
 
 A server based render farm takes care of rendering the videos allowing multiple videos to be created simultaneously.
 
-For examples of how to use the SDK to create videos using code checkout the PHP demo repo: https://github.com/shotstack/ruby-demos
+For examples of how to use the SDK to create videos using code checkout the Ruby demo repo: https://github.com/shotstack/ruby-demos
 
 ## Contents <!-- omit in toc -->
 - [Using the Ruby SDK](#using-the-ruby-sdk)
@@ -1110,5 +1110,5 @@ updated | string | The time the asset status was last updated. | -
 
 - [Getting Started Guide](https://shotstack.io/docs/guide/getting-started/core-concepts/)
 - [API Reference](https://shotstack.io/docs/api/)
-- [Examples](https://github.com/shotstack/node-demos)
+- [Examples](https://github.com/shotstack/ruby-demos)
 - [Shotstack Website](https://shotstack.io)
