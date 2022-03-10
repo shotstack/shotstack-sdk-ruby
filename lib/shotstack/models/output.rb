@@ -27,7 +27,7 @@ module Shotstack
 
     attr_accessor :size
 
-    # Override the default frames per second. Useful for when the source footage is recorded at 30fps, i.e. on  mobile devices. Lower frame rates can be used to add cinematic quality (24fps) or to create smaller file size/faster render times or animated gifs (12 or 15fps). Default is 25fps. <ul>   <li>`12` - 12fps</li>   <li>`15` - 15fps</li>   <li>`24` - 24fps</li>   <li>`25` - 25fps</li>   <li>`30` - 30fps</li> </ul>
+    # Override the default frames per second. Useful for when the source footage is recorded at 30fps, i.e. on  mobile devices. Lower frame rates can be used to add cinematic quality (24fps) or to create smaller file size/faster render times or animated gifs (12 or 15fps). Default is 25fps. <ul>   <li>`12` - 12fps</li>   <li>`15` - 15fps</li>   <li>`24` - 24fps</li>   <li>`23.976` - 23.976fps</li>   <li>`25` - 25fps</li>   <li>`29.97` - 29.97fps</li>   <li>`30` - 30fps</li> </ul>
     attr_accessor :fps
 
     # Override the resolution and scale the video or image to render at a different size. When using scaleTo the asset should be edited at the resolution dimensions, i.e. use font sizes that look best at HD, then use scaleTo to output the file at SD and the text will be scaled to the correct size. This is useful if you want to create multiple asset sizes. <ul>   <li>`preview` - 512px x 288px @ 15fps</li>   <li>`mobile` - 640px x 360px @ 25fps</li>   <li>`sd` - 1024px x 576px @25fps</li>   <li>`hd` - 1280px x 720px @25fps</li>   <li>`1080` - 1920px x 1080px @25fps</li> </ul>
@@ -100,7 +100,7 @@ module Shotstack
         :'resolution' => :'String',
         :'aspect_ratio' => :'String',
         :'size' => :'Size',
-        :'fps' => :'Integer',
+        :'fps' => :'Float',
         :'scale_to' => :'String',
         :'quality' => :'String',
         :'repeat' => :'Boolean',
@@ -151,7 +151,7 @@ module Shotstack
       if attributes.key?(:'fps')
         self.fps = attributes[:'fps']
       else
-        self.fps = 25
+        self.fps = FPS::N25
       end
 
       if attributes.key?(:'scale_to')
@@ -210,7 +210,7 @@ module Shotstack
       return false unless resolution_validator.valid?(@resolution)
       aspect_ratio_validator = EnumAttributeValidator.new('String', ["16:9", "9:16", "1:1", "4:5", "4:3"])
       return false unless aspect_ratio_validator.valid?(@aspect_ratio)
-      fps_validator = EnumAttributeValidator.new('Integer', [12, 15, 24, 25, 30])
+      fps_validator = EnumAttributeValidator.new('Float', [12, 15, 23.976, 24, 25, 29.97, 30])
       return false unless fps_validator.valid?(@fps)
       scale_to_validator = EnumAttributeValidator.new('String', ["preview", "mobile", "sd", "hd", "1080"])
       return false unless scale_to_validator.valid?(@scale_to)
@@ -252,7 +252,7 @@ module Shotstack
     # Custom attribute writer method checking allowed values (enum).
     # @param [Object] fps Object to be assigned
     def fps=(fps)
-      validator = EnumAttributeValidator.new('Integer', [12, 15, 24, 25, 30])
+      validator = EnumAttributeValidator.new('Float', [12, 15, 23.976, 24, 25, 29.97, 30])
       unless validator.valid?(fps)
         fail ArgumentError, "invalid value for \"fps\", must be one of #{validator.allowable_values}."
       end

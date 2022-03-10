@@ -147,13 +147,13 @@ module Shotstack
       @server_operation_variables = {}
       @api_key = {}
       @api_key_prefix = {}
-      @timeout = 0
       @client_side_validation = true
       @verify_ssl = true
       @verify_ssl_host = true
       @params_encoding = nil
       @cert_file = nil
       @key_file = nil
+      @timeout = 0
       @debugging = false
       @inject_format = false
       @force_ending_format = false
@@ -197,11 +197,13 @@ module Shotstack
 
     # Gets API key (with prefix if set).
     # @param [String] param_name the parameter name of API key auth
-    def api_key_with_prefix(param_name)
+    def api_key_with_prefix(param_name, param_alias = nil)
+      key = @api_key[param_name]
+      key = @api_key.fetch(param_alias, key) unless param_alias.nil?
       if @api_key_prefix[param_name]
-        "#{@api_key_prefix[param_name]} #{@api_key[param_name]}"
+        "#{@api_key_prefix[param_name]} #{key}"
       else
-        @api_key[param_name]
+        key
       end
     end
 
@@ -295,5 +297,6 @@ module Shotstack
 
       url
     end
+
   end
 end
