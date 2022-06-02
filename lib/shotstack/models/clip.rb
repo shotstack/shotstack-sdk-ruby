@@ -1,7 +1,7 @@
 =begin
 #Shotstack
 
-#Shotstack is a video, image and audio editing service that allows for the automated generation of videos, images and audio using JSON and a RESTful API.  You arrange and configure an edit and POST it to the API which will render your media and provide a file  location when complete.  For more details visit [shotstack.io](https://shotstack.io) or checkout our [getting started](https://shotstack.gitbook.io/docs/guides/getting-started) documentation. There are two main API's, one for editing and generating assets (Edit API) and one for managing hosted assets (Serve API).  The Edit API base URL is: <b>https://api.shotstack.io/{version}</b>  The Serve API base URL is: <b>https://api.shotstack.io/serve/{version}</b>
+#Shotstack is a video, image and audio editing service that allows for the automated generation of videos, images and audio using JSON and a RESTful API.  You arrange and configure an edit and POST it to the API which will render your media and provide a file  location when complete.  For more details visit [shotstack.io](https://shotstack.io) or checkout our [getting started](https://shotstack.io/docs/guide/) documentation. There are two main API's, one for editing and generating assets (Edit API) and one for managing hosted assets (Serve API).  The Edit API base URL is: <b>https://api.shotstack.io/{version}</b>  The Serve API base URL is: <b>https://api.shotstack.io/serve/{version}</b>
 
 The version of the OpenAPI document: v1
 
@@ -16,7 +16,6 @@ require 'time'
 module Shotstack
   # A clip is a container for a specific type of asset, i.e. a title, image, video, audio or html. You use a Clip to define when an asset will display on the timeline, how long it will play for and transitions, filters and effects to apply to it.
   class Clip
-    # The type of asset to display for the duration of this Clip. Value must be one of:   <ul>     <li><a href=\"#tocs_videoasset\">VideoAsset</a></li>     <li><a href=\"#tocs_imageasset\">ImageAsset</a></li>     <li><a href=\"#tocs_titleasset\">TitleAsset</a></li>     <li><a href=\"#tocs_htmlasset\">HtmlAsset</a></li>     <li><a href=\"#tocs_audioasset\">AudioAsset</a></li>     <li><a href=\"#tocs_lumaasset\">LumaAsset</a></li>   </ul>
     attr_accessor :asset
 
     # The start position of the Clip on the timeline, in seconds.

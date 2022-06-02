@@ -1,7 +1,7 @@
 =begin
 #Shotstack
 
-#Shotstack is a video, image and audio editing service that allows for the automated generation of videos, images and audio using JSON and a RESTful API.  You arrange and configure an edit and POST it to the API which will render your media and provide a file  location when complete.  For more details visit [shotstack.io](https://shotstack.io) or checkout our [getting started](https://shotstack.gitbook.io/docs/guides/getting-started) documentation. There are two main API's, one for editing and generating assets (Edit API) and one for managing hosted assets (Serve API).  The Edit API base URL is: <b>https://api.shotstack.io/{version}</b>  The Serve API base URL is: <b>https://api.shotstack.io/serve/{version}</b>
+#Shotstack is a video, image and audio editing service that allows for the automated generation of videos, images and audio using JSON and a RESTful API.  You arrange and configure an edit and POST it to the API which will render your media and provide a file  location when complete.  For more details visit [shotstack.io](https://shotstack.io) or checkout our [getting started](https://shotstack.io/docs/guide/) documentation. There are two main API's, one for editing and generating assets (Edit API) and one for managing hosted assets (Serve API).  The Edit API base URL is: <b>https://api.shotstack.io/{version}</b>  The Serve API base URL is: <b>https://api.shotstack.io/serve/{version}</b>
 
 The version of the OpenAPI document: v1
 
@@ -17,6 +17,7 @@ require 'shotstack/version'
 require 'shotstack/configuration'
 
 # Models
+require 'shotstack/models/asset'
 require 'shotstack/models/asset_render_response'
 require 'shotstack/models/asset_response'
 require 'shotstack/models/asset_response_attributes'
@@ -24,6 +25,7 @@ require 'shotstack/models/asset_response_data'
 require 'shotstack/models/audio_asset'
 require 'shotstack/models/clip'
 require 'shotstack/models/crop'
+require 'shotstack/models/destinations'
 require 'shotstack/models/edit'
 require 'shotstack/models/flip_transformation'
 require 'shotstack/models/font'
@@ -31,6 +33,8 @@ require 'shotstack/models/html_asset'
 require 'shotstack/models/image_asset'
 require 'shotstack/models/luma_asset'
 require 'shotstack/models/merge_field'
+require 'shotstack/models/mux_destination'
+require 'shotstack/models/mux_destination_options'
 require 'shotstack/models/offset'
 require 'shotstack/models/output'
 require 'shotstack/models/poster'
@@ -55,7 +59,6 @@ require 'shotstack/models/video_asset'
 
 # APIs
 require 'shotstack/api/edit_api'
-require 'shotstack/api/endpoints_api'
 require 'shotstack/api/serve_api'
 
 module Shotstack
