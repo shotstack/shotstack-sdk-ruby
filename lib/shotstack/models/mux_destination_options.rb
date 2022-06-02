@@ -14,19 +14,37 @@ require 'date'
 require 'time'
 
 module Shotstack
-  # Set a custom size for a video or image. When using a custom size omit the `resolution` and `aspectRatio`. Custom sizes must be divisible by 2 based on the encoder specifications.
-  class Size
-    # Set a custom width for the video or image file. Value must be divisible by 2. Maximum video width is 1920px, maximum image width is 4096px.
-    attr_accessor :width
+  # Pass additional options to control how Mux processes video. Currently supports playback policy option.
+  class MuxDestinationOptions
+    # Sets the Mux `playback_policy` option. Value is an array of strings - use `public`, `signed`, or both.
+    attr_accessor :playback_policy
 
-    # Set a custom height for the video or image file. Value must be divisible by 2. Maximum video height is 1920px, maximum image height is 4096px.
-    attr_accessor :height
+    class EnumAttributeValidator
+      attr_reader :datatype
+      attr_reader :allowable_values
+
+      def initialize(datatype, allowable_values)
+        @allowable_values = allowable_values.map do |value|
+          case datatype.to_s
+          when /Integer/i
+            value.to_i
+          when /Float/i
+            value.to_f
+          else
+            value
+          end
+        end
+      end
+
+      def valid?(value)
+        !value || allowable_values.include?(value)
+      end
+    end
 
     # Attribute mapping from ruby-style variable name to JSON key.
     def self.attribute_map
       {
-        :'width' => :'width',
-        :'height' => :'height'
+        :'playback_policy' => :'playbackPolicy'
       }
     end
 
@@ -38,8 +56,7 @@ module Shotstack
     # Attribute type mapping.
     def self.openapi_types
       {
-        :'width' => :'Integer',
-        :'height' => :'Integer'
+        :'playback_policy' => :'Array<String>'
       }
     end
 
@@ -53,23 +70,21 @@ module Shotstack
     # @param [Hash] attributes Model attributes in the form of hash
     def initialize(attributes = {})
       if (!attributes.is_a?(Hash))
-        fail ArgumentError, "The input argument (attributes) must be a hash in `Shotstack::Size` initialize method"
+        fail ArgumentError, "The input argument (attributes) must be a hash in `Shotstack::MuxDestinationOptions` initialize method"
       end
 
       # check to see if the attribute exists and convert string to symbol for hash key
       attributes = attributes.each_with_object({}) { |(k, v), h|
         if (!self.class.attribute_map.key?(k.to_sym))
-          fail ArgumentError, "`#{k}` is not a valid attribute in `Shotstack::Size`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
+          fail ArgumentError, "`#{k}` is not a valid attribute in `Shotstack::MuxDestinationOptions`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
         end
         h[k.to_sym] = v
       }
 
-      if attributes.key?(:'width')
-        self.width = attributes[:'width']
-      end
-
-      if attributes.key?(:'height')
-        self.height = attributes[:'height']
+      if attributes.key?(:'playback_policy')
+        if (value = attributes[:'playback_policy']).is_a?(Array)
+          self.playback_policy = value
+        end
       end
     end
 
@@ -77,61 +92,13 @@ module Shotstack
     # @return Array for valid properties with the reasons
     def list_invalid_properties
       invalid_properties = Array.new
-      if !@width.nil? && @width > 4096
-        invalid_properties.push('invalid value for "width", must be smaller than or equal to 4096.')
-      end
-
-      if !@width.nil? && @width < 0
-        invalid_properties.push('invalid value for "width", must be greater than or equal to 0.')
-      end
-
-      if !@height.nil? && @height > 4096
-        invalid_properties.push('invalid value for "height", must be smaller than or equal to 4096.')
-      end
-
-      if !@height.nil? && @height < 0
-        invalid_properties.push('invalid value for "height", must be greater than or equal to 0.')
-      end
-
       invalid_properties
     end
 
     # Check to see if the all the properties in the model are valid
     # @return true if the model is valid
     def valid?
-      return false if !@width.nil? && @width > 4096
-      return false if !@width.nil? && @width < 0
-      return false if !@height.nil? && @height > 4096
-      return false if !@height.nil? && @height < 0
       true
-    end
-
-    # Custom attribute writer method with validation
-    # @param [Object] width Value to be assigned
-    def width=(width)
-      if !width.nil? && width > 4096
-        fail ArgumentError, 'invalid value for "width", must be smaller than or equal to 4096.'
-      end
-
-      if !width.nil? && width < 0
-        fail ArgumentError, 'invalid value for "width", must be greater than or equal to 0.'
-      end
-
-      @width = width
-    end
-
-    # Custom attribute writer method with validation
-    # @param [Object] height Value to be assigned
-    def height=(height)
-      if !height.nil? && height > 4096
-        fail ArgumentError, 'invalid value for "height", must be smaller than or equal to 4096.'
-      end
-
-      if !height.nil? && height < 0
-        fail ArgumentError, 'invalid value for "height", must be greater than or equal to 0.'
-      end
-
-      @height = height
     end
 
     # Checks equality by comparing each attribute.
@@ -139,8 +106,7 @@ module Shotstack
     def ==(o)
       return true if self.equal?(o)
       self.class == o.class &&
-          width == o.width &&
-          height == o.height
+          playback_policy == o.playback_policy
     end
 
     # @see the `==` method
@@ -152,7 +118,7 @@ module Shotstack
     # Calculates hash code according to all attributes.
     # @return [Integer] Hash code
     def hash
-      [width, height].hash
+      [playback_policy].hash
     end
 
     # Builds the object from hash
