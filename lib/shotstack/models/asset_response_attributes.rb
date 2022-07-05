@@ -1,7 +1,7 @@
 =begin
 #Shotstack
 
-#Shotstack is a video, image and audio editing service that allows for the automated generation of videos, images and audio using JSON and a RESTful API.  You arrange and configure an edit and POST it to the API which will render your media and provide a file  location when complete.  For more details visit [shotstack.io](https://shotstack.io) or checkout our [getting started](https://shotstack.io/docs/guide/) documentation. There are two main API's, one for editing and generating assets (Edit API) and one for managing hosted assets (Serve API).  The Edit API base URL is: <b>https://api.shotstack.io/{version}</b>  The Serve API base URL is: <b>https://api.shotstack.io/serve/{version}</b>
+#Shotstack is a video, image and audio editing service that allows for the automated generation of videos, images and audio using JSON and a RESTful API.  You arrange and configure an edit and POST it to the API which will render your media and provide a file  location when complete.  For more details visit [shotstack.io](https://shotstack.io) or checkout our [getting started](https://shotstack.io/docs/guide/) documentation.  There are two main API's, one for editing and generating assets (Edit API) and one for managing hosted assets (Serve API).  The Edit API base URL is: <b>https://api.shotstack.io/{version}</b>  The Serve API base URL is: <b>https://api.shotstack.io/serve/{version}</b> 
 
 The version of the OpenAPI document: v1
 
@@ -27,6 +27,9 @@ module Shotstack
 
     # The original render id that created the asset in UUID format. Multiple assets can share the same render id.
     attr_accessor :render_id
+
+    # The third party id of an asset transferred to an external provider, i.e. Mux, YouTube or S3. If the provider is Shotstack, the providerID is the same as the asset id.
+    attr_accessor :provider_id
 
     # The asset file name.
     attr_accessor :filename
@@ -72,6 +75,7 @@ module Shotstack
         :'owner' => :'owner',
         :'region' => :'region',
         :'render_id' => :'renderId',
+        :'provider_id' => :'providerId',
         :'filename' => :'filename',
         :'url' => :'url',
         :'status' => :'status',
@@ -92,6 +96,7 @@ module Shotstack
         :'owner' => :'String',
         :'region' => :'String',
         :'render_id' => :'String',
+        :'provider_id' => :'String',
         :'filename' => :'String',
         :'url' => :'String',
         :'status' => :'String',
@@ -135,6 +140,10 @@ module Shotstack
 
       if attributes.key?(:'render_id')
         self.render_id = attributes[:'render_id']
+      end
+
+      if attributes.key?(:'provider_id')
+        self.provider_id = attributes[:'provider_id']
       end
 
       if attributes.key?(:'filename')
@@ -192,6 +201,7 @@ module Shotstack
           owner == o.owner &&
           region == o.region &&
           render_id == o.render_id &&
+          provider_id == o.provider_id &&
           filename == o.filename &&
           url == o.url &&
           status == o.status &&
@@ -208,7 +218,7 @@ module Shotstack
     # Calculates hash code according to all attributes.
     # @return [Integer] Hash code
     def hash
-      [id, owner, region, render_id, filename, url, status, created, updated].hash
+      [id, owner, region, render_id, provider_id, filename, url, status, created, updated].hash
     end
 
     # Builds the object from hash

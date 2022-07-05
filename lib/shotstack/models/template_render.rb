@@ -14,20 +14,19 @@ require 'date'
 require 'time'
 
 module Shotstack
-  # Apply one or more transformations to a clip. Transformations alter the visual properties of a clip and can be combined to create new shapes and effects.
-  class Transformation
-    attr_accessor :rotate
+  # Render a template by it's id and optional merge fields.
+  class TemplateRender
+    # The id of the template to render in UUID format.
+    attr_accessor :id
 
-    attr_accessor :skew
-
-    attr_accessor :flip
+    # An array of key/value pairs that provides an easy way to create templates with placeholders. The placeholders can be used to find and replace keys with values. For example you can search for the placeholder `{{NAME}}` and replace it with the value `Jane`. 
+    attr_accessor :merge
 
     # Attribute mapping from ruby-style variable name to JSON key.
     def self.attribute_map
       {
-        :'rotate' => :'rotate',
-        :'skew' => :'skew',
-        :'flip' => :'flip'
+        :'id' => :'id',
+        :'merge' => :'merge'
       }
     end
 
@@ -39,9 +38,8 @@ module Shotstack
     # Attribute type mapping.
     def self.openapi_types
       {
-        :'rotate' => :'RotateTransformation',
-        :'skew' => :'SkewTransformation',
-        :'flip' => :'FlipTransformation'
+        :'id' => :'String',
+        :'merge' => :'Array<MergeField>'
       }
     end
 
@@ -55,27 +53,25 @@ module Shotstack
     # @param [Hash] attributes Model attributes in the form of hash
     def initialize(attributes = {})
       if (!attributes.is_a?(Hash))
-        fail ArgumentError, "The input argument (attributes) must be a hash in `Shotstack::Transformation` initialize method"
+        fail ArgumentError, "The input argument (attributes) must be a hash in `Shotstack::TemplateRender` initialize method"
       end
 
       # check to see if the attribute exists and convert string to symbol for hash key
       attributes = attributes.each_with_object({}) { |(k, v), h|
         if (!self.class.attribute_map.key?(k.to_sym))
-          fail ArgumentError, "`#{k}` is not a valid attribute in `Shotstack::Transformation`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
+          fail ArgumentError, "`#{k}` is not a valid attribute in `Shotstack::TemplateRender`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
         end
         h[k.to_sym] = v
       }
 
-      if attributes.key?(:'rotate')
-        self.rotate = attributes[:'rotate']
+      if attributes.key?(:'id')
+        self.id = attributes[:'id']
       end
 
-      if attributes.key?(:'skew')
-        self.skew = attributes[:'skew']
-      end
-
-      if attributes.key?(:'flip')
-        self.flip = attributes[:'flip']
+      if attributes.key?(:'merge')
+        if (value = attributes[:'merge']).is_a?(Array)
+          self.merge = value
+        end
       end
     end
 
@@ -83,12 +79,17 @@ module Shotstack
     # @return Array for valid properties with the reasons
     def list_invalid_properties
       invalid_properties = Array.new
+      if @id.nil?
+        invalid_properties.push('invalid value for "id", id cannot be nil.')
+      end
+
       invalid_properties
     end
 
     # Check to see if the all the properties in the model are valid
     # @return true if the model is valid
     def valid?
+      return false if @id.nil?
       true
     end
 
@@ -97,9 +98,8 @@ module Shotstack
     def ==(o)
       return true if self.equal?(o)
       self.class == o.class &&
-          rotate == o.rotate &&
-          skew == o.skew &&
-          flip == o.flip
+          id == o.id &&
+          merge == o.merge
     end
 
     # @see the `==` method
@@ -111,7 +111,7 @@ module Shotstack
     # Calculates hash code according to all attributes.
     # @return [Integer] Hash code
     def hash
-      [rotate, skew, flip].hash
+      [id, merge].hash
     end
 
     # Builds the object from hash
