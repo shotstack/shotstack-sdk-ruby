@@ -14,20 +14,18 @@ require 'date'
 require 'time'
 
 module Shotstack
-  # Apply one or more transformations to a clip. Transformations alter the visual properties of a clip and can be combined to create new shapes and effects.
-  class Transformation
-    attr_accessor :rotate
+  # A template is a saved [Edit](#tocs_edit) than can be loaded and re-used.
+  class Template
+    # The template name
+    attr_accessor :name
 
-    attr_accessor :skew
-
-    attr_accessor :flip
+    attr_accessor :template
 
     # Attribute mapping from ruby-style variable name to JSON key.
     def self.attribute_map
       {
-        :'rotate' => :'rotate',
-        :'skew' => :'skew',
-        :'flip' => :'flip'
+        :'name' => :'name',
+        :'template' => :'template'
       }
     end
 
@@ -39,9 +37,8 @@ module Shotstack
     # Attribute type mapping.
     def self.openapi_types
       {
-        :'rotate' => :'RotateTransformation',
-        :'skew' => :'SkewTransformation',
-        :'flip' => :'FlipTransformation'
+        :'name' => :'String',
+        :'template' => :'Edit'
       }
     end
 
@@ -55,27 +52,23 @@ module Shotstack
     # @param [Hash] attributes Model attributes in the form of hash
     def initialize(attributes = {})
       if (!attributes.is_a?(Hash))
-        fail ArgumentError, "The input argument (attributes) must be a hash in `Shotstack::Transformation` initialize method"
+        fail ArgumentError, "The input argument (attributes) must be a hash in `Shotstack::Template` initialize method"
       end
 
       # check to see if the attribute exists and convert string to symbol for hash key
       attributes = attributes.each_with_object({}) { |(k, v), h|
         if (!self.class.attribute_map.key?(k.to_sym))
-          fail ArgumentError, "`#{k}` is not a valid attribute in `Shotstack::Transformation`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
+          fail ArgumentError, "`#{k}` is not a valid attribute in `Shotstack::Template`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
         end
         h[k.to_sym] = v
       }
 
-      if attributes.key?(:'rotate')
-        self.rotate = attributes[:'rotate']
+      if attributes.key?(:'name')
+        self.name = attributes[:'name']
       end
 
-      if attributes.key?(:'skew')
-        self.skew = attributes[:'skew']
-      end
-
-      if attributes.key?(:'flip')
-        self.flip = attributes[:'flip']
+      if attributes.key?(:'template')
+        self.template = attributes[:'template']
       end
     end
 
@@ -83,12 +76,17 @@ module Shotstack
     # @return Array for valid properties with the reasons
     def list_invalid_properties
       invalid_properties = Array.new
+      if @name.nil?
+        invalid_properties.push('invalid value for "name", name cannot be nil.')
+      end
+
       invalid_properties
     end
 
     # Check to see if the all the properties in the model are valid
     # @return true if the model is valid
     def valid?
+      return false if @name.nil?
       true
     end
 
@@ -97,9 +95,8 @@ module Shotstack
     def ==(o)
       return true if self.equal?(o)
       self.class == o.class &&
-          rotate == o.rotate &&
-          skew == o.skew &&
-          flip == o.flip
+          name == o.name &&
+          template == o.template
     end
 
     # @see the `==` method
@@ -111,7 +108,7 @@ module Shotstack
     # Calculates hash code according to all attributes.
     # @return [Integer] Hash code
     def hash
-      [rotate, skew, flip].hash
+      [name, template].hash
     end
 
     # Builds the object from hash
