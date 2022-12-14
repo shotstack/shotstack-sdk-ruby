@@ -39,6 +39,9 @@ For examples of how to use the SDK to create videos using code checkout the Ruby
     - [SkewTransformation](#skewtransformation)
     - [FlipTransformation](#fliptransformation)
     - [MergeField](#mergefield)
+  - [Template Schemas](#template-schemas)
+    - [Template](#template)
+    - [TemplateRender](#templaterender)
   - [Output Schemas](#output-schemas)
     - [Output](#output)
     - [Size](#size)
@@ -795,6 +798,59 @@ Argument | Type | Description | Required
 :--- | :--- | :--- | :---: 
 find | string | The string to find <u>without</u> delimiters. | Y
 replace | replace | The replacement value. The replacement can be any valid JSON type - string, boolean, number, etc... | Y
+
+---
+
+## Template Schemas
+
+The following schemas specify how to use templates to store and render templates. A template lets you save an
+[Edit](#edit) that can be rendered by its template ID and optionally include merge fields that are merged with the
+template when rendered.
+
+### Template
+
+A template is a saved [Edit](#edit) than can be loaded and re-used.
+
+#### Example:
+
+```ruby
+require "shotstack"
+
+template = Shotstack::Template.new(
+  name: 'My Template',
+  template: edit
+)
+```
+
+#### Methods:
+
+Method | Description | Required
+:--- | :--- | :---: 
+name | string | The template name. | Y
+template | [Shotstack::Edit](#edit) | An edit defines the arrangement of a video on a timeline, an audio edit or an image design and the output format. | Y
+
+### TemplateRender
+
+Configure the id and optional merge fields to render a template by id.
+
+#### Example:
+
+
+```ruby
+require "shotstack"
+
+template = Shotstack::TemplateRender.new(
+  id: '21e781c0-8232-4418-fec1-cc99f0280c21',
+  merge: merge
+)
+```
+
+#### Methods:
+
+Method | Description | Required
+:--- | :--- | :---: 
+id | string id | The id of the template to render in UUID format. | Y
+merge | [Shotstack::MergeField[]](#mergefield) | An array of key/value pairs that provides an easy way to create templates with placeholders. The placeholders can be used to find and replace keys with values. For example you can search for the placeholder `{{NAME}}` and replace it with the value `Jane`. | -
 
 ---
 
