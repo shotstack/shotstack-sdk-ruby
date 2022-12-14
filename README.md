@@ -16,6 +16,8 @@ For examples of how to use the SDK to create videos using code checkout the Ruby
   - [Video Editing](#video-editing)
     - [Video Editing Example](#video-editing-example)
     - [Status Check Example](#status-check-example)
+    - [Save a Template Example](#save-a-template-example)
+    - [Render a Template Example](#render-a-template-example)
   - [Video Editing Schemas](#video-editing-schemas)
     - [Edit](#edit)
     - [Timeline](#timeline)
@@ -134,13 +136,118 @@ Shotstack.configure do |config|
   config.base_path = "stage"
 end
 
-id = "75143ec6-4b72-46f8-a67a-fd7284546935"
+id = "75143ec6-4b72-46f8-a67a-fd7284546935" # Use the render id from the previous example
 api_client = Shotstack::EditApi.new
 
 response = api_client.get_render(id, { data: false, merged: true }).response
 
 if response.status === "done"
-	puts response.url
+  puts response.url
+```
+
+### Save a Template Example
+
+The example below uses the Edit we create in the [Video Editing Example](#video-editing-example) and saves it as a
+template. The template can be rendered at a later date and can include placeholders. Placeholders can be replaced 
+when rendered using [merge fields](#mergefield).
+
+This example uses a placeholder for the video src (URL), trim (TRIM), and length (LENGTH) to allow you to trim any video
+using a template.
+
+```ruby
+require "shotstack"
+
+Shotstack.configure do |config|
+  config.api_key['x-api-key'] = "H7jKyj90kd09lbLOF7J900jNbSWS67X87xs9j0cD"
+  config.host = "api.shotstack.io"
+  config.base_path = "stage"
+end
+
+api_client = Shotstack::EditApi.new
+
+video_asset = Shotstack::VideoAsset.new(
+  src: "{{URL}}",
+  trim: "{{TRIM}}"
+)
+
+video_clip = Shotstack::Clip.new(
+  asset: video_asset,
+  start: 0,
+  length: "{{LENGTH}}"
+)
+
+track = Shotstack::Track.new(clips: [video_clip])
+
+timeline = Shotstack::Timeline.new(
+  background: "#000000",
+  tracks: [track]
+)
+
+output = Shotstack::Output.new(
+  format: "mp4",
+  resolution: "sd"
+)
+
+edit = Shotstack::Edit.new(
+  timeline: timeline,
+  output: output
+)
+
+template = Shotstack::Template.new(
+  name: "Trim Template",
+  template: edit
+)
+
+response = api_client.post_template(template).response
+
+puts response.id
+```
+
+### Render a Template Example
+
+The example below renders the template we created in the previous example and includes merge fields that will replace
+the placeholders. Once submitted use the returned render ID and call the [Status Check Example](#status-check-example)
+to get the render progress.
+
+```ruby
+require "shotstack"
+
+Shotstack.configure do |config|
+  config.api_key['x-api-key'] = "H7jKyj90kd09lbLOF7J900jNbSWS67X87xs9j0cD"
+  config.host = "api.shotstack.io"
+  config.base_path = "stage"
+end
+
+id = "8aeabb0e-b5eb-8c5e-847d-82297dd4802a"; # use the template id from previous example
+api_client = Shotstack::EditApi.new
+
+merge_field_url = Shotstack::MergeField.new(
+  find: "URL",
+  replace: "https://s3-ap-southeast-2.amazonaws.com/shotstack-assets/footage/skater.hd.mp4"
+)
+
+merge_field_trim = Shotstack::MergeField.new(
+  find: "TRIM",
+  replace: 3
+)
+
+merge_field_length = Shotstack::MergeField.new(
+  find: "LENGTH",
+  replace: 6
+)
+
+template = Shotstack::TemplateRender.new(
+  id: id,
+  merge: [
+    merge_field_url,
+    merge_field_trim,
+    merge_field_length
+  ]
+)
+
+response = api_client.post_template_render(template).response
+
+puts response.id
 ```
 
 ## Video Editing Schemas
