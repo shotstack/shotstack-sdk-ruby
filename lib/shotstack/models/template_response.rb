@@ -14,7 +14,7 @@ require 'date'
 require 'time'
 
 module Shotstack
-  # The response received after a [template](#create-a-template) is submitted. The template is saved and a unique template id is returned.
+  # The response received after a [template](#create-template) is submitted. The template is saved and a unique template id is returned.
   class TemplateResponse
     # `true` if successfully created, else `false`.
     attr_accessor :success

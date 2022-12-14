@@ -25,7 +25,6 @@ module Shotstack
     # The owner id of the templates.
     attr_accessor :owner
 
-    # The [Edit](#tocs_edit) template.
     attr_accessor :template
 
     # Attribute mapping from ruby-style variable name to JSON key.
@@ -49,7 +48,7 @@ module Shotstack
         :'id' => :'String',
         :'name' => :'String',
         :'owner' => :'String',
-        :'template' => :'String'
+        :'template' => :'Edit'
       }
     end
 

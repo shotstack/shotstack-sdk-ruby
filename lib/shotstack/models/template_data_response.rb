@@ -14,7 +14,7 @@ require 'date'
 require 'time'
 
 module Shotstack
-  # The template data including the template name and Edit.
+  # The template data including the template name and [Edit](#tocs_edit).
   class TemplateDataResponse
     # `true` if successfully created, else `false`.
     attr_accessor :success

@@ -101,8 +101,6 @@ module Shotstack
 
       if attributes.key?(:'volume')
         self.volume = attributes[:'volume']
-      else
-        self.volume = 1
       end
     end
 

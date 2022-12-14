@@ -14,7 +14,7 @@ require 'date'
 require 'time'
 
 module Shotstack
-  # Render a template by it's id and optional merge fields.
+  # Configure the id and optional merge fields to render a template by id.
   class TemplateRender
     # The id of the template to render in UUID format.
     attr_accessor :id

@@ -14,7 +14,7 @@ require 'date'
 require 'time'
 
 module Shotstack
-  # Send rendered videos to the [Mux](https://www.mux.com/) video hosting and streaming service. Add the `mux` destination provider to send the output video to Mux. Mux credentials are required and added via the [dashboard](https://dashboard.shotstack.io/integrations/mux), not in the request.
+  # Send rendered videos to the [Mux](https://shotstack.io/docs/guide/serving-assets/destinations/mux) video hosting and streaming service. Mux credentials are required and added via the [dashboard](https://dashboard.shotstack.io/integrations/mux), not in the request.
   class MuxDestination
     # The destination to send rendered assets to - set to `mux` for Mux.
     attr_accessor :provider

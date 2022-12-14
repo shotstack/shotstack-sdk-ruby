@@ -84,8 +84,6 @@ module Shotstack
 
       if attributes.key?(:'background')
         self.background = attributes[:'background']
-      else
-        self.background = '#000000'
       end
 
       if attributes.key?(:'fonts')
@@ -102,8 +100,6 @@ module Shotstack
 
       if attributes.key?(:'cache')
         self.cache = attributes[:'cache']
-      else
-        self.cache = true
       end
     end
 

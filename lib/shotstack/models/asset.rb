@@ -14,7 +14,7 @@ require 'date'
 require 'time'
 
 module Shotstack
-  # The type of asset to display for the duration of this Clip. Value     must be one of:       <ul>         <li><a href=\"#tocs_videoasset\">VideoAsset</a></li>         <li><a href=\"#tocs_imageasset\">ImageAsset</a></li>         <li><a href=\"#tocs_titleasset\">TitleAsset</a></li>         <li><a href=\"#tocs_htmlasset\">HtmlAsset</a></li>         <li><a href=\"#tocs_audioasset\">AudioAsset</a></li>         <li><a href=\"#tocs_lumaasset\">LumaAsset</a></li>       </ul>
+  # The type of asset to display for the duration of the Clip. Value must be one of: <ul>   <li><a href=\"#tocs_videoasset\">VideoAsset</a></li>   <li><a href=\"#tocs_imageasset\">ImageAsset</a></li>   <li><a href=\"#tocs_titleasset\">TitleAsset</a></li>   <li><a href=\"#tocs_htmlasset\">HtmlAsset</a></li>   <li><a href=\"#tocs_audioasset\">AudioAsset</a></li>   <li><a href=\"#tocs_lumaasset\">LumaAsset</a></li> </ul>
   module Asset
     class << self
       # List of class defined in oneOf (OpenAPI v3)

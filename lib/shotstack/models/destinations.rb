@@ -14,12 +14,12 @@ require 'date'
 require 'time'
 
 module Shotstack
-  # A destination is a location where output files can be sent to for serving or hosting. By default all rendered assets are automatically sent to the  [Shotstack hosting destination](https://shotstack.io/docs/guide/serving-assets/hosting). You can add other destinations to send assets to. The following destinations are available:   <ul>     <li><a href=\"#tocs_shotstackdestination\">DestinationShotstack</a></li>     <li><a href=\"#tocs_muxdestination\">DestinationMux</a></li>   </ul>
+  # A destination is a location where output files can be sent to for serving or hosting. By default all rendered assets are automatically sent to the  [Shotstack hosting destination](https://shotstack.io/docs/guide/serving-assets/hosting). You can add other destinations to send assets to. The following destinations are available: <ul>   <li><a href=\"#tocs_shotstackdestination\">ShotstackDestination</a></li>   <li><a href=\"#tocs_muxdestination\">MuxDestination</a></li>   <li><a href=\"#tocs_s3destination\">S3Destination</a></li> </ul>
   class Destinations
-    # The destination to send rendered assets to - set to `mux` for Mux.
+    # The destination to send rendered assets to - set to `s3` for S3.
     attr_accessor :provider
 
-    # Set to `true` to opt-out from the Shotstack hosting and CDN service. All files must be downloaded within 24 hours of rendering.
+    # Set to `true` to [opt-out](https://shotstack.io/docs/guide/serving-assets/self-host) from the Shotstack hosting and CDN service. All files must be downloaded within 24 hours of rendering.
     attr_accessor :exclude
 
     attr_accessor :options
@@ -43,7 +43,7 @@ module Shotstack
       {
         :'provider' => :'String',
         :'exclude' => :'Boolean',
-        :'options' => :'MuxDestinationOptions'
+        :'options' => :'S3DestinationOptions'
       }
     end
 
@@ -57,6 +57,7 @@ module Shotstack
     def self.openapi_any_of
       [
       :'MuxDestination',
+      :'S3Destination',
       :'ShotstackDestination'
       ]
     end
@@ -84,13 +85,11 @@ module Shotstack
       if attributes.key?(:'provider')
         self.provider = attributes[:'provider']
       else
-        self.provider = 'mux'
+        self.provider = 's3'
       end
 
       if attributes.key?(:'exclude')
         self.exclude = attributes[:'exclude']
-      else
-        self.exclude = false
       end
 
       if attributes.key?(:'options')

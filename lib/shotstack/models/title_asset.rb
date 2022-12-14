@@ -14,7 +14,7 @@ require 'date'
 require 'time'
 
 module Shotstack
-  # The TitleAsset clip type lets you create video titles from a text string and apply styling and positioning.
+  # **Notice: The title asset is deprecated, use the [HTML asset](#tocs_htmlasset) instead.**  The TitleAsset clip type lets you create video titles from a text string and apply styling and positioning. 
   class TitleAsset
     # The type of asset - set to `title` for titles.
     attr_accessor :type
@@ -131,14 +131,10 @@ module Shotstack
 
       if attributes.key?(:'color')
         self.color = attributes[:'color']
-      else
-        self.color = '#ffffff'
       end
 
       if attributes.key?(:'size')
         self.size = attributes[:'size']
-      else
-        self.size = 'medium'
       end
 
       if attributes.key?(:'background')
@@ -147,8 +143,6 @@ module Shotstack
 
       if attributes.key?(:'position')
         self.position = attributes[:'position']
-      else
-        self.position = 'center'
       end
 
       if attributes.key?(:'offset')

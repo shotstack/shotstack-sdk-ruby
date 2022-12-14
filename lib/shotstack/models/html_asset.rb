@@ -135,14 +135,10 @@ module Shotstack
 
       if attributes.key?(:'background')
         self.background = attributes[:'background']
-      else
-        self.background = 'transparent'
       end
 
       if attributes.key?(:'position')
         self.position = attributes[:'position']
-      else
-        self.position = 'center'
       end
     end
 

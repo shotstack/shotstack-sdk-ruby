@@ -14,84 +14,31 @@ require 'date'
 require 'time'
 
 module Shotstack
-  # The response data returned with the [RenderResponse](#tocs_renderresponse) including status and URL.
-  class RenderResponseData
-    # The id of the render task in UUID format.
-    attr_accessor :id
+  # Pass additional options to control how files are stored in S3.
+  class S3DestinationOptions
+    # Choose the region to send the file to. Must be a valid  [AWS region](https://docs.aws.amazon.com/general/latest/gr/s3.html#s3_region) string like `us-east-1` or `ap-southeast-2`.
+    attr_accessor :region
 
-    # The owner id of the render task.
-    attr_accessor :owner
+    # The bucket name to send files to. The bucket must exist in the AWS account before files can be sent.
+    attr_accessor :bucket
 
-    # The customer subscription plan.
-    attr_accessor :plan
+    # A prefix for the file being sent. This is typically a folder name, i.e. `videos` or `customerId/videos`.
+    attr_accessor :prefix
 
-    # The status of the render task. <ul>   <li>`queued` - render is queued waiting to be rendered</li>   <li>`fetching` - assets are being fetched</li>   <li>`rendering` - the asset is being rendered</li>   <li>`saving` - the final asset is being saved to storage</li>   <li>`done` - the asset is ready to be downloaded</li>   <li>`failed` - there was an error rendering the asset</li> </ul>
-    attr_accessor :status
+    # Use your own filename instead of the default render ID filename. Note: omit the file extension as this will be appended depending n the output format. Also `poster.jpg` and `-thumb.jpg` will be appended for poster and thumbnail images.
+    attr_accessor :filename
 
-    # An error message, only displayed if an error occurred.
-    attr_accessor :error
-
-    # The output video or audio length in seconds.
-    attr_accessor :duration
-
-    # The time taken to render the asset in milliseconds.
-    attr_accessor :render_time
-
-    # The URL of the final asset. This will only be available if status is done. This is a temporary URL and will be deleted after 24 hours. By default all assets are copied to the Shotstack hosting and CDN destination.
-    attr_accessor :url
-
-    # The URL of the poster image if requested. This will only be available if status is done.
-    attr_accessor :poster
-
-    # The URL of the thumbnail image if requested. This will only be available if status is done.
-    attr_accessor :thumbnail
-
-    attr_accessor :data
-
-    # The time the render task was initially queued.
-    attr_accessor :created
-
-    # The time the render status was last updated.
-    attr_accessor :updated
-
-    class EnumAttributeValidator
-      attr_reader :datatype
-      attr_reader :allowable_values
-
-      def initialize(datatype, allowable_values)
-        @allowable_values = allowable_values.map do |value|
-          case datatype.to_s
-          when /Integer/i
-            value.to_i
-          when /Float/i
-            value.to_f
-          else
-            value
-          end
-        end
-      end
-
-      def valid?(value)
-        !value || allowable_values.include?(value)
-      end
-    end
+    # Sets the S3 Access Control List (acl) permissions. Default is `private`. Must use a valid  S3 [Canned ACL](https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl-overview.html#canned-acl).
+    attr_accessor :acl
 
     # Attribute mapping from ruby-style variable name to JSON key.
     def self.attribute_map
       {
-        :'id' => :'id',
-        :'owner' => :'owner',
-        :'plan' => :'plan',
-        :'status' => :'status',
-        :'error' => :'error',
-        :'duration' => :'duration',
-        :'render_time' => :'renderTime',
-        :'url' => :'url',
-        :'poster' => :'poster',
-        :'thumbnail' => :'thumbnail',
-        :'data' => :'data',
-        :'created' => :'created',
-        :'updated' => :'updated'
+        :'region' => :'region',
+        :'bucket' => :'bucket',
+        :'prefix' => :'prefix',
+        :'filename' => :'filename',
+        :'acl' => :'acl'
       }
     end
 
@@ -103,27 +50,17 @@ module Shotstack
     # Attribute type mapping.
     def self.openapi_types
       {
-        :'id' => :'String',
-        :'owner' => :'String',
-        :'plan' => :'String',
-        :'status' => :'String',
-        :'error' => :'String',
-        :'duration' => :'Float',
-        :'render_time' => :'Float',
-        :'url' => :'String',
-        :'poster' => :'String',
-        :'thumbnail' => :'String',
-        :'data' => :'Edit',
-        :'created' => :'String',
-        :'updated' => :'String'
+        :'region' => :'String',
+        :'bucket' => :'String',
+        :'prefix' => :'String',
+        :'filename' => :'String',
+        :'acl' => :'String'
       }
     end
 
     # List of attributes with nullable: true
     def self.openapi_nullable
       Set.new([
-        :'poster',
-        :'thumbnail',
       ])
     end
 
@@ -131,67 +68,35 @@ module Shotstack
     # @param [Hash] attributes Model attributes in the form of hash
     def initialize(attributes = {})
       if (!attributes.is_a?(Hash))
-        fail ArgumentError, "The input argument (attributes) must be a hash in `Shotstack::RenderResponseData` initialize method"
+        fail ArgumentError, "The input argument (attributes) must be a hash in `Shotstack::S3DestinationOptions` initialize method"
       end
 
       # check to see if the attribute exists and convert string to symbol for hash key
       attributes = attributes.each_with_object({}) { |(k, v), h|
         if (!self.class.attribute_map.key?(k.to_sym))
-          fail ArgumentError, "`#{k}` is not a valid attribute in `Shotstack::RenderResponseData`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
+          fail ArgumentError, "`#{k}` is not a valid attribute in `Shotstack::S3DestinationOptions`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
         end
         h[k.to_sym] = v
       }
 
-      if attributes.key?(:'id')
-        self.id = attributes[:'id']
+      if attributes.key?(:'region')
+        self.region = attributes[:'region']
       end
 
-      if attributes.key?(:'owner')
-        self.owner = attributes[:'owner']
+      if attributes.key?(:'bucket')
+        self.bucket = attributes[:'bucket']
       end
 
-      if attributes.key?(:'plan')
-        self.plan = attributes[:'plan']
+      if attributes.key?(:'prefix')
+        self.prefix = attributes[:'prefix']
       end
 
-      if attributes.key?(:'status')
-        self.status = attributes[:'status']
+      if attributes.key?(:'filename')
+        self.filename = attributes[:'filename']
       end
 
-      if attributes.key?(:'error')
-        self.error = attributes[:'error']
-      end
-
-      if attributes.key?(:'duration')
-        self.duration = attributes[:'duration']
-      end
-
-      if attributes.key?(:'render_time')
-        self.render_time = attributes[:'render_time']
-      end
-
-      if attributes.key?(:'url')
-        self.url = attributes[:'url']
-      end
-
-      if attributes.key?(:'poster')
-        self.poster = attributes[:'poster']
-      end
-
-      if attributes.key?(:'thumbnail')
-        self.thumbnail = attributes[:'thumbnail']
-      end
-
-      if attributes.key?(:'data')
-        self.data = attributes[:'data']
-      end
-
-      if attributes.key?(:'created')
-        self.created = attributes[:'created']
-      end
-
-      if attributes.key?(:'updated')
-        self.updated = attributes[:'updated']
+      if attributes.key?(:'acl')
+        self.acl = attributes[:'acl']
       end
     end
 
@@ -199,16 +104,12 @@ module Shotstack
     # @return Array for valid properties with the reasons
     def list_invalid_properties
       invalid_properties = Array.new
-      if @id.nil?
-        invalid_properties.push('invalid value for "id", id cannot be nil.')
+      if @region.nil?
+        invalid_properties.push('invalid value for "region", region cannot be nil.')
       end
 
-      if @owner.nil?
-        invalid_properties.push('invalid value for "owner", owner cannot be nil.')
-      end
-
-      if @status.nil?
-        invalid_properties.push('invalid value for "status", status cannot be nil.')
+      if @bucket.nil?
+        invalid_properties.push('invalid value for "bucket", bucket cannot be nil.')
       end
 
       invalid_properties
@@ -217,22 +118,9 @@ module Shotstack
     # Check to see if the all the properties in the model are valid
     # @return true if the model is valid
     def valid?
-      return false if @id.nil?
-      return false if @owner.nil?
-      return false if @status.nil?
-      status_validator = EnumAttributeValidator.new('String', ["queued", "fetching", "rendering", "saving", "done", "failed"])
-      return false unless status_validator.valid?(@status)
+      return false if @region.nil?
+      return false if @bucket.nil?
       true
-    end
-
-    # Custom attribute writer method checking allowed values (enum).
-    # @param [Object] status Object to be assigned
-    def status=(status)
-      validator = EnumAttributeValidator.new('String', ["queued", "fetching", "rendering", "saving", "done", "failed"])
-      unless validator.valid?(status)
-        fail ArgumentError, "invalid value for \"status\", must be one of #{validator.allowable_values}."
-      end
-      @status = status
     end
 
     # Checks equality by comparing each attribute.
@@ -240,19 +128,11 @@ module Shotstack
     def ==(o)
       return true if self.equal?(o)
       self.class == o.class &&
-          id == o.id &&
-          owner == o.owner &&
-          plan == o.plan &&
-          status == o.status &&
-          error == o.error &&
-          duration == o.duration &&
-          render_time == o.render_time &&
-          url == o.url &&
-          poster == o.poster &&
-          thumbnail == o.thumbnail &&
-          data == o.data &&
-          created == o.created &&
-          updated == o.updated
+          region == o.region &&
+          bucket == o.bucket &&
+          prefix == o.prefix &&
+          filename == o.filename &&
+          acl == o.acl
     end
 
     # @see the `==` method
@@ -264,7 +144,7 @@ module Shotstack
     # Calculates hash code according to all attributes.
     # @return [Integer] Hash code
     def hash
-      [id, owner, plan, status, error, duration, render_time, url, poster, thumbnail, data, created, updated].hash
+      [region, bucket, prefix, filename, acl].hash
     end
 
     # Builds the object from hash
