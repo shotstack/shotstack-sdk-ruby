@@ -819,6 +819,7 @@ output = Shotstack::Output.new(
   scaleTo: 'preview',
   quality: 'medium',
   repeat: true,
+  mute: false,
   range: range,
   poster: poster,
   thumbnail: thumbnail,
@@ -838,6 +839,7 @@ fps | float | Override the default frames per second. Useful for when the source
 scaleTo | string | Override the resolution and scale the video or image to render at a different size. When using scaleTo the asset should be edited at the resolution dimensions, i.e. use font sizes that look best at HD, then use scaleTo to output the file at SD and the text will be scaled to the correct size. This is useful if you want to create multiple asset sizes. <ul><li>`preview` - 512px x 288px @ 15fps</li><li>`mobile` - 640px x 360px @ 25fps</li><li>`sd` - 1024px x 576px @25fps</li><li>`hd` - 1280px x 720px @25fps</li><li>`1080` - 1920px x 1080px @25fps</li></ul> | -
 quality | string | Adjust the output quality of the video, image or audio. Adjusting quality affects  render speed, download speeds and storage requirements due to file size. The default `medium` provides the most optimized choice for all three  factors. <ul><li>`low` - slightly reduced quality, smaller file size</li><li>`medium` - optimized quality, render speeds and file size</li><li>`high` - slightly increased quality, larger file size</li></ul> | -
 repeat | bool | Loop tings for gif files. Set to `true` to loop, `false` to play only once. [default to `true`] | -
+mute | bool | Mute the audio track of the output video. Set to `true` to mute, `false` to un-mute. | -
 range | [Shotstack::Range](#range) | Specify a time range to render, i.e. to render only a portion of a video or audio file. Omit this ting to export the entire video. Range can also be used to render a frame at a specific time point - ting a range and output format as `jpg` will output a single frame image at the range `start` point. | -
 poster | [Shotstack::Poster](#poster) | Generate a poster image from a specific point on the timeline. | -
 thumbnail | [Shotstack::Thumbnail](#thumbnail) | Generate a thumbnail image from a specific point on the timeline. | -
