@@ -54,6 +54,14 @@ For examples of how to use the SDK to create videos using code checkout the Ruby
     - [QueuedResponseData](#queuedresponsedata)
     - [RenderResponse](#renderresponse)
     - [RenderResponseData](#renderresponsedata)
+  - [Template Response Schemas](#template-response-schemas)
+    - [TemplateResponse](#templateresponse)
+    - [TemplateResponseData](#templateresponsedata)
+    - [TemplateDataResponse](#templatedataresponse)
+    - [TemplateDataResponseData](#templatedataresponsedata)
+    - [TemplateListResponse](#templatelistresponse)
+    - [TemplateListResponseData](#templatelistresponsedata)
+    - [TemplateListResponseItem](#templatelistresponseitem)
   - [Inspecting Media](#inspecting-media)
     - [Probe Example](#probe-example)
   - [Probe Schemas](#probe-schemas)
@@ -822,10 +830,10 @@ template = Shotstack::Template.new(
 )
 ```
 
-#### Methods:
+#### Arguments:
 
-Method | Description | Required
-:--- | :--- | :---: 
+Argument | Type | Description | Required
+:--- | :--- | :--- | :---: 
 name | string | The template name. | Y
 template | [Shotstack::Edit](#edit) | An edit defines the arrangement of a video on a timeline, an audio edit or an image design and the output format. | Y
 
@@ -845,11 +853,11 @@ template = Shotstack::TemplateRender.new(
 )
 ```
 
-#### Methods:
+#### Arguments:
 
-Method | Description | Required
-:--- | :--- | :---: 
-id | string id | The id of the template to render in UUID format. | Y
+Argument | Type | Description | Required
+:--- | :--- | :--- | :---: 
+id | string | The id of the template to render in UUID format. | Y
 merge | [Shotstack::MergeField[]](#mergefield) | An array of key/value pairs that provides an easy way to create templates with placeholders. The placeholders can be used to find and replace keys with values. For example you can search for the placeholder `{{NAME}}` and replace it with the value `Jane`. | -
 
 ---
@@ -1087,6 +1095,98 @@ thumbnail | string | The URL of the thumbnail image if requested. This will only
 data | [Shotstack::Edit](#edit) | The timeline and output data to be rendered. | Y
 created | string | The time the render task was initially queued. | Y
 updated | string | The time the render status was last updated. | Y
+
+---
+
+## Template Response Schemas
+
+The following schemas are returned by the templates endpoint, including create, update and rendering a template.
+
+### TemplateResponse
+
+The response received after a [template](#create-template) is submitted. The template is saved and a unique
+template id is returned.
+
+#### Arguments:
+
+Argument | Type | Description | Required
+:--- | :--- | :--- | :---: 
+success | bool | `true` if successfully created, else `false`. | Y
+message | string | `Created`, `Bad Request` or an error message. | Y
+response | [Shotstack::TemplateResponseData](#templateresponsedata) | `TemplateResponseData` or an error message. | Y
+
+### TemplateResponseData
+
+The response data returned with the [Shotstack.TemplateResponse](#templateresponse).
+
+#### Arguments:
+
+Argument | Type | Description | Required
+:--- | :--- | :--- | :---: 
+message | string | Success response message or error details. | Y
+id | string | The unique id of the template in UUID format. | Y
+
+### TemplateDataResponse
+
+The template data including the template name and [Edit](#edit).
+
+#### Arguments:
+
+Argument | Type | Description | Required
+:--- | :--- | :--- | :---: 
+success | bool | `true` if successfully returned, else `false`. | Y
+message |  string | `OK`, `Bad Request` or an error message. | Y
+response | [Shotstack::TemplateDataResponseData](#templatedataresponsedata) | `TemplateDataResponseData` or an error message. | Y
+
+### TemplateDataResponseData
+
+The response data returned with the [TemplateDataResponse](#templatedataresponse).
+
+#### Arguments:
+
+Argument | Type | Description | Required
+:--- | :--- | :--- | :---: 
+id | string | The unique id of the template in UUID format. | Y
+name | string | The template name. | Y
+owner | string | The owner id of the templates. | Y
+template [Shotstack::Edit](#edit) | `Edit` or an error message. | Y
+
+### TemplateListResponse
+
+A list of previously saved templates.
+
+#### Arguments:
+
+Argument | Type | Description | Required
+:--- | :--- | :--- | :---:
+success | bool | `true` if successfully returned, else `false`. | Y
+message | string | `OK`, `Bad Request` or an error message. | Y
+response | [Shotstack::TemplateListResponseData](#templatelistresponsedata) | `TemplateListResponseData` or an error message. | Y
+
+### TemplateListResponseData
+
+The response data returned with the [TemplateListResponse](#templatelistresponse).
+
+#### Arguments:
+
+Argument | Type | Description | Required
+:--- | :--- | :--- | :---: 
+owner | bool | The owner id of the templates. | Y
+templates | [Shotstack::TemplateListResponseItem[]](#templatelistresponseitem) | The list of templates. | Y
+
+### TemplateListResponseItem
+
+The individual template item returned with the [TemplateListResponseData](#templatelistresponsedata) templates
+list.
+
+#### Arguments:
+
+Argument | Type | Description | Required
+:--- | :--- | :--- | :---: 
+id | string | The unique id of the template in UUID format. | Y
+name | string | The template name | Y
+created | string | The time the template was created. | -
+updated | string | The time the template was last updated. | -
 
 ---
 ## Inspecting Media
