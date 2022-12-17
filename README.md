@@ -453,11 +453,11 @@ resource such as an mp4 file.
 ```ruby
 require "shotstack"
 
-videoAsset = Shotstack::VideoAsset.new(
+video_asset = Shotstack::VideoAsset.new(
   src: 'https://shotstack-assets.s3-ap-southeast-2.amazonaws.com/footage/table-mountain.mp4',
   trim: 5,
   volume: 0.5,
-  volumeEffect: 'fadeIn',
+  volume_effect: 'fadeIn',
   crop: crop
 )
 ```
@@ -469,7 +469,7 @@ Argument | Type | Description | Required
 src | string | The video source URL. The URL must be publicly accessible or include credentials. | Y
 trim | float | The start trim point of the video clip, in seconds (defaults to 0). Videos will start from the in trim point. The video will play until the file ends or the Clip length is reached. | -
 volume | float | Set the volume for the video clip between 0 and 1 where 0 is muted and 1 is full volume (defaults to 0). | -
-volumeEffect | string | The volume effect to apply to the video asset.<ul><li>`fadeIn` - fade volume in only</li><li>`fadeOut` - fade volume out only</li><li>`fadeInFadeOut` - fade volume in and out</li></ul> | -
+volume_effect | string | The volume effect to apply to the video asset.<ul><li>`fadeIn` - fade volume in only</li><li>`fadeOut` - fade volume out only</li><li>`fadeInFadeOut` - fade volume in and out</li></ul> | -
 crop | [Shotstack::Crop](#crop) | Crop the sides of an asset by a relative amount. The size of the crop is specified using a scale between 0 and 1, relative to the screen width - i.e. a left crop of 0.5 will crop half of the asset from the left, a top crop of 0.25 will crop the top by quarter of the asset. | -
 
 ---
@@ -483,7 +483,7 @@ The **ImageAsset** is used to create video from images to compose an image. The 
 ```ruby
 require "shotstack"
 
-imageAsset = Shotstack::ImageAsset.new(
+image_asset = Shotstack::ImageAsset.new(
   src: 'https://shotstack-assets.s3-ap-southeast-2.amazonaws.com/images/earth.jpg',
   crop: crop
 )
@@ -507,7 +507,7 @@ The **TitleAsset** clip type lets you create video titles from a text string and
 ```ruby
 require "shotstack"
 
-titleAsset = Shotstack::TitleAsset.new(
+title_asset = Shotstack::TitleAsset.new(
   text: 'My Title',
   style: 'minimal',
   color: '#ffffff',
@@ -541,7 +541,7 @@ The **HtmlAsset** clip type lets you create text based layout and formatting usi
 ```ruby
 require "shotstack"
 
-htmlAsset = Shotstack::HtmlAsset.new(
+html_asset = Shotstack::HtmlAsset.new(
   html: '<p>Hello <b>World</b></p>',
   css: 'p { color: #ffffff; } b { color: #ffff00; }',
   width: 400,
@@ -574,7 +574,7 @@ publicly accessible URL to an audio resource such as an mp3 file.
 ```ruby
 require "shotstack"
 
-audioAsset = Shotstack::AudioAsset.new(
+audio_asset = Shotstack::AudioAsset.new(
   src: 'https://shotstack-assets.s3-ap-southeast-2.amazonaws.com/music/unminus/lit.mp3',
   trim: 2,
   volume: 0.5,
@@ -602,7 +602,7 @@ The **LumaAsset** is used to create luma matte masks, transitions and effects be
 ```ruby
 require "shotstack"
 
-lumaAsset = Shotstack::LumaAsset.new(
+luma_asset = Shotstack::LumaAsset.new(
   src: 'https://shotstack-assets.s3-ap-southeast-2.amazonaws.com/examples/luma-mattes/paint-left.mp4',
   trim: 5
 )
@@ -728,7 +728,7 @@ Rotate a clip by the specified angle in degrees. Rotation origin is set based on
 ```ruby
 require "shotstack"
 
-rotateTransformation = Shotstack::RotateTransformation.new(
+rotate_transformation = Shotstack::RotateTransformation.new(
   angle: 45
 )
 ```
@@ -750,7 +750,7 @@ Skew a clip so its edges are sheared at an angle. Use values between 0 and 3. Ov
 ```ruby
 require "shotstack"
 
-skewTransformation = Shotstack::SkewTransformation.new(
+skew_transformation = Shotstack::SkewTransformation.new(
   x: 0.5,
   y: 0.5
 )
@@ -774,7 +774,7 @@ Flip a clip vertically or horizontally. Acts as a mirror effect of the clip alon
 ```ruby
 require "shotstack"
 
-flipTransformation = Shotstack::FlipTransformation.new(
+flip_transformation = Shotstack::FlipTransformation.new(
   horizontal: true,
   vertical: true
 )
@@ -798,7 +798,7 @@ A merge field consists of a key; `find`, and a `value`; replace. Merge fields ca
 ```ruby
 require "shotstack"
 
-mergeField = Shotstack::MergeField.new(
+merge_field = Shotstack::MergeField.new(
   find: 'NAME',
   replace: 'Jane'
 )
@@ -884,14 +884,14 @@ output = Shotstack::Output.new(
   aspectRatio: '16:9',
   size: size,
   fps: 25,
-  scaleTo: 'preview',
+  scale_to: 'preview',
   quality: 'medium',
   repeat: true,
   mute: false,
   range: range,
   poster: poster,
   thumbnail: thumbnail,
-  destination: destination
+  destinations: destinations
 )
 ```
 
@@ -911,7 +911,7 @@ mute | bool | Mute the audio track of the output video. Set to `true` to mute, `
 range | [Shotstack::Range](#range) | Specify a time range to render, i.e. to render only a portion of a video or audio file. Omit this ting to export the entire video. Range can also be used to render a frame at a specific time point - ting a range and output format as `jpg` will output a single frame image at the range `start` point. | -
 poster | [Shotstack::Poster](#poster) | Generate a poster image from a specific point on the timeline. | -
 thumbnail | [Shotstack::Thumbnail](#thumbnail) | Generate a thumbnail image from a specific point on the timeline. | -
-destinations | [AnyOfShotstackDestination[]](#shotstackdestination) | A destination is a location where output files can be sent to for serving or hosting. By default all rendered assets are automatically sent to the Shotstack hosting destination. [ShotstackDestination](#shotstackdestination) is currently the only option with plans to add more in the future such as S3, YouTube, Vimeo and Mux. If you do not require hosting you can opt-out using the  `exclude` property. | -
+destinations | [Shotstack::Destinations[]](#destinations) | A destination is a location where output files can be sent to for serving or hosting. By default all rendered assets are automatically sent to the Shotstack hosting destination. | -
 
 ---
 
@@ -1463,7 +1463,7 @@ Argument | Type | Description | Required
 id | string | The unique id of the hosted asset in UUID format. | -
 owner | string | The owner id of the render task. | -
 region | string | The region the asset is hosted, currently only `au` (Australia). | -
-renderId | string | The original render id that created the asset in UUID format. Multiple asset can share the same render id. | -
+render_id | string | The original render id that created the asset in UUID format. Multiple asset can share the same render id. | -
 filename | string | The asset file name. | -
 url | string | The asset file name. | -
 status | string | The status of the asset. <ul><li>`importing` - the asset is being copied to the hosting service</li><li>`ready` - the asset is ready to be served to users</li><li>`failed` - the asset failed to copy or delete</li><li>`deleted` - the asset has been deleted</li></ul> | -
