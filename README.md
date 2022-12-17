@@ -48,7 +48,11 @@ For examples of how to use the SDK to create videos using code checkout the Ruby
     - [Range](#range)
     - [Poster](#poster)
     - [Thumbnail](#thumbnail)
+  - [Destinations](#destinations)
     - [ShotstackDestination](#shotstackdestination)
+    - [MuxDestination](#muxdestination)
+    - [MuxDestinationOptions](#muxdestinationoptions)
+    - [S3DestinationOptions](#s3destinationoptions)
   - [Render Response Schemas](#render-response-schemas)
     - [QueuedResponse](#queuedresponse)
     - [QueuedResponseData](#queuedresponsedata)
@@ -1005,6 +1009,8 @@ scale | float | Scale the thumbnail size to a fraction of the viewport size - i.
 
 ---
 
+## Destinations
+
 ### ShotstackDestination
 
 Send rendered asset to the Shotstack hosting and CDN service. This destination is enabled by default.
@@ -1014,7 +1020,7 @@ Send rendered asset to the Shotstack hosting and CDN service. This destination i
 ```ruby
 require "shotstack"
 
-shotstackDestination = Shotstack::ShotstackDestination.new(
+shotstack_destination = Shotstack::ShotstackDestination.new(
   provider: 'shotstack',
   exclude: false
 )
@@ -1024,8 +1030,99 @@ shotstackDestination = Shotstack::ShotstackDestination.new(
 
 Argument | Type | Description | Required
 :--- | :--- | :--- | :---: 
-provider | string | The destination to send rendered asset to - set to `shotstack` for Shotstack hosting and CDN. [default to `shotstack`] | Y
+provider | string | The destination to send rendered assets to - set to `shotstack` for Shotstack. | Y
 exclude | bool | Set to `true` to opt-out from the Shotstack hosting and CDN service. All files must be downloaded within 24 hours of rendering. [default to `false`] | -
+
+### MuxDestination
+
+Send rendered videos to the [Mux](https://shotstack.io/docs/guide/serving-assets/destinations/mux) video hosting and
+streaming service. Mux credentials are required and added via the 
+[dashboard](https://dashboard.shotstack.io/integrations/mux), not in the request.
+
+#### Example:
+
+```ruby
+require "shotstack"
+
+mux_destination = Shotstack::MuxDestination.new(
+  provider: 'mux',
+  options: mux_destination_options
+)
+```
+#### Arguments:
+
+Argument | Type | Description | Required
+:--- | :--- | :--- | :---: 
+provider | string | The destination to send rendered assets to - set to `mux` for Mux. | Y
+options | [Shotstack::MuxDestinationOptions](#muxdestinationoptions) | Additional Mux configuration and features. | - 
+
+### MuxDestinationOptions
+
+Pass additional options to control how Mux processes video. Currently supports playback policy option.
+
+#### Example:
+
+mux_destination_options = Shotstack::MuxDestinationOptions.new(
+  playback_policy: ['public']
+)
+```
+
+#### Arguments:
+
+Argument | Type | Description | Required
+:--- | :--- | :--- | :---: 
+playback_policy | [string] | Sets the Mux `playback_policy` option. Value is an array of strings - use **public**, **signed**, or both. | -  
+
+### S3Destination
+
+Send rendered videos to an [Amazon S3](https://shotstack.io/docs/guide/serving-assets/destinations/s3) bucket. Send 
+files to any region with your own prefix and filename. AWS credentials are required and added via the 
+[dashboard](https://dashboard.shotstack.io/integrations/s3), not in the request.
+
+#### Example:
+
+```python
+require "shotstack"
+
+const s3_destination = new Shotstack::S3Destination.new(
+  provider: 's3',
+  options: S3_destination_options
+)
+```
+#### Arguments:
+
+Argument | Type | Description | Required
+:--- | :--- | :--- | :---: 
+provider | string | The destination to send rendered assets to - set to `s3` for S3. | Y
+options | [S3DestinationOptions](#s3destinationoptions) | Additional S3 configuration options. | - 
+
+### S3DestinationOptions
+
+Pass additional options to control how files are stored in S3.
+
+#### Example:
+
+```python
+require "shotstack"
+
+const s3_destination_options = new Shotstack::S3DestinationOptions.new(
+  region: 'us-east-1',
+  bucket: 'my-bucket',
+  prefix: 'my-renders',
+  filename: 'my-file',
+  acl: 'public-read',
+)
+```
+
+#### Arguments:
+
+Argument | Type | Description | Required
+:--- | :--- | :--- | :---: 
+region | string | Choose the region to send the file to. Must be a valid [AWS region](https://docs.aws.amazon.com/general/latest/gr/s3.html#s3_region) string like `us-east-1` or `ap-southeast-2` | Y
+bucket | string | The bucket name to send files to. The bucket must exist in the AWS account before files can be sent. | Y
+prefix | string | A prefix for the file being sent. This is typically a folder name, i.e. `videos` or `customerId/videos`. | -
+filename | string | Use your own filename instead of the default render ID filename. Note: omit the file extension as this will be appended depending on the output format. Also `-poster.jpg` and `-thumb.jpg` will be appended for poster and thumbnail images. | -
+acl | string | Sets the S3 Access Control List (acl) permissions. Default is `private`. Must use a valid  S3 [Canned ACL](https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl-overview.html#canned-acl). | -
 
 ---
 
