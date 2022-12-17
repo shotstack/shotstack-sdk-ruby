@@ -103,14 +103,6 @@ module Shotstack
         invalid_properties.push('invalid value for "name", name cannot be nil.')
       end
 
-      if @created.nil?
-        invalid_properties.push('invalid value for "created", created cannot be nil.')
-      end
-
-      if @updated.nil?
-        invalid_properties.push('invalid value for "updated", updated cannot be nil.')
-      end
-
       invalid_properties
     end
 
@@ -119,8 +111,6 @@ module Shotstack
     def valid?
       return false if @id.nil?
       return false if @name.nil?
-      return false if @created.nil?
-      return false if @updated.nil?
       true
     end
 

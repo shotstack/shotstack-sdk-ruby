@@ -16,6 +16,8 @@ For examples of how to use the SDK to create videos using code checkout the Ruby
   - [Video Editing](#video-editing)
     - [Video Editing Example](#video-editing-example)
     - [Status Check Example](#status-check-example)
+    - [Save a Template Example](#save-a-template-example)
+    - [Render a Template Example](#render-a-template-example)
   - [Video Editing Schemas](#video-editing-schemas)
     - [Edit](#edit)
     - [Timeline](#timeline)
@@ -37,18 +39,33 @@ For examples of how to use the SDK to create videos using code checkout the Ruby
     - [SkewTransformation](#skewtransformation)
     - [FlipTransformation](#fliptransformation)
     - [MergeField](#mergefield)
+  - [Template Schemas](#template-schemas)
+    - [Template](#template)
+    - [TemplateRender](#templaterender)
   - [Output Schemas](#output-schemas)
     - [Output](#output)
     - [Size](#size)
     - [Range](#range)
     - [Poster](#poster)
     - [Thumbnail](#thumbnail)
+  - [Destinations](#destinations)
     - [ShotstackDestination](#shotstackdestination)
+    - [MuxDestination](#muxdestination)
+    - [MuxDestinationOptions](#muxdestinationoptions)
+    - [S3DestinationOptions](#s3destinationoptions)
   - [Render Response Schemas](#render-response-schemas)
     - [QueuedResponse](#queuedresponse)
     - [QueuedResponseData](#queuedresponsedata)
     - [RenderResponse](#renderresponse)
     - [RenderResponseData](#renderresponsedata)
+  - [Template Response Schemas](#template-response-schemas)
+    - [TemplateResponse](#templateresponse)
+    - [TemplateResponseData](#templateresponsedata)
+    - [TemplateDataResponse](#templatedataresponse)
+    - [TemplateDataResponseData](#templatedataresponsedata)
+    - [TemplateListResponse](#templatelistresponse)
+    - [TemplateListResponseData](#templatelistresponsedata)
+    - [TemplateListResponseItem](#templatelistresponseitem)
   - [Inspecting Media](#inspecting-media)
     - [Probe Example](#probe-example)
   - [Probe Schemas](#probe-schemas)
@@ -134,13 +151,118 @@ Shotstack.configure do |config|
   config.base_path = "stage"
 end
 
-id = "75143ec6-4b72-46f8-a67a-fd7284546935"
+id = "75143ec6-4b72-46f8-a67a-fd7284546935" # Use the render id from the previous example
 api_client = Shotstack::EditApi.new
 
 response = api_client.get_render(id, { data: false, merged: true }).response
 
 if response.status === "done"
-	puts response.url
+  puts response.url
+```
+
+### Save a Template Example
+
+The example below uses the Edit we create in the [Video Editing Example](#video-editing-example) and saves it as a
+template. The template can be rendered at a later date and can include placeholders. Placeholders can be replaced 
+when rendered using [merge fields](#mergefield).
+
+This example uses a placeholder for the video src (URL), trim (TRIM), and length (LENGTH) to allow you to trim any video
+using a template.
+
+```ruby
+require "shotstack"
+
+Shotstack.configure do |config|
+  config.api_key['x-api-key'] = "H7jKyj90kd09lbLOF7J900jNbSWS67X87xs9j0cD"
+  config.host = "api.shotstack.io"
+  config.base_path = "stage"
+end
+
+api_client = Shotstack::EditApi.new
+
+video_asset = Shotstack::VideoAsset.new(
+  src: "{{URL}}",
+  trim: "{{TRIM}}"
+)
+
+video_clip = Shotstack::Clip.new(
+  asset: video_asset,
+  start: 0,
+  length: "{{LENGTH}}"
+)
+
+track = Shotstack::Track.new(clips: [video_clip])
+
+timeline = Shotstack::Timeline.new(
+  background: "#000000",
+  tracks: [track]
+)
+
+output = Shotstack::Output.new(
+  format: "mp4",
+  resolution: "sd"
+)
+
+edit = Shotstack::Edit.new(
+  timeline: timeline,
+  output: output
+)
+
+template = Shotstack::Template.new(
+  name: "Trim Template",
+  template: edit
+)
+
+response = api_client.post_template(template).response
+
+puts response.id
+```
+
+### Render a Template Example
+
+The example below renders the template we created in the previous example and includes merge fields that will replace
+the placeholders. Once submitted use the returned render ID and call the [Status Check Example](#status-check-example)
+to get the render progress.
+
+```ruby
+require "shotstack"
+
+Shotstack.configure do |config|
+  config.api_key['x-api-key'] = "H7jKyj90kd09lbLOF7J900jNbSWS67X87xs9j0cD"
+  config.host = "api.shotstack.io"
+  config.base_path = "stage"
+end
+
+id = "8aeabb0e-b5eb-8c5e-847d-82297dd4802a"; # use the template id from previous example
+api_client = Shotstack::EditApi.new
+
+merge_field_url = Shotstack::MergeField.new(
+  find: "URL",
+  replace: "https://s3-ap-southeast-2.amazonaws.com/shotstack-assets/footage/skater.hd.mp4"
+)
+
+merge_field_trim = Shotstack::MergeField.new(
+  find: "TRIM",
+  replace: 3
+)
+
+merge_field_length = Shotstack::MergeField.new(
+  find: "LENGTH",
+  replace: 6
+)
+
+template = Shotstack::TemplateRender.new(
+  id: id,
+  merge: [
+    merge_field_url,
+    merge_field_trim,
+    merge_field_length
+  ]
+)
+
+response = api_client.post_template_render(template).response
+
+puts response.id
 ```
 
 ## Video Editing Schemas
@@ -173,7 +295,7 @@ timeline | [Shotstack::Timeline](#timeline) | A timeline represents the contents
 output | [Shotstack::Output](#output) | The output format, render range and type of media to generate. | Y
 merge | [Shotstack::MergeField[]](#mergefield) | An array of key/value pairs that provides an easy way to create templates with placeholders. The placeholders can be used to find and replace keys with values. For example you can search for the placeholder `{{NAME}}` and replace it with the value `Jane`. | -
 callback | string | An optional webhook callback URL used to receive status notifications when a render completes or fails. See [webhooks](https://shotstack.io/docs/guide/architecting-an-application/webhooks/) for  more details. | -
-disk | string | The disk type to use for storing footage and asset for each render. See [disk types](https://shotstack.io/docs/guide/architecting-an-application/disk-types/) for more details. [default to `local`] <ul><li>`local` - optimized for high speed rendering with up to 512MB storage</li><li>`mount` - optimized for larger file sizes and longer videos with 5GB for source footage and 512MB for output render</li></ul> | -
+disk | string | **(Deprecated)** The disk type to use for storing footage and asset for each render. See [disk types](https://shotstack.io/docs/guide/architecting-an-application/disk-types/) for more details. [default to `local`] <ul><li>`local` - optimized for high speed rendering with up to 512MB storage</li><li>`mount` - optimized for larger file sizes and longer videos with 5GB for source footage and 512MB for output render</li></ul> | -
 
 -----
 
@@ -331,10 +453,11 @@ resource such as an mp4 file.
 ```ruby
 require "shotstack"
 
-videoAsset = Shotstack::VideoAsset.new(
+video_asset = Shotstack::VideoAsset.new(
   src: 'https://shotstack-assets.s3-ap-southeast-2.amazonaws.com/footage/table-mountain.mp4',
   trim: 5,
   volume: 0.5,
+  volume_effect: 'fadeIn',
   crop: crop
 )
 ```
@@ -346,6 +469,7 @@ Argument | Type | Description | Required
 src | string | The video source URL. The URL must be publicly accessible or include credentials. | Y
 trim | float | The start trim point of the video clip, in seconds (defaults to 0). Videos will start from the in trim point. The video will play until the file ends or the Clip length is reached. | -
 volume | float | Set the volume for the video clip between 0 and 1 where 0 is muted and 1 is full volume (defaults to 0). | -
+volume_effect | string | The volume effect to apply to the video asset.<ul><li>`fadeIn` - fade volume in only</li><li>`fadeOut` - fade volume out only</li><li>`fadeInFadeOut` - fade volume in and out</li></ul> | -
 crop | [Shotstack::Crop](#crop) | Crop the sides of an asset by a relative amount. The size of the crop is specified using a scale between 0 and 1, relative to the screen width - i.e. a left crop of 0.5 will crop half of the asset from the left, a top crop of 0.25 will crop the top by quarter of the asset. | -
 
 ---
@@ -359,7 +483,7 @@ The **ImageAsset** is used to create video from images to compose an image. The 
 ```ruby
 require "shotstack"
 
-imageAsset = Shotstack::ImageAsset.new(
+image_asset = Shotstack::ImageAsset.new(
   src: 'https://shotstack-assets.s3-ap-southeast-2.amazonaws.com/images/earth.jpg',
   crop: crop
 )
@@ -383,7 +507,7 @@ The **TitleAsset** clip type lets you create video titles from a text string and
 ```ruby
 require "shotstack"
 
-titleAsset = Shotstack::TitleAsset.new(
+title_asset = Shotstack::TitleAsset.new(
   text: 'My Title',
   style: 'minimal',
   color: '#ffffff',
@@ -417,7 +541,7 @@ The **HtmlAsset** clip type lets you create text based layout and formatting usi
 ```ruby
 require "shotstack"
 
-htmlAsset = Shotstack::HtmlAsset.new(
+html_asset = Shotstack::HtmlAsset.new(
   html: '<p>Hello <b>World</b></p>',
   css: 'p { color: #ffffff; } b { color: #ffff00; }',
   width: 400,
@@ -450,7 +574,7 @@ publicly accessible URL to an audio resource such as an mp3 file.
 ```ruby
 require "shotstack"
 
-audioAsset = Shotstack::AudioAsset.new(
+audio_asset = Shotstack::AudioAsset.new(
   src: 'https://shotstack-assets.s3-ap-southeast-2.amazonaws.com/music/unminus/lit.mp3',
   trim: 2,
   volume: 0.5,
@@ -478,7 +602,7 @@ The **LumaAsset** is used to create luma matte masks, transitions and effects be
 ```ruby
 require "shotstack"
 
-lumaAsset = Shotstack::LumaAsset.new(
+luma_asset = Shotstack::LumaAsset.new(
   src: 'https://shotstack-assets.s3-ap-southeast-2.amazonaws.com/examples/luma-mattes/paint-left.mp4',
   trim: 5
 )
@@ -536,8 +660,8 @@ offset = Shotstack::Offset.new(
 
 Argument | Type | Description | Required
 :--- | :--- | :--- | :---: 
-x | float | Offset an asset on the horizontal axis (left or right), range varies from -1 to 1. Positive numbers move the asset right, negative left. For all asset except titles the distance moved is relative to the width  of the viewport - i.e. an X offset of 0.5 will move the asset half the  screen width to the right. [default to `0`] | -
-y | float | Offset an asset on the vertical axis (up or down), range varies from -1 to 1. Positive numbers move the asset up, negative down. For all asset except titles the distance moved is relative to the height of the viewport - i.e. an Y offset of 0.5 will move the asset up half the screen height. [default to `0`] | -
+x | float | Offset an asset on the horizontal axis (left or right), range varies from -10 to 10. Positive numbers move the asset right, negative left. For all asset except titles the distance moved is relative to the width  of the viewport - i.e. an X offset of 0.5 will move the asset half the  screen width to the right. [default to `0`] | -
+y | float | Offset an asset on the vertical axis (up or down), range varies from -10 to 10. Positive numbers move the asset up, negative down. For all asset except titles the distance moved is relative to the height of the viewport - i.e. an Y offset of 0.5 will move the asset up half the screen height. [default to `0`] | -
 
 ---
 
@@ -604,7 +728,7 @@ Rotate a clip by the specified angle in degrees. Rotation origin is set based on
 ```ruby
 require "shotstack"
 
-rotateTransformation = Shotstack::RotateTransformation.new(
+rotate_transformation = Shotstack::RotateTransformation.new(
   angle: 45
 )
 ```
@@ -626,7 +750,7 @@ Skew a clip so its edges are sheared at an angle. Use values between 0 and 3. Ov
 ```ruby
 require "shotstack"
 
-skewTransformation = Shotstack::SkewTransformation.new(
+skew_transformation = Shotstack::SkewTransformation.new(
   x: 0.5,
   y: 0.5
 )
@@ -650,7 +774,7 @@ Flip a clip vertically or horizontally. Acts as a mirror effect of the clip alon
 ```ruby
 require "shotstack"
 
-flipTransformation = Shotstack::FlipTransformation.new(
+flip_transformation = Shotstack::FlipTransformation.new(
   horizontal: true,
   vertical: true
 )
@@ -674,7 +798,7 @@ A merge field consists of a key; `find`, and a `value`; replace. Merge fields ca
 ```ruby
 require "shotstack"
 
-mergeField = Shotstack::MergeField.new(
+merge_field = Shotstack::MergeField.new(
   find: 'NAME',
   replace: 'Jane'
 )
@@ -686,6 +810,59 @@ Argument | Type | Description | Required
 :--- | :--- | :--- | :---: 
 find | string | The string to find <u>without</u> delimiters. | Y
 replace | replace | The replacement value. The replacement can be any valid JSON type - string, boolean, number, etc... | Y
+
+---
+
+## Template Schemas
+
+The following schemas specify how to use templates to store and render templates. A template lets you save an
+[Edit](#edit) that can be rendered by its template ID and optionally include merge fields that are merged with the
+template when rendered.
+
+### Template
+
+A template is a saved [Edit](#edit) than can be loaded and re-used.
+
+#### Example:
+
+```ruby
+require "shotstack"
+
+template = Shotstack::Template.new(
+  name: 'My Template',
+  template: edit
+)
+```
+
+#### Arguments:
+
+Argument | Type | Description | Required
+:--- | :--- | :--- | :---: 
+name | string | The template name. | Y
+template | [Shotstack::Edit](#edit) | An edit defines the arrangement of a video on a timeline, an audio edit or an image design and the output format. | Y
+
+### TemplateRender
+
+Configure the id and optional merge fields to render a template by id.
+
+#### Example:
+
+
+```ruby
+require "shotstack"
+
+template = Shotstack::TemplateRender.new(
+  id: '21e781c0-8232-4418-fec1-cc99f0280c21',
+  merge: merge
+)
+```
+
+#### Arguments:
+
+Argument | Type | Description | Required
+:--- | :--- | :--- | :---: 
+id | string | The id of the template to render in UUID format. | Y
+merge | [Shotstack::MergeField[]](#mergefield) | An array of key/value pairs that provides an easy way to create templates with placeholders. The placeholders can be used to find and replace keys with values. For example you can search for the placeholder `{{NAME}}` and replace it with the value `Jane`. | -
 
 ---
 
@@ -707,13 +884,14 @@ output = Shotstack::Output.new(
   aspectRatio: '16:9',
   size: size,
   fps: 25,
-  scaleTo: 'preview',
+  scale_to: 'preview',
   quality: 'medium',
   repeat: true,
+  mute: false,
   range: range,
   poster: poster,
   thumbnail: thumbnail,
-  destination: destination
+  destinations: destinations
 )
 ```
 
@@ -729,10 +907,11 @@ fps | float | Override the default frames per second. Useful for when the source
 scaleTo | string | Override the resolution and scale the video or image to render at a different size. When using scaleTo the asset should be edited at the resolution dimensions, i.e. use font sizes that look best at HD, then use scaleTo to output the file at SD and the text will be scaled to the correct size. This is useful if you want to create multiple asset sizes. <ul><li>`preview` - 512px x 288px @ 15fps</li><li>`mobile` - 640px x 360px @ 25fps</li><li>`sd` - 1024px x 576px @25fps</li><li>`hd` - 1280px x 720px @25fps</li><li>`1080` - 1920px x 1080px @25fps</li></ul> | -
 quality | string | Adjust the output quality of the video, image or audio. Adjusting quality affects  render speed, download speeds and storage requirements due to file size. The default `medium` provides the most optimized choice for all three  factors. <ul><li>`low` - slightly reduced quality, smaller file size</li><li>`medium` - optimized quality, render speeds and file size</li><li>`high` - slightly increased quality, larger file size</li></ul> | -
 repeat | bool | Loop tings for gif files. Set to `true` to loop, `false` to play only once. [default to `true`] | -
+mute | bool | Mute the audio track of the output video. Set to `true` to mute, `false` to un-mute. | -
 range | [Shotstack::Range](#range) | Specify a time range to render, i.e. to render only a portion of a video or audio file. Omit this ting to export the entire video. Range can also be used to render a frame at a specific time point - ting a range and output format as `jpg` will output a single frame image at the range `start` point. | -
 poster | [Shotstack::Poster](#poster) | Generate a poster image from a specific point on the timeline. | -
 thumbnail | [Shotstack::Thumbnail](#thumbnail) | Generate a thumbnail image from a specific point on the timeline. | -
-destinations | [AnyOfShotstackDestination[]](#shotstackdestination) | A destination is a location where output files can be sent to for serving or hosting. By default all rendered assets are automatically sent to the Shotstack hosting destination. [ShotstackDestination](#shotstackdestination) is currently the only option with plans to add more in the future such as S3, YouTube, Vimeo and Mux. If you do not require hosting you can opt-out using the  `exclude` property. | -
+destinations | [Shotstack::Destinations[]](#destinations) | A destination is a location where output files can be sent to for serving or hosting. By default all rendered assets are automatically sent to the Shotstack hosting destination. | -
 
 ---
 
@@ -830,6 +1009,8 @@ scale | float | Scale the thumbnail size to a fraction of the viewport size - i.
 
 ---
 
+## Destinations
+
 ### ShotstackDestination
 
 Send rendered asset to the Shotstack hosting and CDN service. This destination is enabled by default.
@@ -839,7 +1020,7 @@ Send rendered asset to the Shotstack hosting and CDN service. This destination i
 ```ruby
 require "shotstack"
 
-shotstackDestination = Shotstack::ShotstackDestination.new(
+shotstack_destination = Shotstack::ShotstackDestination.new(
   provider: 'shotstack',
   exclude: false
 )
@@ -849,8 +1030,99 @@ shotstackDestination = Shotstack::ShotstackDestination.new(
 
 Argument | Type | Description | Required
 :--- | :--- | :--- | :---: 
-provider | string | The destination to send rendered asset to - set to `shotstack` for Shotstack hosting and CDN. [default to `shotstack`] | Y
+provider | string | The destination to send rendered assets to - set to `shotstack` for Shotstack. | Y
 exclude | bool | Set to `true` to opt-out from the Shotstack hosting and CDN service. All files must be downloaded within 24 hours of rendering. [default to `false`] | -
+
+### MuxDestination
+
+Send rendered videos to the [Mux](https://shotstack.io/docs/guide/serving-assets/destinations/mux) video hosting and
+streaming service. Mux credentials are required and added via the 
+[dashboard](https://dashboard.shotstack.io/integrations/mux), not in the request.
+
+#### Example:
+
+```ruby
+require "shotstack"
+
+mux_destination = Shotstack::MuxDestination.new(
+  provider: 'mux',
+  options: mux_destination_options
+)
+```
+#### Arguments:
+
+Argument | Type | Description | Required
+:--- | :--- | :--- | :---: 
+provider | string | The destination to send rendered assets to - set to `mux` for Mux. | Y
+options | [Shotstack::MuxDestinationOptions](#muxdestinationoptions) | Additional Mux configuration and features. | - 
+
+### MuxDestinationOptions
+
+Pass additional options to control how Mux processes video. Currently supports playback policy option.
+
+#### Example:
+
+mux_destination_options = Shotstack::MuxDestinationOptions.new(
+  playback_policy: ['public']
+)
+```
+
+#### Arguments:
+
+Argument | Type | Description | Required
+:--- | :--- | :--- | :---: 
+playback_policy | [string] | Sets the Mux `playback_policy` option. Value is an array of strings - use **public**, **signed**, or both. | -  
+
+### S3Destination
+
+Send rendered videos to an [Amazon S3](https://shotstack.io/docs/guide/serving-assets/destinations/s3) bucket. Send 
+files to any region with your own prefix and filename. AWS credentials are required and added via the 
+[dashboard](https://dashboard.shotstack.io/integrations/s3), not in the request.
+
+#### Example:
+
+```python
+require "shotstack"
+
+const s3_destination = new Shotstack::S3Destination.new(
+  provider: 's3',
+  options: S3_destination_options
+)
+```
+#### Arguments:
+
+Argument | Type | Description | Required
+:--- | :--- | :--- | :---: 
+provider | string | The destination to send rendered assets to - set to `s3` for S3. | Y
+options | [S3DestinationOptions](#s3destinationoptions) | Additional S3 configuration options. | - 
+
+### S3DestinationOptions
+
+Pass additional options to control how files are stored in S3.
+
+#### Example:
+
+```python
+require "shotstack"
+
+const s3_destination_options = new Shotstack::S3DestinationOptions.new(
+  region: 'us-east-1',
+  bucket: 'my-bucket',
+  prefix: 'my-renders',
+  filename: 'my-file',
+  acl: 'public-read',
+)
+```
+
+#### Arguments:
+
+Argument | Type | Description | Required
+:--- | :--- | :--- | :---: 
+region | string | Choose the region to send the file to. Must be a valid [AWS region](https://docs.aws.amazon.com/general/latest/gr/s3.html#s3_region) string like `us-east-1` or `ap-southeast-2` | Y
+bucket | string | The bucket name to send files to. The bucket must exist in the AWS account before files can be sent. | Y
+prefix | string | A prefix for the file being sent. This is typically a folder name, i.e. `videos` or `customerId/videos`. | -
+filename | string | Use your own filename instead of the default render ID filename. Note: omit the file extension as this will be appended depending on the output format. Also `-poster.jpg` and `-thumb.jpg` will be appended for poster and thumbnail images. | -
+acl | string | Sets the S3 Access Control List (acl) permissions. Default is `private`. Must use a valid  S3 [Canned ACL](https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl-overview.html#canned-acl). | -
 
 ---
 
@@ -920,6 +1192,98 @@ thumbnail | string | The URL of the thumbnail image if requested. This will only
 data | [Shotstack::Edit](#edit) | The timeline and output data to be rendered. | Y
 created | string | The time the render task was initially queued. | Y
 updated | string | The time the render status was last updated. | Y
+
+---
+
+## Template Response Schemas
+
+The following schemas are returned by the templates endpoint, including create, update and rendering a template.
+
+### TemplateResponse
+
+The response received after a [template](#create-template) is submitted. The template is saved and a unique
+template id is returned.
+
+#### Arguments:
+
+Argument | Type | Description | Required
+:--- | :--- | :--- | :---: 
+success | bool | `true` if successfully created, else `false`. | Y
+message | string | `Created`, `Bad Request` or an error message. | Y
+response | [Shotstack::TemplateResponseData](#templateresponsedata) | `TemplateResponseData` or an error message. | Y
+
+### TemplateResponseData
+
+The response data returned with the [Shotstack.TemplateResponse](#templateresponse).
+
+#### Arguments:
+
+Argument | Type | Description | Required
+:--- | :--- | :--- | :---: 
+message | string | Success response message or error details. | Y
+id | string | The unique id of the template in UUID format. | Y
+
+### TemplateDataResponse
+
+The template data including the template name and [Edit](#edit).
+
+#### Arguments:
+
+Argument | Type | Description | Required
+:--- | :--- | :--- | :---: 
+success | bool | `true` if successfully returned, else `false`. | Y
+message |  string | `OK`, `Bad Request` or an error message. | Y
+response | [Shotstack::TemplateDataResponseData](#templatedataresponsedata) | `TemplateDataResponseData` or an error message. | Y
+
+### TemplateDataResponseData
+
+The response data returned with the [TemplateDataResponse](#templatedataresponse).
+
+#### Arguments:
+
+Argument | Type | Description | Required
+:--- | :--- | :--- | :---: 
+id | string | The unique id of the template in UUID format. | Y
+name | string | The template name. | Y
+owner | string | The owner id of the templates. | Y
+template [Shotstack::Edit](#edit) | `Edit` or an error message. | Y
+
+### TemplateListResponse
+
+A list of previously saved templates.
+
+#### Arguments:
+
+Argument | Type | Description | Required
+:--- | :--- | :--- | :---:
+success | bool | `true` if successfully returned, else `false`. | Y
+message | string | `OK`, `Bad Request` or an error message. | Y
+response | [Shotstack::TemplateListResponseData](#templatelistresponsedata) | `TemplateListResponseData` or an error message. | Y
+
+### TemplateListResponseData
+
+The response data returned with the [TemplateListResponse](#templatelistresponse).
+
+#### Arguments:
+
+Argument | Type | Description | Required
+:--- | :--- | :--- | :---: 
+owner | bool | The owner id of the templates. | Y
+templates | [Shotstack::TemplateListResponseItem[]](#templatelistresponseitem) | The list of templates. | Y
+
+### TemplateListResponseItem
+
+The individual template item returned with the [TemplateListResponseData](#templatelistresponsedata) templates
+list.
+
+#### Arguments:
+
+Argument | Type | Description | Required
+:--- | :--- | :--- | :---: 
+id | string | The unique id of the template in UUID format. | Y
+name | string | The template name | Y
+created | string | The time the template was created. | -
+updated | string | The time the template was last updated. | -
 
 ---
 ## Inspecting Media
@@ -1099,7 +1463,7 @@ Argument | Type | Description | Required
 id | string | The unique id of the hosted asset in UUID format. | -
 owner | string | The owner id of the render task. | -
 region | string | The region the asset is hosted, currently only `au` (Australia). | -
-renderId | string | The original render id that created the asset in UUID format. Multiple asset can share the same render id. | -
+render_id | string | The original render id that created the asset in UUID format. Multiple asset can share the same render id. | -
 filename | string | The asset file name. | -
 url | string | The asset file name. | -
 status | string | The status of the asset. <ul><li>`importing` - the asset is being copied to the hosting service</li><li>`ready` - the asset is ready to be served to users</li><li>`failed` - the asset failed to copy or delete</li><li>`deleted` - the asset has been deleted</li></ul> | -

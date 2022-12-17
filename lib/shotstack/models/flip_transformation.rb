@@ -66,14 +66,10 @@ module Shotstack
 
       if attributes.key?(:'horizontal')
         self.horizontal = attributes[:'horizontal']
-      else
-        self.horizontal = false
       end
 
       if attributes.key?(:'vertical')
         self.vertical = attributes[:'vertical']
-      else
-        self.vertical = false
       end
     end
 

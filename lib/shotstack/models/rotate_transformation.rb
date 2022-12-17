@@ -61,8 +61,6 @@ module Shotstack
 
       if attributes.key?(:'angle')
         self.angle = attributes[:'angle']
-      else
-        self.angle = 0
       end
     end
 

@@ -66,14 +66,10 @@ module Shotstack
 
       if attributes.key?(:'x')
         self.x = attributes[:'x']
-      else
-        self.x = 0
       end
 
       if attributes.key?(:'y')
         self.y = attributes[:'y']
-      else
-        self.y = 0
       end
     end
 

@@ -25,10 +25,35 @@ module Shotstack
     # The start trim point of the video clip, in seconds (defaults to 0). Videos will start from the in trim point. The video will play until the file ends or the Clip length is reached.
     attr_accessor :trim
 
-    # Set the volume for the video clip between 0 and 1 where 0 is muted and 1 is full volume (defaults to 0).
+    # Set the volume for the video clip between 0 and 1 where 0 is muted and 1 is full volume (defaults to 1).
     attr_accessor :volume
 
+    # The volume effect to apply to the video asset <ul>   <li>`fadeIn` - fade volume in only</li>   <li>`fadeOut` - fade volume out only</li>   <li>`fadeInFadeOut` - fade volume in and out</li> </ul>
+    attr_accessor :volume_effect
+
     attr_accessor :crop
+
+    class EnumAttributeValidator
+      attr_reader :datatype
+      attr_reader :allowable_values
+
+      def initialize(datatype, allowable_values)
+        @allowable_values = allowable_values.map do |value|
+          case datatype.to_s
+          when /Integer/i
+            value.to_i
+          when /Float/i
+            value.to_f
+          else
+            value
+          end
+        end
+      end
+
+      def valid?(value)
+        !value || allowable_values.include?(value)
+      end
+    end
 
     # Attribute mapping from ruby-style variable name to JSON key.
     def self.attribute_map
@@ -37,6 +62,7 @@ module Shotstack
         :'src' => :'src',
         :'trim' => :'trim',
         :'volume' => :'volume',
+        :'volume_effect' => :'volumeEffect',
         :'crop' => :'crop'
       }
     end
@@ -53,6 +79,7 @@ module Shotstack
         :'src' => :'String',
         :'trim' => :'Float',
         :'volume' => :'Float',
+        :'volume_effect' => :'String',
         :'crop' => :'Crop'
       }
     end
@@ -96,6 +123,10 @@ module Shotstack
         self.volume = attributes[:'volume']
       end
 
+      if attributes.key?(:'volume_effect')
+        self.volume_effect = attributes[:'volume_effect']
+      end
+
       if attributes.key?(:'crop')
         self.crop = attributes[:'crop']
       end
@@ -121,7 +152,19 @@ module Shotstack
     def valid?
       return false if @type.nil?
       return false if @src.nil?
+      volume_effect_validator = EnumAttributeValidator.new('String', ["fadeIn", "fadeOut", "fadeInFadeOut"])
+      return false unless volume_effect_validator.valid?(@volume_effect)
       true
+    end
+
+    # Custom attribute writer method checking allowed values (enum).
+    # @param [Object] volume_effect Object to be assigned
+    def volume_effect=(volume_effect)
+      validator = EnumAttributeValidator.new('String', ["fadeIn", "fadeOut", "fadeInFadeOut"])
+      unless validator.valid?(volume_effect)
+        fail ArgumentError, "invalid value for \"volume_effect\", must be one of #{validator.allowable_values}."
+      end
+      @volume_effect = volume_effect
     end
 
     # Checks equality by comparing each attribute.
@@ -133,6 +176,7 @@ module Shotstack
           src == o.src &&
           trim == o.trim &&
           volume == o.volume &&
+          volume_effect == o.volume_effect &&
           crop == o.crop
     end
 
@@ -145,7 +189,7 @@ module Shotstack
     # Calculates hash code according to all attributes.
     # @return [Integer] Hash code
     def hash
-      [type, src, trim, volume, crop].hash
+      [type, src, trim, volume, volume_effect, crop].hash
     end
 
     # Builds the object from hash

@@ -14,12 +14,12 @@ require 'date'
 require 'time'
 
 module Shotstack
-  # Send rendered assets to the Shotstack hosting and CDN service. This destination is enabled by default.
+  # Send rendered assets to the  [Shotstack hosting and CDN](https://shotstack.io/docs/guide/serving-assets/destinations/shotstack) service.  This destination is enabled by default.
   class ShotstackDestination
     # The destination to send rendered assets to - set to `shotstack` for Shotstack hosting and CDN.
     attr_accessor :provider
 
-    # Set to `true` to opt-out from the Shotstack hosting and CDN service. All files must be downloaded within 24 hours of rendering.
+    # Set to `true` to [opt-out](https://shotstack.io/docs/guide/serving-assets/self-host) from the Shotstack hosting and CDN service. All files must be downloaded within 24 hours of rendering.
     attr_accessor :exclude
 
     # Attribute mapping from ruby-style variable name to JSON key.
@@ -72,8 +72,6 @@ module Shotstack
 
       if attributes.key?(:'exclude')
         self.exclude = attributes[:'exclude']
-      else
-        self.exclude = false
       end
     end
 

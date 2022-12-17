@@ -24,7 +24,7 @@ module Shotstack
     # The length, in seconds, the Clip should play for.
     attr_accessor :length
 
-    # Set how the asset should be scaled to fit the viewport using one of the following options:    <ul>     <li>`cover` - stretch the asset to fill the viewport without maintaining the aspect ratio.</li>     <li>`contain` - fit the entire asset within the viewport while maintaining the original aspect ratio.</li>     <li>`crop` - scale the asset to fill the viewport while maintaining the aspect ratio. The asset will be cropped if it exceeds the bounds of the viewport.</li>     <li>`none` - preserves the original asset dimensions and does not apply any scaling.</li>   </ul>
+    # Set how the asset should be scaled to fit the viewport using one of the following options:    <ul>     <li>`crop` <b>(default)</b> - scale the asset to fill the viewport while maintaining the aspect ratio. The asset will be cropped if it exceeds the bounds of the viewport.</li>     <li>`cover` - stretch the asset to fill the viewport without maintaining the aspect ratio.</li>     <li>`contain` - fit the entire asset within the viewport while maintaining the original aspect ratio.</li>     <li>`none` - preserves the original asset dimensions and does not apply any scaling.</li>   </ul>
     attr_accessor :fit
 
     # Scale the asset to a fraction of the viewport size - i.e. setting the scale to 0.5 will scale asset to half the size of the viewport. This is useful for picture-in-picture video and  scaling images such as logos and watermarks.
@@ -37,10 +37,10 @@ module Shotstack
 
     attr_accessor :transition
 
-    # A motion effect to apply to the Clip. <ul>   <li>`zoomIn` - slow zoom in</li>   <li>`zoomOut` - slow zoom out</li>   <li>`slideLeft` - slow slide (pan) left</li>   <li>`slideRight` - slow slide (pan) right</li>   <li>`slideUp` - slow slide (pan) up</li>   <li>`slideDown` - slow slide (pan) down</li> </ul>
+    # A motion effect to apply to the Clip. <ul>   <li>`zoomIn` - slow zoom in</li>   <li>`zoomOut` - slow zoom out</li>   <li>`slideLeft` - slow slide (pan) left</li>   <li>`slideRight` - slow slide (pan) right</li>   <li>`slideUp` - slow slide (pan) up</li>   <li>`slideDown` - slow slide (pan) down</li> </ul> The motion effect speed can also be controlled by appending `Fast` or `Slow` to the effect, e.g. `zoomInFast` or `slideRightSlow`.
     attr_accessor :effect
 
-    # A filter effect to apply to the Clip. <ul>   <li>`boost` - boost contrast and saturation</li>   <li>`contrast` - increase contrast</li>   <li>`darken` - darken the scene</li>   <li>`greyscale` - remove colour</li>   <li>`lighten` - lighten the scene</li>   <li>`muted` - reduce saturation and contrast</li>   <li>`invert` - invert colors</li> </ul>
+    # A filter effect to apply to the Clip. <ul>   <li>`boost` - boost contrast and saturation</li>   <li>`contrast` - increase contrast</li>   <li>`darken` - darken the scene</li>   <li>`greyscale` - remove colour</li>   <li>`lighten` - lighten the scene</li>   <li>`muted` - reduce saturation and contrast</li>   <li>`negative` - negative colors</li> </ul>
     attr_accessor :filter
 
     # Sets the opacity of the Clip where 1 is opaque and 0 is transparent.
@@ -146,8 +146,6 @@ module Shotstack
 
       if attributes.key?(:'fit')
         self.fit = attributes[:'fit']
-      else
-        self.fit = 'crop'
       end
 
       if attributes.key?(:'scale')
@@ -156,8 +154,6 @@ module Shotstack
 
       if attributes.key?(:'position')
         self.position = attributes[:'position']
-      else
-        self.position = 'center'
       end
 
       if attributes.key?(:'offset')
@@ -178,8 +174,6 @@ module Shotstack
 
       if attributes.key?(:'opacity')
         self.opacity = attributes[:'opacity']
-      else
-        self.opacity = 1
       end
 
       if attributes.key?(:'transform')
@@ -216,7 +210,7 @@ module Shotstack
       return false unless fit_validator.valid?(@fit)
       position_validator = EnumAttributeValidator.new('String', ["top", "topRight", "right", "bottomRight", "bottom", "bottomLeft", "left", "topLeft", "center"])
       return false unless position_validator.valid?(@position)
-      effect_validator = EnumAttributeValidator.new('String', ["zoomIn", "zoomOut", "slideLeft", "slideRight", "slideUp", "slideDown"])
+      effect_validator = EnumAttributeValidator.new('String', ["zoomIn", "zoomInSlow", "zoomInFast", "zoomOut", "zoomOutSlow", "zoomOutFast", "slideLeft", "slideLeftSLow", "slideLeftFast", "slideRight", "slideRightSlow", "slideRightFast", "slideUp", "slideUpSlow", "slideUpFast", "slideDown", "slideDownSlow", "slideDownFast"])
       return false unless effect_validator.valid?(@effect)
       filter_validator = EnumAttributeValidator.new('String', ["boost", "contrast", "darken", "greyscale", "lighten", "muted", "negative"])
       return false unless filter_validator.valid?(@filter)
@@ -246,7 +240,7 @@ module Shotstack
     # Custom attribute writer method checking allowed values (enum).
     # @param [Object] effect Object to be assigned
     def effect=(effect)
-      validator = EnumAttributeValidator.new('String', ["zoomIn", "zoomOut", "slideLeft", "slideRight", "slideUp", "slideDown"])
+      validator = EnumAttributeValidator.new('String', ["zoomIn", "zoomInSlow", "zoomInFast", "zoomOut", "zoomOutSlow", "zoomOutFast", "slideLeft", "slideLeftSLow", "slideLeftFast", "slideRight", "slideRightSlow", "slideRightFast", "slideUp", "slideUpSlow", "slideUpFast", "slideDown", "slideDownSlow", "slideDownFast"])
       unless validator.valid?(effect)
         fail ArgumentError, "invalid value for \"effect\", must be one of #{validator.allowable_values}."
       end
