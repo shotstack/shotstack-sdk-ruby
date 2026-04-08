@@ -115,6 +115,15 @@ module Shotstack
         invalid_properties.push('invalid value for "src", src cannot be nil.')
       end
 
+      if @src.to_s.length < 1
+        invalid_properties.push('invalid value for "src", the character length must be great than or equal to 1.')
+      end
+
+      pattern = Regexp.new(/\S/)
+      if @src !~ pattern
+        invalid_properties.push("invalid value for \"src\", must conform to the pattern #{pattern}.")
+      end
+
       invalid_properties
     end
 
@@ -123,9 +132,30 @@ module Shotstack
     def valid?
       warn '[DEPRECATED] the `valid?` method is obsolete'
       return false if @src.nil?
+      return false if @src.to_s.length < 1
+      return false if @src !~ Regexp.new(/\S/)
       effect_validator = EnumAttributeValidator.new('String', ["fadeIn", "fadeOut", "fadeInFadeOut"])
       return false unless effect_validator.valid?(@effect)
       true
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] src Value to be assigned
+    def src=(src)
+      if src.nil?
+        fail ArgumentError, 'src cannot be nil'
+      end
+
+      if src.to_s.length < 1
+        fail ArgumentError, 'invalid value for "src", the character length must be great than or equal to 1.'
+      end
+
+      pattern = Regexp.new(/\S/)
+      if src !~ pattern
+        fail ArgumentError, "invalid value for \"src\", must conform to the pattern #{pattern}."
+      end
+
+      @src = src
     end
 
     # Custom attribute writer method checking allowed values (enum).

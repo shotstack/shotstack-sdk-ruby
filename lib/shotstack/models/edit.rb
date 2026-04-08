@@ -14,7 +14,7 @@ require 'date'
 require 'time'
 
 module Shotstack
-  # An edit defines the arrangement of a video on a timeline, an audio edit or an image design and the output format.
+  # An edit defines the arrangement of a video on a timeline, an audio edit or an image design and the output format. Video assets are automatically preprocessed to fix common compatibility issues before rendering. You can control preprocessing behavior using the `transcode` flag on video assets.
   class Edit
     attr_accessor :timeline
 
@@ -28,6 +28,9 @@ module Shotstack
 
     # **Notice: This option is now deprecated and will be removed. Disk types are handled automatically. Setting a disk type has no effect.**  The disk type to use for storing footage and assets for each render. See [disk types](https://shotstack.io/docs/guide/architecting-an-application/disk-types/) for more details. <ul>   <li>`local` - optimized for high speed rendering with up to 512MB storage</li>   <li>`mount` - optimized for larger file sizes and longer videos with 5GB for source footage and 512MB for output render</li> </ul> 
     attr_accessor :disk
+
+    # The render instance type to use for processing the edit. <ul>   <li>`s1` - standard instance (default)</li>   <li>`s2` - standard instance with more resources</li>   <li>`a1` - accelerated instance for faster rendering</li> </ul>
+    attr_accessor :instance
 
     class EnumAttributeValidator
       attr_reader :datatype
@@ -58,7 +61,8 @@ module Shotstack
         :'output' => :'output',
         :'merge' => :'merge',
         :'callback' => :'callback',
-        :'disk' => :'disk'
+        :'disk' => :'disk',
+        :'instance' => :'instance'
       }
     end
 
@@ -74,7 +78,8 @@ module Shotstack
         :'output' => :'Output',
         :'merge' => :'Array<MergeField>',
         :'callback' => :'String',
-        :'disk' => :'String'
+        :'disk' => :'String',
+        :'instance' => :'String'
       }
     end
 
@@ -124,6 +129,12 @@ module Shotstack
       if attributes.key?(:'disk')
         self.disk = attributes[:'disk']
       end
+
+      if attributes.key?(:'instance')
+        self.instance = attributes[:'instance']
+      else
+        self.instance = 's1'
+      end
     end
 
     # Show invalid properties with the reasons. Usually used together with valid?
@@ -150,6 +161,8 @@ module Shotstack
       return false if @output.nil?
       disk_validator = EnumAttributeValidator.new('String', ["local", "mount"])
       return false unless disk_validator.valid?(@disk)
+      instance_validator = EnumAttributeValidator.new('String', ["s1", "s2", "a1"])
+      return false unless instance_validator.valid?(@instance)
       true
     end
 
@@ -163,6 +176,16 @@ module Shotstack
       @disk = disk
     end
 
+    # Custom attribute writer method checking allowed values (enum).
+    # @param [Object] instance Object to be assigned
+    def instance=(instance)
+      validator = EnumAttributeValidator.new('String', ["s1", "s2", "a1"])
+      unless validator.valid?(instance)
+        fail ArgumentError, "invalid value for \"instance\", must be one of #{validator.allowable_values}."
+      end
+      @instance = instance
+    end
+
     # Checks equality by comparing each attribute.
     # @param [Object] Object to be compared
     def ==(o)
@@ -172,7 +195,8 @@ module Shotstack
           output == o.output &&
           merge == o.merge &&
           callback == o.callback &&
-          disk == o.disk
+          disk == o.disk &&
+          instance == o.instance
     end
 
     # @see the `==` method
@@ -184,7 +208,7 @@ module Shotstack
     # Calculates hash code according to all attributes.
     # @return [Integer] Hash code
     def hash
-      [timeline, output, merge, callback, disk].hash
+      [timeline, output, merge, callback, disk, instance].hash
     end
 
     # Builds the object from hash

@@ -14,12 +14,10 @@ require 'date'
 require 'time'
 
 module Shotstack
-  # Skew a clip so its edges are sheared at an angle. Use values between 0 and 3. Over 3 the clip will be skewed almost flat.
+  # Skew a clip so its edges are sheared at an angle. Use values between -100 and 100. Values over 3 or under -3 will skew the clip almost flat.
   class SkewTransformation
-    # Skew the clip along it's x axis.
     attr_accessor :x
 
-    # Skew the clip along it's y axis.
     attr_accessor :y
 
     # Attribute mapping from ruby-style variable name to JSON key.
@@ -38,8 +36,8 @@ module Shotstack
     # Attribute type mapping.
     def self.openapi_types
       {
-        :'x' => :'Float',
-        :'y' => :'Float'
+        :'x' => :'SkewTransformationX',
+        :'y' => :'SkewTransformationY'
       }
     end
 

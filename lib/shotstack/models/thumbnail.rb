@@ -90,6 +90,14 @@ module Shotstack
         invalid_properties.push('invalid value for "scale", scale cannot be nil.')
       end
 
+      if @scale > 1
+        invalid_properties.push('invalid value for "scale", must be smaller than or equal to 1.')
+      end
+
+      if @scale < 0
+        invalid_properties.push('invalid value for "scale", must be greater than or equal to 0.')
+      end
+
       invalid_properties
     end
 
@@ -99,7 +107,27 @@ module Shotstack
       warn '[DEPRECATED] the `valid?` method is obsolete'
       return false if @capture.nil?
       return false if @scale.nil?
+      return false if @scale > 1
+      return false if @scale < 0
       true
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] scale Value to be assigned
+    def scale=(scale)
+      if scale.nil?
+        fail ArgumentError, 'scale cannot be nil'
+      end
+
+      if scale > 1
+        fail ArgumentError, 'invalid value for "scale", must be smaller than or equal to 1.'
+      end
+
+      if scale < 0
+        fail ArgumentError, 'invalid value for "scale", must be greater than or equal to 0.'
+      end
+
+      @scale = scale
     end
 
     # Checks equality by comparing each attribute.

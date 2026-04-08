@@ -24,6 +24,28 @@ module Shotstack
 
     attr_accessor :crop
 
+    class EnumAttributeValidator
+      attr_reader :datatype
+      attr_reader :allowable_values
+
+      def initialize(datatype, allowable_values)
+        @allowable_values = allowable_values.map do |value|
+          case datatype.to_s
+          when /Integer/i
+            value.to_i
+          when /Float/i
+            value.to_f
+          else
+            value
+          end
+        end
+      end
+
+      def valid?(value)
+        !value || allowable_values.include?(value)
+      end
+    end
+
     # Attribute mapping from ruby-style variable name to JSON key.
     def self.attribute_map
       {
@@ -98,6 +120,15 @@ module Shotstack
         invalid_properties.push('invalid value for "src", src cannot be nil.')
       end
 
+      if @src.to_s.length < 1
+        invalid_properties.push('invalid value for "src", the character length must be great than or equal to 1.')
+      end
+
+      pattern = Regexp.new(/\S/)
+      if @src !~ pattern
+        invalid_properties.push("invalid value for \"src\", must conform to the pattern #{pattern}.")
+      end
+
       invalid_properties
     end
 
@@ -106,8 +137,41 @@ module Shotstack
     def valid?
       warn '[DEPRECATED] the `valid?` method is obsolete'
       return false if @type.nil?
+      type_validator = EnumAttributeValidator.new('String', ["image"])
+      return false unless type_validator.valid?(@type)
       return false if @src.nil?
+      return false if @src.to_s.length < 1
+      return false if @src !~ Regexp.new(/\S/)
       true
+    end
+
+    # Custom attribute writer method checking allowed values (enum).
+    # @param [Object] type Object to be assigned
+    def type=(type)
+      validator = EnumAttributeValidator.new('String', ["image"])
+      unless validator.valid?(type)
+        fail ArgumentError, "invalid value for \"type\", must be one of #{validator.allowable_values}."
+      end
+      @type = type
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] src Value to be assigned
+    def src=(src)
+      if src.nil?
+        fail ArgumentError, 'src cannot be nil'
+      end
+
+      if src.to_s.length < 1
+        fail ArgumentError, 'invalid value for "src", the character length must be great than or equal to 1.'
+      end
+
+      pattern = Regexp.new(/\S/)
+      if src !~ pattern
+        fail ArgumentError, "invalid value for \"src\", must conform to the pattern #{pattern}."
+      end
+
+      @src = src
     end
 
     # Checks equality by comparing each attribute.

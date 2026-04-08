@@ -114,6 +114,10 @@ module Shotstack
         invalid_properties.push('invalid value for "tracks", tracks cannot be nil.')
       end
 
+      if @tracks.length < 1
+        invalid_properties.push('invalid value for "tracks", number of items must be greater than or equal to 1.')
+      end
+
       invalid_properties
     end
 
@@ -122,7 +126,22 @@ module Shotstack
     def valid?
       warn '[DEPRECATED] the `valid?` method is obsolete'
       return false if @tracks.nil?
+      return false if @tracks.length < 1
       true
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] tracks Value to be assigned
+    def tracks=(tracks)
+      if tracks.nil?
+        fail ArgumentError, 'tracks cannot be nil'
+      end
+
+      if tracks.length < 1
+        fail ArgumentError, 'invalid value for "tracks", number of items must be greater than or equal to 1.'
+      end
+
+      @tracks = tracks
     end
 
     # Checks equality by comparing each attribute.

@@ -16,7 +16,6 @@ require 'time'
 module Shotstack
   # Rotate a clip by the specified angle in degrees. Rotation origin is set based on the clips `position`.
   class RotateTransformation
-    # The angle to rotate the clip. Can be 0 to 360, or 0 to -360. Using a positive number rotates the clip clockwise, negative numbers counter-clockwise.
     attr_accessor :angle
 
     # Attribute mapping from ruby-style variable name to JSON key.
@@ -34,7 +33,7 @@ module Shotstack
     # Attribute type mapping.
     def self.openapi_types
       {
-        :'angle' => :'Integer'
+        :'angle' => :'RotateTransformationAngle'
       }
     end
 

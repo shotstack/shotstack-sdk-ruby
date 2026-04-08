@@ -219,7 +219,7 @@ module Shotstack
       return false unless aspect_ratio_validator.valid?(@aspect_ratio)
       fps_validator = EnumAttributeValidator.new('Float', [12, 15, 23.976, 24, 25, 29.97, 30, 48, 50, 59.94, 60])
       return false unless fps_validator.valid?(@fps)
-      scale_to_validator = EnumAttributeValidator.new('String', ["preview", "mobile", "sd", "hd", "1080"])
+      scale_to_validator = EnumAttributeValidator.new('String', ["preview", "mobile", "sd", "hd", "1080", "4k"])
       return false unless scale_to_validator.valid?(@scale_to)
       quality_validator = EnumAttributeValidator.new('String', ["verylow", "low", "medium", "high", "veryhigh"])
       return false unless quality_validator.valid?(@quality)
@@ -269,7 +269,7 @@ module Shotstack
     # Custom attribute writer method checking allowed values (enum).
     # @param [Object] scale_to Object to be assigned
     def scale_to=(scale_to)
-      validator = EnumAttributeValidator.new('String', ["preview", "mobile", "sd", "hd", "1080"])
+      validator = EnumAttributeValidator.new('String', ["preview", "mobile", "sd", "hd", "1080", "4k"])
       unless validator.valid?(scale_to)
         fail ArgumentError, "invalid value for \"scale_to\", must be one of #{validator.allowable_values}."
       end

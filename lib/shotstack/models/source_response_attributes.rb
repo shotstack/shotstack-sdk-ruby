@@ -106,7 +106,7 @@ module Shotstack
         :'status' => :'String',
         :'outputs' => :'OutputsResponse',
         :'width' => :'Integer',
-        :'height' => :'String',
+        :'height' => :'Integer',
         :'duration' => :'Float',
         :'fps' => :'Float',
         :'created' => :'String',
