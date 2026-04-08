@@ -16,10 +16,8 @@ require 'time'
 module Shotstack
   # Offsets the position of an asset horizontally or vertically by a relative distance.
   class Offset
-    # Offset an asset on the horizontal axis (left or right), range varies from -10 to 10. Positive numbers move the asset right, negative left. For all assets except titles the distance moved is relative to the width  of the viewport - i.e. an X offset of 0.5 will move the asset half the  screen width to the right.
     attr_accessor :x
 
-    # Offset an asset on the vertical axis (up or down), range varies from -10 to 10. Positive numbers move the asset up, negative down. For all assets except titles the distance moved is relative to the height  of the viewport - i.e. an Y offset of 0.5 will move the asset up half the  screen height.
     attr_accessor :y
 
     # Attribute mapping from ruby-style variable name to JSON key.
@@ -38,8 +36,8 @@ module Shotstack
     # Attribute type mapping.
     def self.openapi_types
       {
-        :'x' => :'Float',
-        :'y' => :'Float'
+        :'x' => :'OffsetX',
+        :'y' => :'OffsetY'
       }
     end
 
@@ -78,22 +76,6 @@ module Shotstack
     def list_invalid_properties
       warn '[DEPRECATED] the `list_invalid_properties` method is obsolete'
       invalid_properties = Array.new
-      if !@x.nil? && @x > 10
-        invalid_properties.push('invalid value for "x", must be smaller than or equal to 10.')
-      end
-
-      if !@x.nil? && @x < -10
-        invalid_properties.push('invalid value for "x", must be greater than or equal to -10.')
-      end
-
-      if !@y.nil? && @y > 10
-        invalid_properties.push('invalid value for "y", must be smaller than or equal to 10.')
-      end
-
-      if !@y.nil? && @y < -10
-        invalid_properties.push('invalid value for "y", must be greater than or equal to -10.')
-      end
-
       invalid_properties
     end
 
@@ -101,47 +83,7 @@ module Shotstack
     # @return true if the model is valid
     def valid?
       warn '[DEPRECATED] the `valid?` method is obsolete'
-      return false if !@x.nil? && @x > 10
-      return false if !@x.nil? && @x < -10
-      return false if !@y.nil? && @y > 10
-      return false if !@y.nil? && @y < -10
       true
-    end
-
-    # Custom attribute writer method with validation
-    # @param [Object] x Value to be assigned
-    def x=(x)
-      if x.nil?
-        fail ArgumentError, 'x cannot be nil'
-      end
-
-      if x > 10
-        fail ArgumentError, 'invalid value for "x", must be smaller than or equal to 10.'
-      end
-
-      if x < -10
-        fail ArgumentError, 'invalid value for "x", must be greater than or equal to -10.'
-      end
-
-      @x = x
-    end
-
-    # Custom attribute writer method with validation
-    # @param [Object] y Value to be assigned
-    def y=(y)
-      if y.nil?
-        fail ArgumentError, 'y cannot be nil'
-      end
-
-      if y > 10
-        fail ArgumentError, 'invalid value for "y", must be smaller than or equal to 10.'
-      end
-
-      if y < -10
-        fail ArgumentError, 'invalid value for "y", must be greater than or equal to -10.'
-      end
-
-      @y = y
     end
 
     # Checks equality by comparing each attribute.

@@ -18,17 +18,20 @@ module Shotstack
   class Clip
     attr_accessor :asset
 
-    # The start position of the Clip on the timeline, in seconds.
     attr_accessor :start
 
-    # The length, in seconds, the Clip should play for.
     attr_accessor :length
 
     # Set how the asset should be scaled to fit the viewport using one of the following options:    <ul>     <li>`crop` <b>(default)</b> - scale the asset to fill the viewport while maintaining the aspect ratio. The asset will be cropped if it exceeds the bounds of the viewport.</li>     <li>`cover` - stretch the asset to fill the viewport without maintaining the aspect ratio.</li>     <li>`contain` - fit the entire asset within the viewport while maintaining the original aspect ratio.</li>     <li>`none` - preserves the original asset dimensions and does not apply any scaling.</li>   </ul>
     attr_accessor :fit
 
-    # Scale the asset to a fraction of the viewport size - i.e. setting the scale to 0.5 will scale asset to half the size of the viewport. This is useful for picture-in-picture video and  scaling images such as logos and watermarks.
     attr_accessor :scale
+
+    # Set the width of the clip bounding box in pixels. This constrains the width of the clip, overriding the default behavior where clips fill the viewport width.
+    attr_accessor :width
+
+    # Set the height of the clip bounding box in pixels. This constrains the height of the clip, overriding the default behavior where clips fill the viewport height.
+    attr_accessor :height
 
     # Place the asset in one of nine predefined positions of the viewport. This is most effective for when the asset is scaled and you want to position the element to a specific position. <ul>   <li>`top` - top (center)</li>   <li>`topRight` - top right</li>   <li>`right` - right (center)</li>   <li>`bottomRight` - bottom right</li>   <li>`bottom` - bottom (center)</li>   <li>`bottomLeft` - bottom left</li>   <li>`left` - left (center)</li>   <li>`topLeft` - top left</li>   <li>`center` - center</li> </ul>
     attr_accessor :position
@@ -40,13 +43,15 @@ module Shotstack
     # A motion effect to apply to the Clip. <ul>   <li>`zoomIn` - slow zoom in</li>   <li>`zoomOut` - slow zoom out</li>   <li>`slideLeft` - slow slide (pan) left</li>   <li>`slideRight` - slow slide (pan) right</li>   <li>`slideUp` - slow slide (pan) up</li>   <li>`slideDown` - slow slide (pan) down</li> </ul> The motion effect speed can also be controlled by appending `Fast` or `Slow` to the effect, e.g. `zoomInFast` or `slideRightSlow`.
     attr_accessor :effect
 
-    # A filter effect to apply to the Clip. <ul>   <li>`blur` - blur the scene</li>   <li>`boost` - boost contrast and saturation</li>   <li>`contrast` - increase contrast</li>   <li>`darken` - darken the scene</li>   <li>`greyscale` - remove colour</li>   <li>`lighten` - lighten the scene</li>   <li>`muted` - reduce saturation and contrast</li>   <li>`negative` - negative colors</li> </ul>
+    # A filter effect to apply to the Clip. <ul>   <li>`none` - no filter applied</li>   <li>`blur` - blur the scene</li>   <li>`boost` - boost contrast and saturation</li>   <li>`contrast` - increase contrast</li>   <li>`darken` - darken the scene</li>   <li>`greyscale` - remove colour</li>   <li>`lighten` - lighten the scene</li>   <li>`muted` - reduce saturation and contrast</li>   <li>`negative` - negative colors</li> </ul>
     attr_accessor :filter
 
-    # Sets the opacity of the Clip where 1 is opaque and 0 is transparent.
     attr_accessor :opacity
 
     attr_accessor :transform
+
+    # A unique identifier for this clip that can be used to reference it from other clips using the `alias://` protocol in asset sources. This is useful for features like auto-captioning where a caption asset needs to reference the audio from another clip.
+    attr_accessor :_alias
 
     class EnumAttributeValidator
       attr_reader :datatype
@@ -78,13 +83,16 @@ module Shotstack
         :'length' => :'length',
         :'fit' => :'fit',
         :'scale' => :'scale',
+        :'width' => :'width',
+        :'height' => :'height',
         :'position' => :'position',
         :'offset' => :'offset',
         :'transition' => :'transition',
         :'effect' => :'effect',
         :'filter' => :'filter',
         :'opacity' => :'opacity',
-        :'transform' => :'transform'
+        :'transform' => :'transform',
+        :'_alias' => :'alias'
       }
     end
 
@@ -97,17 +105,20 @@ module Shotstack
     def self.openapi_types
       {
         :'asset' => :'Asset',
-        :'start' => :'Float',
-        :'length' => :'Float',
+        :'start' => :'ClipStart',
+        :'length' => :'ClipLength',
         :'fit' => :'String',
-        :'scale' => :'Float',
+        :'scale' => :'ClipScale',
+        :'width' => :'Float',
+        :'height' => :'Float',
         :'position' => :'String',
         :'offset' => :'Offset',
         :'transition' => :'Transition',
         :'effect' => :'String',
         :'filter' => :'String',
-        :'opacity' => :'Float',
-        :'transform' => :'Transformation'
+        :'opacity' => :'ClipOpacity',
+        :'transform' => :'Transformation',
+        :'_alias' => :'String'
       }
     end
 
@@ -158,6 +169,14 @@ module Shotstack
         self.scale = attributes[:'scale']
       end
 
+      if attributes.key?(:'width')
+        self.width = attributes[:'width']
+      end
+
+      if attributes.key?(:'height')
+        self.height = attributes[:'height']
+      end
+
       if attributes.key?(:'position')
         self.position = attributes[:'position']
       end
@@ -185,6 +204,10 @@ module Shotstack
       if attributes.key?(:'transform')
         self.transform = attributes[:'transform']
       end
+
+      if attributes.key?(:'_alias')
+        self._alias = attributes[:'_alias']
+      end
     end
 
     # Show invalid properties with the reasons. Usually used together with valid?
@@ -204,6 +227,27 @@ module Shotstack
         invalid_properties.push('invalid value for "length", length cannot be nil.')
       end
 
+      if !@width.nil? && @width > 3840
+        invalid_properties.push('invalid value for "width", must be smaller than or equal to 3840.')
+      end
+
+      if !@width.nil? && @width < 1
+        invalid_properties.push('invalid value for "width", must be greater than or equal to 1.')
+      end
+
+      if !@height.nil? && @height > 2160
+        invalid_properties.push('invalid value for "height", must be smaller than or equal to 2160.')
+      end
+
+      if !@height.nil? && @height < 1
+        invalid_properties.push('invalid value for "height", must be greater than or equal to 1.')
+      end
+
+      pattern = Regexp.new(/^[A-Za-z0-9_-]+$/)
+      if !@_alias.nil? && @_alias !~ pattern
+        invalid_properties.push("invalid value for \"_alias\", must conform to the pattern #{pattern}.")
+      end
+
       invalid_properties
     end
 
@@ -216,12 +260,17 @@ module Shotstack
       return false if @length.nil?
       fit_validator = EnumAttributeValidator.new('String', ["cover", "contain", "crop", "none"])
       return false unless fit_validator.valid?(@fit)
+      return false if !@width.nil? && @width > 3840
+      return false if !@width.nil? && @width < 1
+      return false if !@height.nil? && @height > 2160
+      return false if !@height.nil? && @height < 1
       position_validator = EnumAttributeValidator.new('String', ["top", "topRight", "right", "bottomRight", "bottom", "bottomLeft", "left", "topLeft", "center"])
       return false unless position_validator.valid?(@position)
       effect_validator = EnumAttributeValidator.new('String', ["zoomIn", "zoomInSlow", "zoomInFast", "zoomOut", "zoomOutSlow", "zoomOutFast", "slideLeft", "slideLeftSlow", "slideLeftFast", "slideRight", "slideRightSlow", "slideRightFast", "slideUp", "slideUpSlow", "slideUpFast", "slideDown", "slideDownSlow", "slideDownFast"])
       return false unless effect_validator.valid?(@effect)
-      filter_validator = EnumAttributeValidator.new('String', ["blur", "boost", "contrast", "darken", "greyscale", "lighten", "muted", "negative"])
+      filter_validator = EnumAttributeValidator.new('String', ["none", "blur", "boost", "contrast", "darken", "greyscale", "lighten", "muted", "negative"])
       return false unless filter_validator.valid?(@filter)
+      return false if !@_alias.nil? && @_alias !~ Regexp.new(/^[A-Za-z0-9_-]+$/)
       true
     end
 
@@ -233,6 +282,42 @@ module Shotstack
         fail ArgumentError, "invalid value for \"fit\", must be one of #{validator.allowable_values}."
       end
       @fit = fit
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] width Value to be assigned
+    def width=(width)
+      if width.nil?
+        fail ArgumentError, 'width cannot be nil'
+      end
+
+      if width > 3840
+        fail ArgumentError, 'invalid value for "width", must be smaller than or equal to 3840.'
+      end
+
+      if width < 1
+        fail ArgumentError, 'invalid value for "width", must be greater than or equal to 1.'
+      end
+
+      @width = width
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] height Value to be assigned
+    def height=(height)
+      if height.nil?
+        fail ArgumentError, 'height cannot be nil'
+      end
+
+      if height > 2160
+        fail ArgumentError, 'invalid value for "height", must be smaller than or equal to 2160.'
+      end
+
+      if height < 1
+        fail ArgumentError, 'invalid value for "height", must be greater than or equal to 1.'
+      end
+
+      @height = height
     end
 
     # Custom attribute writer method checking allowed values (enum).
@@ -258,11 +343,26 @@ module Shotstack
     # Custom attribute writer method checking allowed values (enum).
     # @param [Object] filter Object to be assigned
     def filter=(filter)
-      validator = EnumAttributeValidator.new('String', ["blur", "boost", "contrast", "darken", "greyscale", "lighten", "muted", "negative"])
+      validator = EnumAttributeValidator.new('String', ["none", "blur", "boost", "contrast", "darken", "greyscale", "lighten", "muted", "negative"])
       unless validator.valid?(filter)
         fail ArgumentError, "invalid value for \"filter\", must be one of #{validator.allowable_values}."
       end
       @filter = filter
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] _alias Value to be assigned
+    def _alias=(_alias)
+      if _alias.nil?
+        fail ArgumentError, '_alias cannot be nil'
+      end
+
+      pattern = Regexp.new(/^[A-Za-z0-9_-]+$/)
+      if _alias !~ pattern
+        fail ArgumentError, "invalid value for \"_alias\", must conform to the pattern #{pattern}."
+      end
+
+      @_alias = _alias
     end
 
     # Checks equality by comparing each attribute.
@@ -275,13 +375,16 @@ module Shotstack
           length == o.length &&
           fit == o.fit &&
           scale == o.scale &&
+          width == o.width &&
+          height == o.height &&
           position == o.position &&
           offset == o.offset &&
           transition == o.transition &&
           effect == o.effect &&
           filter == o.filter &&
           opacity == o.opacity &&
-          transform == o.transform
+          transform == o.transform &&
+          _alias == o._alias
     end
 
     # @see the `==` method
@@ -293,7 +396,7 @@ module Shotstack
     # Calculates hash code according to all attributes.
     # @return [Integer] Hash code
     def hash
-      [asset, start, length, fit, scale, position, offset, transition, effect, filter, opacity, transform].hash
+      [asset, start, length, fit, scale, width, height, position, offset, transition, effect, filter, opacity, transform, _alias].hash
     end
 
     # Builds the object from hash

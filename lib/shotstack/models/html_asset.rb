@@ -14,7 +14,7 @@ require 'date'
 require 'time'
 
 module Shotstack
-  # The HtmlAsset clip type lets you create text based layout and formatting using HTML and CSS. You can also set the height and width of a bounding box for the HTML content to sit within. Text and elements will wrap within the bounding box.
+  # **Notice: The HtmlAsset is deprecated, use the [TextAsset](#tocs_textasset) instead.**  The HtmlAsset clip type lets you create text based layout and formatting using HTML and CSS. You can also set the height and width of a bounding box for the HTML content to sit within. Text and elements will wrap within the bounding box. 
   class HtmlAsset
     # The type of asset - set to `html` for HTML.
     attr_accessor :type
@@ -165,10 +165,22 @@ module Shotstack
     def valid?
       warn '[DEPRECATED] the `valid?` method is obsolete'
       return false if @type.nil?
+      type_validator = EnumAttributeValidator.new('String', ["html"])
+      return false unless type_validator.valid?(@type)
       return false if @html.nil?
       position_validator = EnumAttributeValidator.new('String', ["top", "topRight", "right", "bottomRight", "bottom", "bottomLeft", "left", "topLeft", "center"])
       return false unless position_validator.valid?(@position)
       true
+    end
+
+    # Custom attribute writer method checking allowed values (enum).
+    # @param [Object] type Object to be assigned
+    def type=(type)
+      validator = EnumAttributeValidator.new('String', ["html"])
+      unless validator.valid?(type)
+        fail ArgumentError, "invalid value for \"type\", must be one of #{validator.allowable_values}."
+      end
+      @type = type
     end
 
     # Custom attribute writer method checking allowed values (enum).

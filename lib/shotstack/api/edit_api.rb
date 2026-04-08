@@ -285,7 +285,7 @@ module Shotstack
     end
 
     # Render Asset
-    # Queue and render the contents of an [Edit](#tocs_edit) as a video, image or audio file.  **Base URL:** <a href=\"#\">https://api.shotstack.io/edit/{version}</a> 
+    # Queue and render the contents of an [Edit](#tocs_edit) as a video, image or audio file.  **Rendering Process:** 1. **Validation**: The edit JSON is validated 2. **Download**: All assets are downloaded and cached   3. **Preprocessing**: Video assets are automatically processed to fix compatibility issues 4. **Rendering**: The timeline is rendered using the processed assets 5. **Output**: The final media file is generated and stored  **Video Preprocessing:** Video assets undergo automatic preprocessing to ensure compatibility. You can force  preprocessing by setting `\"transcode\": true` on video assets. See [Preprocessing](#preprocessing)  for more details.  **Base URL:** <a href=\"#\">https://api.shotstack.io/edit/{version}</a> 
     # @param edit [Edit] The video, image or audio edit specified using JSON.
     # @param [Hash] opts the optional parameters
     # @return [QueuedResponse]
@@ -295,7 +295,7 @@ module Shotstack
     end
 
     # Render Asset
-    # Queue and render the contents of an [Edit](#tocs_edit) as a video, image or audio file.  **Base URL:** &lt;a href&#x3D;\&quot;#\&quot;&gt;https://api.shotstack.io/edit/{version}&lt;/a&gt; 
+    # Queue and render the contents of an [Edit](#tocs_edit) as a video, image or audio file.  **Rendering Process:** 1. **Validation**: The edit JSON is validated 2. **Download**: All assets are downloaded and cached   3. **Preprocessing**: Video assets are automatically processed to fix compatibility issues 4. **Rendering**: The timeline is rendered using the processed assets 5. **Output**: The final media file is generated and stored  **Video Preprocessing:** Video assets undergo automatic preprocessing to ensure compatibility. You can force  preprocessing by setting &#x60;\&quot;transcode\&quot;: true&#x60; on video assets. See [Preprocessing](#preprocessing)  for more details.  **Base URL:** &lt;a href&#x3D;\&quot;#\&quot;&gt;https://api.shotstack.io/edit/{version}&lt;/a&gt; 
     # @param edit [Edit] The video, image or audio edit specified using JSON.
     # @param [Hash] opts the optional parameters
     # @return [Array<(QueuedResponse, Integer, Hash)>] QueuedResponse data, response status code and response headers

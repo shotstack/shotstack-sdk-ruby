@@ -286,20 +286,6 @@ module Shotstack
                 ]
               }
             }
-        },
-        {
-          url: "https://api.shotstack.io/create/{version}",
-          description: "No description provided",
-          variables: {
-            version: {
-                description: "Set the stage to **v1** for production usage. Set to **stage** to use the development sandbox.",
-                default_value: "v1",
-                enum_values: [
-                  "v1",
-                  "stage"
-                ]
-              }
-            }
         }
       ]
     end

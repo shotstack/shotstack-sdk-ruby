@@ -14,7 +14,7 @@ require 'date'
 require 'time'
 
 module Shotstack
-  # **Notice: The title asset is deprecated, use the [HTML asset](#tocs_htmlasset) instead.**  The TitleAsset clip type lets you create video titles from a text string and apply styling and positioning. 
+  # **Notice: The TitleAsset is deprecated, use the [TextAsset](#tocs_textasset) instead.**  The TitleAsset clip type lets you create video titles from a text string and apply styling and positioning. 
   class TitleAsset
     # The type of asset - set to `title` for titles.
     attr_accessor :type
@@ -173,6 +173,8 @@ module Shotstack
     def valid?
       warn '[DEPRECATED] the `valid?` method is obsolete'
       return false if @type.nil?
+      type_validator = EnumAttributeValidator.new('String', ["title"])
+      return false unless type_validator.valid?(@type)
       return false if @text.nil?
       style_validator = EnumAttributeValidator.new('String', ["minimal", "blockbuster", "vogue", "sketchy", "skinny", "chunk", "chunkLight", "marker", "future", "subtitle"])
       return false unless style_validator.valid?(@style)
@@ -181,6 +183,16 @@ module Shotstack
       position_validator = EnumAttributeValidator.new('String', ["top", "topRight", "right", "bottomRight", "bottom", "bottomLeft", "left", "topLeft", "center"])
       return false unless position_validator.valid?(@position)
       true
+    end
+
+    # Custom attribute writer method checking allowed values (enum).
+    # @param [Object] type Object to be assigned
+    def type=(type)
+      validator = EnumAttributeValidator.new('String', ["title"])
+      unless validator.valid?(type)
+        fail ArgumentError, "invalid value for \"type\", must be one of #{validator.allowable_values}."
+      end
+      @type = type
     end
 
     # Custom attribute writer method checking allowed values (enum).

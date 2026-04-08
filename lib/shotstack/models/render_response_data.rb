@@ -25,7 +25,7 @@ module Shotstack
     # The customer subscription plan.
     attr_accessor :plan
 
-    # The status of the render task. <ul>   <li>`queued` - render is queued waiting to be rendered</li>   <li>`fetching` - assets are being fetched</li>   <li>`rendering` - the asset is being rendered</li>   <li>`saving` - the final asset is being saved to storage</li>   <li>`done` - the asset is ready to be downloaded</li>   <li>`failed` - there was an error rendering the asset</li> </ul>
+    # The status of the render task. <ul>   <li>`queued` - render is queued waiting to be rendered</li>   <li>`fetching` - assets are being fetched</li>   <li>`preprocessing` - video assets are being processed for compatibility</li>   <li>`rendering` - the asset is being rendered</li>   <li>`saving` - the final asset is being saved to storage</li>   <li>`done` - the asset is ready to be downloaded</li>   <li>`failed` - there was an error rendering the asset</li> </ul>
     attr_accessor :status
 
     # An error message, only displayed if an error occurred.
@@ -228,7 +228,7 @@ module Shotstack
       return false if @id.nil?
       return false if @owner.nil?
       return false if @status.nil?
-      status_validator = EnumAttributeValidator.new('String', ["queued", "fetching", "rendering", "saving", "done", "failed"])
+      status_validator = EnumAttributeValidator.new('String', ["queued", "fetching", "preprocessing", "rendering", "saving", "done", "failed"])
       return false unless status_validator.valid?(@status)
       true
     end
@@ -236,7 +236,7 @@ module Shotstack
     # Custom attribute writer method checking allowed values (enum).
     # @param [Object] status Object to be assigned
     def status=(status)
-      validator = EnumAttributeValidator.new('String', ["queued", "fetching", "rendering", "saving", "done", "failed"])
+      validator = EnumAttributeValidator.new('String', ["queued", "fetching", "preprocessing", "rendering", "saving", "done", "failed"])
       unless validator.valid?(status)
         fail ArgumentError, "invalid value for \"status\", must be one of #{validator.allowable_values}."
       end

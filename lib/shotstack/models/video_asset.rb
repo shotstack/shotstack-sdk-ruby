@@ -22,19 +22,23 @@ module Shotstack
     # The video source URL. The URL must be publicly accessible or include credentials.
     attr_accessor :src
 
+    # Set to `true` to force re-encoding of the video during preprocessing. This can help resolve compatibility issues, fix rotation problems, synchronize audio, or convert formats. The video will be processed to ensure optimal compatibility with the rendering engine.
+    attr_accessor :transcode
+
     # The start trim point of the video clip, in seconds (defaults to 0). Videos will start from the in trim point. The video will play until the file ends or the Clip length is reached.
     attr_accessor :trim
 
-    # Set the volume for the video clip between 0 and 1 where 0 is muted and 1 is full volume (defaults to 1).
     attr_accessor :volume
 
-    # The volume effect to apply to the video asset <ul>   <li>`fadeIn` - fade volume in only</li>   <li>`fadeOut` - fade volume out only</li>   <li>`fadeInFadeOut` - fade volume in and out</li> </ul>
+    # Preset volume effects to apply to the video asset <ul>   <li>`fadeIn` - fade volume in only</li>   <li>`fadeOut` - fade volume out only</li>   <li>`fadeInFadeOut` - fade volume in and out</li> </ul>
     attr_accessor :volume_effect
 
     # Adjust the playback speed of the video clip between 0 (paused) and 10 (10x normal speed) where 1 is normal speed (defaults to 1). Adjusting the speed will also adjust the duration of the clip and may require you to  adjust the Clip length. For example, if you set speed to 0.5, the clip will need to be 2x as long to play the entire video (i.e. original length / 0.5). If you set speed to 2, the clip will need to be half as long to play the entire video (i.e. original length / 2).
     attr_accessor :speed
 
     attr_accessor :crop
+
+    attr_accessor :chroma_key
 
     class EnumAttributeValidator
       attr_reader :datatype
@@ -63,11 +67,13 @@ module Shotstack
       {
         :'type' => :'type',
         :'src' => :'src',
+        :'transcode' => :'transcode',
         :'trim' => :'trim',
         :'volume' => :'volume',
         :'volume_effect' => :'volumeEffect',
         :'speed' => :'speed',
-        :'crop' => :'crop'
+        :'crop' => :'crop',
+        :'chroma_key' => :'chromaKey'
       }
     end
 
@@ -81,11 +87,13 @@ module Shotstack
       {
         :'type' => :'String',
         :'src' => :'String',
+        :'transcode' => :'Boolean',
         :'trim' => :'Float',
-        :'volume' => :'Float',
+        :'volume' => :'VideoAssetVolume',
         :'volume_effect' => :'String',
         :'speed' => :'Float',
-        :'crop' => :'Crop'
+        :'crop' => :'Crop',
+        :'chroma_key' => :'ChromaKey'
       }
     end
 
@@ -122,6 +130,10 @@ module Shotstack
         self.src = nil
       end
 
+      if attributes.key?(:'transcode')
+        self.transcode = attributes[:'transcode']
+      end
+
       if attributes.key?(:'trim')
         self.trim = attributes[:'trim']
       end
@@ -141,6 +153,10 @@ module Shotstack
       if attributes.key?(:'crop')
         self.crop = attributes[:'crop']
       end
+
+      if attributes.key?(:'chroma_key')
+        self.chroma_key = attributes[:'chroma_key']
+      end
     end
 
     # Show invalid properties with the reasons. Usually used together with valid?
@@ -154,6 +170,15 @@ module Shotstack
 
       if @src.nil?
         invalid_properties.push('invalid value for "src", src cannot be nil.')
+      end
+
+      if @src.to_s.length < 1
+        invalid_properties.push('invalid value for "src", the character length must be great than or equal to 1.')
+      end
+
+      pattern = Regexp.new(/\S/)
+      if @src !~ pattern
+        invalid_properties.push("invalid value for \"src\", must conform to the pattern #{pattern}.")
       end
 
       if !@speed.nil? && @speed > 10
@@ -172,8 +197,12 @@ module Shotstack
     def valid?
       warn '[DEPRECATED] the `valid?` method is obsolete'
       return false if @type.nil?
+      type_validator = EnumAttributeValidator.new('String', ["video"])
+      return false unless type_validator.valid?(@type)
       return false if @src.nil?
-      volume_effect_validator = EnumAttributeValidator.new('String', ["fadeIn", "fadeOut", "fadeInFadeOut"])
+      return false if @src.to_s.length < 1
+      return false if @src !~ Regexp.new(/\S/)
+      volume_effect_validator = EnumAttributeValidator.new('String', ["none", "fadeIn", "fadeOut", "fadeInFadeOut"])
       return false unless volume_effect_validator.valid?(@volume_effect)
       return false if !@speed.nil? && @speed > 10
       return false if !@speed.nil? && @speed < 0
@@ -181,9 +210,38 @@ module Shotstack
     end
 
     # Custom attribute writer method checking allowed values (enum).
+    # @param [Object] type Object to be assigned
+    def type=(type)
+      validator = EnumAttributeValidator.new('String', ["video"])
+      unless validator.valid?(type)
+        fail ArgumentError, "invalid value for \"type\", must be one of #{validator.allowable_values}."
+      end
+      @type = type
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] src Value to be assigned
+    def src=(src)
+      if src.nil?
+        fail ArgumentError, 'src cannot be nil'
+      end
+
+      if src.to_s.length < 1
+        fail ArgumentError, 'invalid value for "src", the character length must be great than or equal to 1.'
+      end
+
+      pattern = Regexp.new(/\S/)
+      if src !~ pattern
+        fail ArgumentError, "invalid value for \"src\", must conform to the pattern #{pattern}."
+      end
+
+      @src = src
+    end
+
+    # Custom attribute writer method checking allowed values (enum).
     # @param [Object] volume_effect Object to be assigned
     def volume_effect=(volume_effect)
-      validator = EnumAttributeValidator.new('String', ["fadeIn", "fadeOut", "fadeInFadeOut"])
+      validator = EnumAttributeValidator.new('String', ["none", "fadeIn", "fadeOut", "fadeInFadeOut"])
       unless validator.valid?(volume_effect)
         fail ArgumentError, "invalid value for \"volume_effect\", must be one of #{validator.allowable_values}."
       end
@@ -215,11 +273,13 @@ module Shotstack
       self.class == o.class &&
           type == o.type &&
           src == o.src &&
+          transcode == o.transcode &&
           trim == o.trim &&
           volume == o.volume &&
           volume_effect == o.volume_effect &&
           speed == o.speed &&
-          crop == o.crop
+          crop == o.crop &&
+          chroma_key == o.chroma_key
     end
 
     # @see the `==` method
@@ -231,7 +291,7 @@ module Shotstack
     # Calculates hash code according to all attributes.
     # @return [Integer] Hash code
     def hash
-      [type, src, trim, volume, volume_effect, speed, crop].hash
+      [type, src, transcode, trim, volume, volume_effect, speed, crop, chroma_key].hash
     end
 
     # Builds the object from hash

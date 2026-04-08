@@ -25,7 +25,6 @@ module Shotstack
     # The start trim point of the audio clip, in seconds (defaults to 0). Audio will start from the in trim point. The audio will play until the file ends or the Clip length is reached.
     attr_accessor :trim
 
-    # Set the volume for the audio clip between 0 and 1 where 0 is muted and 1 is full volume (defaults to 1).
     attr_accessor :volume
 
     # Adjust the playback speed of the audio clip between 0 (paused) and 10 (10x normal speed), where 1 is normal speed (defaults to 1). Adjusting the speed will also adjust the duration of the clip and may require you to  adjust the Clip length. For example, if you set speed to 0.5, the clip will need to be 2x as long to play the entire audio (i.e. original length / 0.5). If you set speed to 2, the clip will need to be half as long to play the entire audio (i.e. original length / 2).
@@ -79,7 +78,7 @@ module Shotstack
         :'type' => :'String',
         :'src' => :'String',
         :'trim' => :'Float',
-        :'volume' => :'Float',
+        :'volume' => :'AudioAssetVolume',
         :'speed' => :'Float',
         :'effect' => :'String'
       }
@@ -148,6 +147,15 @@ module Shotstack
         invalid_properties.push('invalid value for "src", src cannot be nil.')
       end
 
+      if @src.to_s.length < 1
+        invalid_properties.push('invalid value for "src", the character length must be great than or equal to 1.')
+      end
+
+      pattern = Regexp.new(/\S/)
+      if @src !~ pattern
+        invalid_properties.push("invalid value for \"src\", must conform to the pattern #{pattern}.")
+      end
+
       if !@speed.nil? && @speed > 10
         invalid_properties.push('invalid value for "speed", must be smaller than or equal to 10.')
       end
@@ -164,12 +172,45 @@ module Shotstack
     def valid?
       warn '[DEPRECATED] the `valid?` method is obsolete'
       return false if @type.nil?
+      type_validator = EnumAttributeValidator.new('String', ["audio"])
+      return false unless type_validator.valid?(@type)
       return false if @src.nil?
+      return false if @src.to_s.length < 1
+      return false if @src !~ Regexp.new(/\S/)
       return false if !@speed.nil? && @speed > 10
       return false if !@speed.nil? && @speed < 0
-      effect_validator = EnumAttributeValidator.new('String', ["fadeIn", "fadeOut", "fadeInFadeOut"])
+      effect_validator = EnumAttributeValidator.new('String', ["none", "fadeIn", "fadeOut", "fadeInFadeOut"])
       return false unless effect_validator.valid?(@effect)
       true
+    end
+
+    # Custom attribute writer method checking allowed values (enum).
+    # @param [Object] type Object to be assigned
+    def type=(type)
+      validator = EnumAttributeValidator.new('String', ["audio"])
+      unless validator.valid?(type)
+        fail ArgumentError, "invalid value for \"type\", must be one of #{validator.allowable_values}."
+      end
+      @type = type
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] src Value to be assigned
+    def src=(src)
+      if src.nil?
+        fail ArgumentError, 'src cannot be nil'
+      end
+
+      if src.to_s.length < 1
+        fail ArgumentError, 'invalid value for "src", the character length must be great than or equal to 1.'
+      end
+
+      pattern = Regexp.new(/\S/)
+      if src !~ pattern
+        fail ArgumentError, "invalid value for \"src\", must conform to the pattern #{pattern}."
+      end
+
+      @src = src
     end
 
     # Custom attribute writer method with validation
@@ -193,7 +234,7 @@ module Shotstack
     # Custom attribute writer method checking allowed values (enum).
     # @param [Object] effect Object to be assigned
     def effect=(effect)
-      validator = EnumAttributeValidator.new('String', ["fadeIn", "fadeOut", "fadeInFadeOut"])
+      validator = EnumAttributeValidator.new('String', ["none", "fadeIn", "fadeOut", "fadeInFadeOut"])
       unless validator.valid?(effect)
         fail ArgumentError, "invalid value for \"effect\", must be one of #{validator.allowable_values}."
       end

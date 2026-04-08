@@ -38,6 +38,12 @@ module Shotstack
     # The keyframe interval is useful to optimize playback, seeking and smoother scrubbing in browsers. The value sets the number of frames between a keyframe. The lower the number, the larger the file. Try a value between 10 and 25 for smooth scrubbing.
     attr_accessor :keyframe_interval
 
+    # Attempt to fix audio and video sync issues. This can occur when recording devices, such as smartphones and  web cams use compression techniques like [Variable Frame Rate](https://en.wikipedia.org/wiki/Variable_frame_rate)  (VFR) which can cause audio and video to go out of sync. This option will attempt to fix the sync issues.
+    attr_accessor :fix_offset
+
+    # Automatically reset the rotation of the video based on the orientation metadata in the video file. This is useful for videos recorded on smartphones that have orientation metadata that may not work correctly with certain video editing software, including the Shotstack Edit API.
+    attr_accessor :fix_rotation
+
     attr_accessor :enhance
 
     # A custom name for the generated rendition file. The file extension will be automatically added based on the format of the rendition. If no filename is provided, the rendition ID will be used.
@@ -76,6 +82,8 @@ module Shotstack
         :'fps' => :'fps',
         :'speed' => :'speed',
         :'keyframe_interval' => :'keyframeInterval',
+        :'fix_offset' => :'fixOffset',
+        :'fix_rotation' => :'fixRotation',
         :'enhance' => :'enhance',
         :'filename' => :'filename'
       }
@@ -97,6 +105,8 @@ module Shotstack
         :'fps' => :'Float',
         :'speed' => :'Speed',
         :'keyframe_interval' => :'Integer',
+        :'fix_offset' => :'Boolean',
+        :'fix_rotation' => :'Boolean',
         :'enhance' => :'Enhancements',
         :'filename' => :'String'
       }
@@ -153,6 +163,14 @@ module Shotstack
 
       if attributes.key?(:'keyframe_interval')
         self.keyframe_interval = attributes[:'keyframe_interval']
+      end
+
+      if attributes.key?(:'fix_offset')
+        self.fix_offset = attributes[:'fix_offset']
+      end
+
+      if attributes.key?(:'fix_rotation')
+        self.fix_rotation = attributes[:'fix_rotation']
       end
 
       if attributes.key?(:'enhance')
@@ -296,6 +314,8 @@ module Shotstack
           fps == o.fps &&
           speed == o.speed &&
           keyframe_interval == o.keyframe_interval &&
+          fix_offset == o.fix_offset &&
+          fix_rotation == o.fix_rotation &&
           enhance == o.enhance &&
           filename == o.filename
     end
@@ -309,7 +329,7 @@ module Shotstack
     # Calculates hash code according to all attributes.
     # @return [Integer] Hash code
     def hash
-      [format, size, fit, resolution, quality, fps, speed, keyframe_interval, enhance, filename].hash
+      [format, size, fit, resolution, quality, fps, speed, keyframe_interval, fix_offset, fix_rotation, enhance, filename].hash
     end
 
     # Builds the object from hash

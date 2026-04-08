@@ -14,16 +14,25 @@ require 'date'
 require 'time'
 
 module Shotstack
-  # The type of asset to display for the duration of the Clip. Value must be one of: <ul>   <li><a href=\"#tocs_videoasset\">VideoAsset</a></li>   <li><a href=\"#tocs_imageasset\">ImageAsset</a></li>   <li><a href=\"#tocs_titleasset\">TitleAsset</a></li>   <li><a href=\"#tocs_htmlasset\">HtmlAsset</a></li>   <li><a href=\"#tocs_audioasset\">AudioAsset</a></li>   <li><a href=\"#tocs_lumaasset\">LumaAsset</a></li> </ul>
+  # The type of asset to display for the duration of the Clip, i.e. a video clip or an image. Choose from one of the available asset types below.
   module Asset
     class << self
       # List of class defined in oneOf (OpenAPI v3)
       def openapi_one_of
         [
           :'AudioAsset',
+          :'CaptionAsset',
           :'HtmlAsset',
           :'ImageAsset',
+          :'ImageToVideoAsset',
           :'LumaAsset',
+          :'RichCaptionAsset',
+          :'RichTextAsset',
+          :'ShapeAsset',
+          :'SvgAsset',
+          :'TextAsset',
+          :'TextToImageAsset',
+          :'TextToSpeechAsset',
           :'TitleAsset',
           :'VideoAsset'
         ]
@@ -31,7 +40,28 @@ module Shotstack
 
       # Discriminator's property name (OpenAPI v3)
       def openapi_discriminator_name
-        :'asset'
+        :'type'
+      end
+
+      # Discriminator's mapping (OpenAPI v3)
+      def openapi_discriminator_mapping
+        {
+          :'audio' => :'AudioAsset',
+          :'caption' => :'CaptionAsset',
+          :'html' => :'HtmlAsset',
+          :'image' => :'ImageAsset',
+          :'image-to-video' => :'ImageToVideoAsset',
+          :'luma' => :'LumaAsset',
+          :'rich-caption' => :'RichCaptionAsset',
+          :'rich-text' => :'RichTextAsset',
+          :'shape' => :'ShapeAsset',
+          :'svg' => :'SvgAsset',
+          :'text' => :'TextAsset',
+          :'text-to-image' => :'TextToImageAsset',
+          :'text-to-speech' => :'TextToSpeechAsset',
+          :'title' => :'TitleAsset',
+          :'video' => :'VideoAsset'
+        }
       end
 
       # Builds the object
@@ -40,7 +70,11 @@ module Shotstack
       def build(data)
         discriminator_value = data[openapi_discriminator_name]
         return nil if discriminator_value.nil?
-        Shotstack.const_get(discriminator_value).build_from_hash(data)
+
+        klass = openapi_discriminator_mapping[discriminator_value.to_s.to_sym]
+        return nil unless klass
+
+        Shotstack.const_get(klass).build_from_hash(data)
       end
     end
   end
