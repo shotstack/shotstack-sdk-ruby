@@ -14,27 +14,49 @@ require 'date'
 require 'time'
 
 module Shotstack
-  # Background styling properties for the text bounding box.
-  class RichTextBackground
-    # The background color using hexadecimal color notation.
-    attr_accessor :color
+  # The Html5Asset renders full HTML5/CSS3/JS. 
+  class Html5Asset
+    # The type of asset - set to `html5` for HTML5/CSS3/JS.
+    attr_accessor :type
 
-    # The opacity of the background where 1 is opaque and 0 is transparent.
-    attr_accessor :opacity
+    # The HTML markup for the asset. Max 1,000,000 characters.
+    attr_accessor :html
 
-    # The border radius of the background box in pixels. Must be 0 or greater.
-    attr_accessor :border_radius
+    # The CSS string applied to the HTML. Max 500,000 characters.
+    attr_accessor :css
 
-    # When true, the background pill shrinks to fit the rendered text bounding box plus the asset's padding (and stroke width, if present), producing a pill or badge effect. When false (default), the background fills the full asset content area. Available on rich-text and rich-caption assets only; not supported on legacy `type: text`. 
-    attr_accessor :wrap
+    # Optional JavaScript. Use for chart libraries, animations, or DOM manipulation. `gsap`, `d3`, `anime` and `lottie` are always available. CSS animations, transitions, and `Element.animate()` are also captured automatically. Max 500,000 characters. 
+    attr_accessor :js
+
+    class EnumAttributeValidator
+      attr_reader :datatype
+      attr_reader :allowable_values
+
+      def initialize(datatype, allowable_values)
+        @allowable_values = allowable_values.map do |value|
+          case datatype.to_s
+          when /Integer/i
+            value.to_i
+          when /Float/i
+            value.to_f
+          else
+            value
+          end
+        end
+      end
+
+      def valid?(value)
+        !value || allowable_values.include?(value)
+      end
+    end
 
     # Attribute mapping from ruby-style variable name to JSON key.
     def self.attribute_map
       {
-        :'color' => :'color',
-        :'opacity' => :'opacity',
-        :'border_radius' => :'borderRadius',
-        :'wrap' => :'wrap'
+        :'type' => :'type',
+        :'html' => :'html',
+        :'css' => :'css',
+        :'js' => :'js'
       }
     end
 
@@ -46,10 +68,10 @@ module Shotstack
     # Attribute type mapping.
     def self.openapi_types
       {
-        :'color' => :'String',
-        :'opacity' => :'Float',
-        :'border_radius' => :'Float',
-        :'wrap' => :'Boolean'
+        :'type' => :'String',
+        :'html' => :'String',
+        :'css' => :'String',
+        :'js' => :'String'
       }
     end
 
@@ -63,37 +85,35 @@ module Shotstack
     # @param [Hash] attributes Model attributes in the form of hash
     def initialize(attributes = {})
       if (!attributes.is_a?(Hash))
-        fail ArgumentError, "The input argument (attributes) must be a hash in `Shotstack::RichTextBackground` initialize method"
+        fail ArgumentError, "The input argument (attributes) must be a hash in `Shotstack::Html5Asset` initialize method"
       end
 
       # check to see if the attribute exists and convert string to symbol for hash key
       attributes = attributes.each_with_object({}) { |(k, v), h|
         if (!self.class.attribute_map.key?(k.to_sym))
-          fail ArgumentError, "`#{k}` is not a valid attribute in `Shotstack::RichTextBackground`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
+          fail ArgumentError, "`#{k}` is not a valid attribute in `Shotstack::Html5Asset`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
         end
         h[k.to_sym] = v
       }
 
-      if attributes.key?(:'color')
-        self.color = attributes[:'color']
+      if attributes.key?(:'type')
+        self.type = attributes[:'type']
+      else
+        self.type = 'html5'
       end
 
-      if attributes.key?(:'opacity')
-        self.opacity = attributes[:'opacity']
+      if attributes.key?(:'html')
+        self.html = attributes[:'html']
       else
-        self.opacity = 1
+        self.html = nil
       end
 
-      if attributes.key?(:'border_radius')
-        self.border_radius = attributes[:'border_radius']
-      else
-        self.border_radius = 0
+      if attributes.key?(:'css')
+        self.css = attributes[:'css']
       end
 
-      if attributes.key?(:'wrap')
-        self.wrap = attributes[:'wrap']
-      else
-        self.wrap = false
+      if attributes.key?(:'js')
+        self.js = attributes[:'js']
       end
     end
 
@@ -102,21 +122,24 @@ module Shotstack
     def list_invalid_properties
       warn '[DEPRECATED] the `list_invalid_properties` method is obsolete'
       invalid_properties = Array.new
-      pattern = Regexp.new(/^#[A-Fa-f0-9]{6}$/)
-      if !@color.nil? && @color !~ pattern
-        invalid_properties.push("invalid value for \"color\", must conform to the pattern #{pattern}.")
+      if @type.nil?
+        invalid_properties.push('invalid value for "type", type cannot be nil.')
       end
 
-      if !@opacity.nil? && @opacity > 1
-        invalid_properties.push('invalid value for "opacity", must be smaller than or equal to 1.')
+      if @html.nil?
+        invalid_properties.push('invalid value for "html", html cannot be nil.')
       end
 
-      if !@opacity.nil? && @opacity < 0
-        invalid_properties.push('invalid value for "opacity", must be greater than or equal to 0.')
+      if @html.to_s.length > 1000000
+        invalid_properties.push('invalid value for "html", the character length must be smaller than or equal to 1000000.')
       end
 
-      if !@border_radius.nil? && @border_radius < 0
-        invalid_properties.push('invalid value for "border_radius", must be greater than or equal to 0.')
+      if !@css.nil? && @css.to_s.length > 500000
+        invalid_properties.push('invalid value for "css", the character length must be smaller than or equal to 500000.')
+      end
+
+      if !@js.nil? && @js.to_s.length > 500000
+        invalid_properties.push('invalid value for "js", the character length must be smaller than or equal to 500000.')
       end
 
       invalid_properties
@@ -126,58 +149,66 @@ module Shotstack
     # @return true if the model is valid
     def valid?
       warn '[DEPRECATED] the `valid?` method is obsolete'
-      return false if !@color.nil? && @color !~ Regexp.new(/^#[A-Fa-f0-9]{6}$/)
-      return false if !@opacity.nil? && @opacity > 1
-      return false if !@opacity.nil? && @opacity < 0
-      return false if !@border_radius.nil? && @border_radius < 0
+      return false if @type.nil?
+      type_validator = EnumAttributeValidator.new('String', ["html5"])
+      return false unless type_validator.valid?(@type)
+      return false if @html.nil?
+      return false if @html.to_s.length > 1000000
+      return false if !@css.nil? && @css.to_s.length > 500000
+      return false if !@js.nil? && @js.to_s.length > 500000
       true
     end
 
-    # Custom attribute writer method with validation
-    # @param [Object] color Value to be assigned
-    def color=(color)
-      if color.nil?
-        fail ArgumentError, 'color cannot be nil'
+    # Custom attribute writer method checking allowed values (enum).
+    # @param [Object] type Object to be assigned
+    def type=(type)
+      validator = EnumAttributeValidator.new('String', ["html5"])
+      unless validator.valid?(type)
+        fail ArgumentError, "invalid value for \"type\", must be one of #{validator.allowable_values}."
       end
-
-      pattern = Regexp.new(/^#[A-Fa-f0-9]{6}$/)
-      if color !~ pattern
-        fail ArgumentError, "invalid value for \"color\", must conform to the pattern #{pattern}."
-      end
-
-      @color = color
+      @type = type
     end
 
     # Custom attribute writer method with validation
-    # @param [Object] opacity Value to be assigned
-    def opacity=(opacity)
-      if opacity.nil?
-        fail ArgumentError, 'opacity cannot be nil'
+    # @param [Object] html Value to be assigned
+    def html=(html)
+      if html.nil?
+        fail ArgumentError, 'html cannot be nil'
       end
 
-      if opacity > 1
-        fail ArgumentError, 'invalid value for "opacity", must be smaller than or equal to 1.'
+      if html.to_s.length > 1000000
+        fail ArgumentError, 'invalid value for "html", the character length must be smaller than or equal to 1000000.'
       end
 
-      if opacity < 0
-        fail ArgumentError, 'invalid value for "opacity", must be greater than or equal to 0.'
-      end
-
-      @opacity = opacity
+      @html = html
     end
 
     # Custom attribute writer method with validation
-    # @param [Object] border_radius Value to be assigned
-    def border_radius=(border_radius)
-      if border_radius.nil?
-        fail ArgumentError, 'border_radius cannot be nil'
+    # @param [Object] css Value to be assigned
+    def css=(css)
+      if css.nil?
+        fail ArgumentError, 'css cannot be nil'
       end
 
-      if border_radius < 0
-        fail ArgumentError, 'invalid value for "border_radius", must be greater than or equal to 0.'
+      if css.to_s.length > 500000
+        fail ArgumentError, 'invalid value for "css", the character length must be smaller than or equal to 500000.'
       end
 
-      @border_radius = border_radius
+      @css = css
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] js Value to be assigned
+    def js=(js)
+      if js.nil?
+        fail ArgumentError, 'js cannot be nil'
+      end
+
+      if js.to_s.length > 500000
+        fail ArgumentError, 'invalid value for "js", the character length must be smaller than or equal to 500000.'
+      end
+
+      @js = js
     end
 
     # Checks equality by comparing each attribute.
@@ -185,10 +216,10 @@ module Shotstack
     def ==(o)
       return true if self.equal?(o)
       self.class == o.class &&
-          color == o.color &&
-          opacity == o.opacity &&
-          border_radius == o.border_radius &&
-          wrap == o.wrap
+          type == o.type &&
+          html == o.html &&
+          css == o.css &&
+          js == o.js
     end
 
     # @see the `==` method
@@ -200,7 +231,7 @@ module Shotstack
     # Calculates hash code according to all attributes.
     # @return [Integer] Hash code
     def hash
-      [color, opacity, border_radius, wrap].hash
+      [type, html, css, js].hash
     end
 
     # Builds the object from hash
