@@ -14,24 +14,19 @@ require 'date'
 require 'time'
 
 module Shotstack
-  # **Notice: ImageToVideoAsset is deprecated. Use [VideoAsset](#tocs_videoasset) with `prompt` and `seed` instead.** This type continues to function and is internally rewritten to VideoAsset; no behaviour change for existing integrations.  The ImageToVideoAsset lets you create a video from an image and a text prompt. 
-  class ImageToVideoAsset
-    # The type of asset to generate - set to `image-to-video` for image-to-video.
+  # The Html5Asset renders full HTML5/CSS3/JS. 
+  class Html5Asset
+    # The type of asset - set to `html5` for HTML5/CSS3/JS.
     attr_accessor :type
 
-    # The image source URL. The URL must be publicly accessible or include credentials.
-    attr_accessor :src
+    # The HTML markup for the asset. Max 1,000,000 characters.
+    attr_accessor :html
 
-    # The instructions for modifying the image into a video sequence.
-    attr_accessor :prompt
+    # The CSS string applied to the HTML. Max 500,000 characters.
+    attr_accessor :css
 
-    # The aspect ratio (shape) of the video output.
-    attr_accessor :aspect_ratio
-
-    # Adjust the playback speed of the video clip between 0 (paused) and 10 (10x normal speed) where 1 is normal speed (defaults to 1). Adjusting the speed will also adjust the duration of the clip and may require you to  adjust the Clip length. For example, if you set speed to 0.5, the clip will need to be 2x as long to play the entire video (i.e. original length / 0.5). If you set speed to 2, the clip will need to be half as long to play the entire video (i.e. original length / 2).
-    attr_accessor :speed
-
-    attr_accessor :crop
+    # Optional JavaScript. Use for chart libraries, animations, or DOM manipulation. `gsap`, `d3`, `anime` and `lottie` are always available. CSS animations, transitions, and `Element.animate()` are also captured automatically. Max 500,000 characters. 
+    attr_accessor :js
 
     class EnumAttributeValidator
       attr_reader :datatype
@@ -59,11 +54,9 @@ module Shotstack
     def self.attribute_map
       {
         :'type' => :'type',
-        :'src' => :'src',
-        :'prompt' => :'prompt',
-        :'aspect_ratio' => :'aspectRatio',
-        :'speed' => :'speed',
-        :'crop' => :'crop'
+        :'html' => :'html',
+        :'css' => :'css',
+        :'js' => :'js'
       }
     end
 
@@ -76,11 +69,9 @@ module Shotstack
     def self.openapi_types
       {
         :'type' => :'String',
-        :'src' => :'String',
-        :'prompt' => :'String',
-        :'aspect_ratio' => :'String',
-        :'speed' => :'Float',
-        :'crop' => :'Crop'
+        :'html' => :'String',
+        :'css' => :'String',
+        :'js' => :'String'
       }
     end
 
@@ -94,13 +85,13 @@ module Shotstack
     # @param [Hash] attributes Model attributes in the form of hash
     def initialize(attributes = {})
       if (!attributes.is_a?(Hash))
-        fail ArgumentError, "The input argument (attributes) must be a hash in `Shotstack::ImageToVideoAsset` initialize method"
+        fail ArgumentError, "The input argument (attributes) must be a hash in `Shotstack::Html5Asset` initialize method"
       end
 
       # check to see if the attribute exists and convert string to symbol for hash key
       attributes = attributes.each_with_object({}) { |(k, v), h|
         if (!self.class.attribute_map.key?(k.to_sym))
-          fail ArgumentError, "`#{k}` is not a valid attribute in `Shotstack::ImageToVideoAsset`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
+          fail ArgumentError, "`#{k}` is not a valid attribute in `Shotstack::Html5Asset`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
         end
         h[k.to_sym] = v
       }
@@ -108,29 +99,21 @@ module Shotstack
       if attributes.key?(:'type')
         self.type = attributes[:'type']
       else
-        self.type = 'image-to-video'
+        self.type = 'html5'
       end
 
-      if attributes.key?(:'src')
-        self.src = attributes[:'src']
+      if attributes.key?(:'html')
+        self.html = attributes[:'html']
       else
-        self.src = nil
+        self.html = nil
       end
 
-      if attributes.key?(:'prompt')
-        self.prompt = attributes[:'prompt']
+      if attributes.key?(:'css')
+        self.css = attributes[:'css']
       end
 
-      if attributes.key?(:'aspect_ratio')
-        self.aspect_ratio = attributes[:'aspect_ratio']
-      end
-
-      if attributes.key?(:'speed')
-        self.speed = attributes[:'speed']
-      end
-
-      if attributes.key?(:'crop')
-        self.crop = attributes[:'crop']
+      if attributes.key?(:'js')
+        self.js = attributes[:'js']
       end
     end
 
@@ -143,20 +126,20 @@ module Shotstack
         invalid_properties.push('invalid value for "type", type cannot be nil.')
       end
 
-      if @src.nil?
-        invalid_properties.push('invalid value for "src", src cannot be nil.')
+      if @html.nil?
+        invalid_properties.push('invalid value for "html", html cannot be nil.')
       end
 
-      if @src.to_s.length < 1
-        invalid_properties.push('invalid value for "src", the character length must be great than or equal to 1.')
+      if @html.to_s.length > 1000000
+        invalid_properties.push('invalid value for "html", the character length must be smaller than or equal to 1000000.')
       end
 
-      if !@speed.nil? && @speed > 10
-        invalid_properties.push('invalid value for "speed", must be smaller than or equal to 10.')
+      if !@css.nil? && @css.to_s.length > 500000
+        invalid_properties.push('invalid value for "css", the character length must be smaller than or equal to 500000.')
       end
 
-      if !@speed.nil? && @speed < 0
-        invalid_properties.push('invalid value for "speed", must be greater than or equal to 0.')
+      if !@js.nil? && @js.to_s.length > 500000
+        invalid_properties.push('invalid value for "js", the character length must be smaller than or equal to 500000.')
       end
 
       invalid_properties
@@ -167,21 +150,19 @@ module Shotstack
     def valid?
       warn '[DEPRECATED] the `valid?` method is obsolete'
       return false if @type.nil?
-      type_validator = EnumAttributeValidator.new('String', ["image-to-video"])
+      type_validator = EnumAttributeValidator.new('String', ["html5"])
       return false unless type_validator.valid?(@type)
-      return false if @src.nil?
-      return false if @src.to_s.length < 1
-      aspect_ratio_validator = EnumAttributeValidator.new('String', ["1:1", "4:3", "16:9", "9:16", "3:4", "21:9", "9:21"])
-      return false unless aspect_ratio_validator.valid?(@aspect_ratio)
-      return false if !@speed.nil? && @speed > 10
-      return false if !@speed.nil? && @speed < 0
+      return false if @html.nil?
+      return false if @html.to_s.length > 1000000
+      return false if !@css.nil? && @css.to_s.length > 500000
+      return false if !@js.nil? && @js.to_s.length > 500000
       true
     end
 
     # Custom attribute writer method checking allowed values (enum).
     # @param [Object] type Object to be assigned
     def type=(type)
-      validator = EnumAttributeValidator.new('String', ["image-to-video"])
+      validator = EnumAttributeValidator.new('String', ["html5"])
       unless validator.valid?(type)
         fail ArgumentError, "invalid value for \"type\", must be one of #{validator.allowable_values}."
       end
@@ -189,45 +170,45 @@ module Shotstack
     end
 
     # Custom attribute writer method with validation
-    # @param [Object] src Value to be assigned
-    def src=(src)
-      if src.nil?
-        fail ArgumentError, 'src cannot be nil'
+    # @param [Object] html Value to be assigned
+    def html=(html)
+      if html.nil?
+        fail ArgumentError, 'html cannot be nil'
       end
 
-      if src.to_s.length < 1
-        fail ArgumentError, 'invalid value for "src", the character length must be great than or equal to 1.'
+      if html.to_s.length > 1000000
+        fail ArgumentError, 'invalid value for "html", the character length must be smaller than or equal to 1000000.'
       end
 
-      @src = src
-    end
-
-    # Custom attribute writer method checking allowed values (enum).
-    # @param [Object] aspect_ratio Object to be assigned
-    def aspect_ratio=(aspect_ratio)
-      validator = EnumAttributeValidator.new('String', ["1:1", "4:3", "16:9", "9:16", "3:4", "21:9", "9:21"])
-      unless validator.valid?(aspect_ratio)
-        fail ArgumentError, "invalid value for \"aspect_ratio\", must be one of #{validator.allowable_values}."
-      end
-      @aspect_ratio = aspect_ratio
+      @html = html
     end
 
     # Custom attribute writer method with validation
-    # @param [Object] speed Value to be assigned
-    def speed=(speed)
-      if speed.nil?
-        fail ArgumentError, 'speed cannot be nil'
+    # @param [Object] css Value to be assigned
+    def css=(css)
+      if css.nil?
+        fail ArgumentError, 'css cannot be nil'
       end
 
-      if speed > 10
-        fail ArgumentError, 'invalid value for "speed", must be smaller than or equal to 10.'
+      if css.to_s.length > 500000
+        fail ArgumentError, 'invalid value for "css", the character length must be smaller than or equal to 500000.'
       end
 
-      if speed < 0
-        fail ArgumentError, 'invalid value for "speed", must be greater than or equal to 0.'
+      @css = css
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] js Value to be assigned
+    def js=(js)
+      if js.nil?
+        fail ArgumentError, 'js cannot be nil'
       end
 
-      @speed = speed
+      if js.to_s.length > 500000
+        fail ArgumentError, 'invalid value for "js", the character length must be smaller than or equal to 500000.'
+      end
+
+      @js = js
     end
 
     # Checks equality by comparing each attribute.
@@ -236,11 +217,9 @@ module Shotstack
       return true if self.equal?(o)
       self.class == o.class &&
           type == o.type &&
-          src == o.src &&
-          prompt == o.prompt &&
-          aspect_ratio == o.aspect_ratio &&
-          speed == o.speed &&
-          crop == o.crop
+          html == o.html &&
+          css == o.css &&
+          js == o.js
     end
 
     # @see the `==` method
@@ -252,7 +231,7 @@ module Shotstack
     # Calculates hash code according to all attributes.
     # @return [Integer] Hash code
     def hash
-      [type, src, prompt, aspect_ratio, speed, crop].hash
+      [type, html, css, js].hash
     end
 
     # Builds the object from hash
