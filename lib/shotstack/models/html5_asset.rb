@@ -14,33 +14,19 @@ require 'date'
 require 'time'
 
 module Shotstack
-  # The RichCaptionAsset provides word-level caption animations with rich-text styling. It supports karaoke-style highlighting, word-by-word animations, and advanced typography. Captions can be sourced from SRT/VTT/TTML subtitle files, from audio/video media URLs (auto-transcribed), or from alias references to other clips in the same timeline. 
-  class RichCaptionAsset
-    # The type of asset - set to `rich-caption` for rich captions.
+  # The Html5Asset renders full HTML5/CSS3/JS. 
+  class Html5Asset
+    # The type of asset - set to `html5` for HTML5/CSS3/JS.
     attr_accessor :type
 
-    # Source for the caption words. Accepts three formats: (1) the URL to a subtitle file (`.srt`, `.vtt`, `.ttml`, or `.dfxp`) which is parsed directly; (2) the URL to an audio or video media file (`.mp4`, `.mov`, `.webm`, `.mp3`, `.wav`, `.m4a`, `.flac`, `.aac`, `.ogg`, and related formats) which is auto-transcribed; (3) an alias reference in the form `alias://clip-name` where `clip-name` is the alias of another audio, video, or text-to-speech clip in the same timeline — the referenced clip's source is auto-transcribed. For file URLs, the URL must be publicly accessible or include credentials. Content is classified at runtime and unsupported content types (HTML, PDF, images, archives) are rejected with a structured error.
-    attr_accessor :src
+    # The HTML markup for the asset. Max 1,000,000 characters.
+    attr_accessor :html
 
-    attr_accessor :font
+    # The CSS string applied to the HTML. Max 500,000 characters.
+    attr_accessor :css
 
-    attr_accessor :style
-
-    attr_accessor :stroke
-
-    attr_accessor :shadow
-
-    attr_accessor :background
-
-    attr_accessor :border
-
-    attr_accessor :padding
-
-    attr_accessor :align
-
-    attr_accessor :active
-
-    attr_accessor :animation
+    # Optional JavaScript. Use for chart libraries, animations, or DOM manipulation. `gsap`, `d3`, `anime` and `lottie` are always available. CSS animations, transitions, and `Element.animate()` are also captured automatically. Max 500,000 characters. 
+    attr_accessor :js
 
     class EnumAttributeValidator
       attr_reader :datatype
@@ -68,17 +54,9 @@ module Shotstack
     def self.attribute_map
       {
         :'type' => :'type',
-        :'src' => :'src',
-        :'font' => :'font',
-        :'style' => :'style',
-        :'stroke' => :'stroke',
-        :'shadow' => :'shadow',
-        :'background' => :'background',
-        :'border' => :'border',
-        :'padding' => :'padding',
-        :'align' => :'align',
-        :'active' => :'active',
-        :'animation' => :'animation'
+        :'html' => :'html',
+        :'css' => :'css',
+        :'js' => :'js'
       }
     end
 
@@ -91,17 +69,9 @@ module Shotstack
     def self.openapi_types
       {
         :'type' => :'String',
-        :'src' => :'String',
-        :'font' => :'RichCaptionAssetFont',
-        :'style' => :'RichCaptionAssetStyle',
-        :'stroke' => :'RichTextStroke',
-        :'shadow' => :'RichTextShadow',
-        :'background' => :'RichTextBackground',
-        :'border' => :'Border',
-        :'padding' => :'RichCaptionAssetPadding',
-        :'align' => :'RichTextAlignment',
-        :'active' => :'RichCaptionActive',
-        :'animation' => :'RichCaptionAnimation'
+        :'html' => :'String',
+        :'css' => :'String',
+        :'js' => :'String'
       }
     end
 
@@ -115,13 +85,13 @@ module Shotstack
     # @param [Hash] attributes Model attributes in the form of hash
     def initialize(attributes = {})
       if (!attributes.is_a?(Hash))
-        fail ArgumentError, "The input argument (attributes) must be a hash in `Shotstack::RichCaptionAsset` initialize method"
+        fail ArgumentError, "The input argument (attributes) must be a hash in `Shotstack::Html5Asset` initialize method"
       end
 
       # check to see if the attribute exists and convert string to symbol for hash key
       attributes = attributes.each_with_object({}) { |(k, v), h|
         if (!self.class.attribute_map.key?(k.to_sym))
-          fail ArgumentError, "`#{k}` is not a valid attribute in `Shotstack::RichCaptionAsset`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
+          fail ArgumentError, "`#{k}` is not a valid attribute in `Shotstack::Html5Asset`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
         end
         h[k.to_sym] = v
       }
@@ -129,53 +99,21 @@ module Shotstack
       if attributes.key?(:'type')
         self.type = attributes[:'type']
       else
-        self.type = 'rich-caption'
+        self.type = 'html5'
       end
 
-      if attributes.key?(:'src')
-        self.src = attributes[:'src']
+      if attributes.key?(:'html')
+        self.html = attributes[:'html']
       else
-        self.src = nil
+        self.html = nil
       end
 
-      if attributes.key?(:'font')
-        self.font = attributes[:'font']
+      if attributes.key?(:'css')
+        self.css = attributes[:'css']
       end
 
-      if attributes.key?(:'style')
-        self.style = attributes[:'style']
-      end
-
-      if attributes.key?(:'stroke')
-        self.stroke = attributes[:'stroke']
-      end
-
-      if attributes.key?(:'shadow')
-        self.shadow = attributes[:'shadow']
-      end
-
-      if attributes.key?(:'background')
-        self.background = attributes[:'background']
-      end
-
-      if attributes.key?(:'border')
-        self.border = attributes[:'border']
-      end
-
-      if attributes.key?(:'padding')
-        self.padding = attributes[:'padding']
-      end
-
-      if attributes.key?(:'align')
-        self.align = attributes[:'align']
-      end
-
-      if attributes.key?(:'active')
-        self.active = attributes[:'active']
-      end
-
-      if attributes.key?(:'animation')
-        self.animation = attributes[:'animation']
+      if attributes.key?(:'js')
+        self.js = attributes[:'js']
       end
     end
 
@@ -188,12 +126,20 @@ module Shotstack
         invalid_properties.push('invalid value for "type", type cannot be nil.')
       end
 
-      if @src.nil?
-        invalid_properties.push('invalid value for "src", src cannot be nil.')
+      if @html.nil?
+        invalid_properties.push('invalid value for "html", html cannot be nil.')
       end
 
-      if @src.to_s.length < 1
-        invalid_properties.push('invalid value for "src", the character length must be great than or equal to 1.')
+      if @html.to_s.length > 1000000
+        invalid_properties.push('invalid value for "html", the character length must be smaller than or equal to 1000000.')
+      end
+
+      if !@css.nil? && @css.to_s.length > 500000
+        invalid_properties.push('invalid value for "css", the character length must be smaller than or equal to 500000.')
+      end
+
+      if !@js.nil? && @js.to_s.length > 500000
+        invalid_properties.push('invalid value for "js", the character length must be smaller than or equal to 500000.')
       end
 
       invalid_properties
@@ -204,17 +150,19 @@ module Shotstack
     def valid?
       warn '[DEPRECATED] the `valid?` method is obsolete'
       return false if @type.nil?
-      type_validator = EnumAttributeValidator.new('String', ["rich-caption"])
+      type_validator = EnumAttributeValidator.new('String', ["html5"])
       return false unless type_validator.valid?(@type)
-      return false if @src.nil?
-      return false if @src.to_s.length < 1
+      return false if @html.nil?
+      return false if @html.to_s.length > 1000000
+      return false if !@css.nil? && @css.to_s.length > 500000
+      return false if !@js.nil? && @js.to_s.length > 500000
       true
     end
 
     # Custom attribute writer method checking allowed values (enum).
     # @param [Object] type Object to be assigned
     def type=(type)
-      validator = EnumAttributeValidator.new('String', ["rich-caption"])
+      validator = EnumAttributeValidator.new('String', ["html5"])
       unless validator.valid?(type)
         fail ArgumentError, "invalid value for \"type\", must be one of #{validator.allowable_values}."
       end
@@ -222,17 +170,45 @@ module Shotstack
     end
 
     # Custom attribute writer method with validation
-    # @param [Object] src Value to be assigned
-    def src=(src)
-      if src.nil?
-        fail ArgumentError, 'src cannot be nil'
+    # @param [Object] html Value to be assigned
+    def html=(html)
+      if html.nil?
+        fail ArgumentError, 'html cannot be nil'
       end
 
-      if src.to_s.length < 1
-        fail ArgumentError, 'invalid value for "src", the character length must be great than or equal to 1.'
+      if html.to_s.length > 1000000
+        fail ArgumentError, 'invalid value for "html", the character length must be smaller than or equal to 1000000.'
       end
 
-      @src = src
+      @html = html
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] css Value to be assigned
+    def css=(css)
+      if css.nil?
+        fail ArgumentError, 'css cannot be nil'
+      end
+
+      if css.to_s.length > 500000
+        fail ArgumentError, 'invalid value for "css", the character length must be smaller than or equal to 500000.'
+      end
+
+      @css = css
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] js Value to be assigned
+    def js=(js)
+      if js.nil?
+        fail ArgumentError, 'js cannot be nil'
+      end
+
+      if js.to_s.length > 500000
+        fail ArgumentError, 'invalid value for "js", the character length must be smaller than or equal to 500000.'
+      end
+
+      @js = js
     end
 
     # Checks equality by comparing each attribute.
@@ -241,17 +217,9 @@ module Shotstack
       return true if self.equal?(o)
       self.class == o.class &&
           type == o.type &&
-          src == o.src &&
-          font == o.font &&
-          style == o.style &&
-          stroke == o.stroke &&
-          shadow == o.shadow &&
-          background == o.background &&
-          border == o.border &&
-          padding == o.padding &&
-          align == o.align &&
-          active == o.active &&
-          animation == o.animation
+          html == o.html &&
+          css == o.css &&
+          js == o.js
     end
 
     # @see the `==` method
@@ -263,7 +231,7 @@ module Shotstack
     # Calculates hash code according to all attributes.
     # @return [Integer] Hash code
     def hash
-      [type, src, font, style, stroke, shadow, background, border, padding, align, active, animation].hash
+      [type, html, css, js].hash
     end
 
     # Builds the object from hash
