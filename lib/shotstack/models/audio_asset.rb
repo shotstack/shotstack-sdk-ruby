@@ -14,20 +14,35 @@ require 'date'
 require 'time'
 
 module Shotstack
-  # The AudioAsset is used to add sound effects and audio at specific intervals on the timeline. The src must be a publicly accessible URL to an audio resource such  as an mp3 file.
+  # The AudioAsset adds audio to a Clip. The audio can be sourced from a URL (`src`) or generated from a text prompt (`prompt`). Exactly one of `src` or `prompt` must be provided.  - **Source URL:** set `src` to a publicly accessible audio URL (e.g. mp3). - **Generated speech:** set `prompt` to the spoken text and `voice` to a voice   identifier (text-to-speech). Optionally set `language`/`newscaster`. - **Generated music or SFX:** set `prompt` describing the sound; omit `voice`. - Use `model` to choose the generator. The generated `src` is filled in   automatically. 
   class AudioAsset
     # The type of asset - set to `audio` for audio assets.
     attr_accessor :type
 
-    # The audio source URL. The URL must be publicly accessible or include credentials.
+    # The audio source URL. The URL must be publicly accessible or include credentials. Provide either `src` or `prompt`, not both.
     attr_accessor :src
+
+    # A text prompt. When `voice` is set, the prompt is the spoken text (text-to-speech). Without `voice`, the prompt describes generated music or sound effects. The generated `src` is filled in automatically.
+    attr_accessor :prompt
+
+    # Voice identifier for text-to-speech generation (e.g. `Matthew`, `Joanna`). Only meaningful when `prompt` is set.
+    attr_accessor :voice
+
+    # Optional BCP-47 language code (e.g. `en-US`) for text-to-speech. Only meaningful when `prompt` and `voice` are set.
+    attr_accessor :language
+
+    # Set to `true` to use the voice's newscaster mode when supported. Only meaningful when `prompt` and `voice` are set.
+    attr_accessor :newscaster
+
+    # The generation model to use when `prompt` is set (e.g. `polly-neural`). Defaults to the platform's preferred generator if omitted.
+    attr_accessor :model
 
     # The start trim point of the audio clip, in seconds (defaults to 0). Audio will start from the in trim point. The audio will play until the file ends or the Clip length is reached.
     attr_accessor :trim
 
     attr_accessor :volume
 
-    # Adjust the playback speed of the audio clip between 0 (paused) and 10 (10x normal speed), where 1 is normal speed (defaults to 1). Adjusting the speed will also adjust the duration of the clip and may require you to  adjust the Clip length. For example, if you set speed to 0.5, the clip will need to be 2x as long to play the entire audio (i.e. original length / 0.5). If you set speed to 2, the clip will need to be half as long to play the entire audio (i.e. original length / 2).
+    # Adjust the playback speed of the audio clip between 0 (paused) and 10 (10x normal speed), where 1 is normal speed (defaults to 1). Adjusting the speed will also adjust the duration of the clip and may require you to adjust the Clip length. For example, if you set speed to 0.5, the clip will need to be 2x as long to play the entire audio (i.e. original length / 0.5). If you set speed to 2, the clip will need to be half as long to play the entire audio (i.e. original length / 2).
     attr_accessor :speed
 
     # The effect to apply to the audio asset <ul>   <li>`fadeIn` - fade volume in only</li>   <li>`fadeOut` - fade volume out only</li>   <li>`fadeInFadeOut` - fade volume in and out</li> </ul>
@@ -60,6 +75,11 @@ module Shotstack
       {
         :'type' => :'type',
         :'src' => :'src',
+        :'prompt' => :'prompt',
+        :'voice' => :'voice',
+        :'language' => :'language',
+        :'newscaster' => :'newscaster',
+        :'model' => :'model',
         :'trim' => :'trim',
         :'volume' => :'volume',
         :'speed' => :'speed',
@@ -77,6 +97,11 @@ module Shotstack
       {
         :'type' => :'String',
         :'src' => :'String',
+        :'prompt' => :'String',
+        :'voice' => :'String',
+        :'language' => :'String',
+        :'newscaster' => :'Boolean',
+        :'model' => :'String',
         :'trim' => :'Float',
         :'volume' => :'AudioAssetVolume',
         :'speed' => :'Float',
@@ -113,8 +138,28 @@ module Shotstack
 
       if attributes.key?(:'src')
         self.src = attributes[:'src']
+      end
+
+      if attributes.key?(:'prompt')
+        self.prompt = attributes[:'prompt']
+      end
+
+      if attributes.key?(:'voice')
+        self.voice = attributes[:'voice']
+      end
+
+      if attributes.key?(:'language')
+        self.language = attributes[:'language']
+      end
+
+      if attributes.key?(:'newscaster')
+        self.newscaster = attributes[:'newscaster']
       else
-        self.src = nil
+        self.newscaster = false
+      end
+
+      if attributes.key?(:'model')
+        self.model = attributes[:'model']
       end
 
       if attributes.key?(:'trim')
@@ -143,17 +188,17 @@ module Shotstack
         invalid_properties.push('invalid value for "type", type cannot be nil.')
       end
 
-      if @src.nil?
-        invalid_properties.push('invalid value for "src", src cannot be nil.')
-      end
-
-      if @src.to_s.length < 1
+      if !@src.nil? && @src.to_s.length < 1
         invalid_properties.push('invalid value for "src", the character length must be great than or equal to 1.')
       end
 
       pattern = Regexp.new(/\S/)
-      if @src !~ pattern
+      if !@src.nil? && @src !~ pattern
         invalid_properties.push("invalid value for \"src\", must conform to the pattern #{pattern}.")
+      end
+
+      if !@prompt.nil? && @prompt.to_s.length > 4000
+        invalid_properties.push('invalid value for "prompt", the character length must be smaller than or equal to 4000.')
       end
 
       if !@speed.nil? && @speed > 10
@@ -174,9 +219,9 @@ module Shotstack
       return false if @type.nil?
       type_validator = EnumAttributeValidator.new('String', ["audio"])
       return false unless type_validator.valid?(@type)
-      return false if @src.nil?
-      return false if @src.to_s.length < 1
-      return false if @src !~ Regexp.new(/\S/)
+      return false if !@src.nil? && @src.to_s.length < 1
+      return false if !@src.nil? && @src !~ Regexp.new(/\S/)
+      return false if !@prompt.nil? && @prompt.to_s.length > 4000
       return false if !@speed.nil? && @speed > 10
       return false if !@speed.nil? && @speed < 0
       effect_validator = EnumAttributeValidator.new('String', ["none", "fadeIn", "fadeOut", "fadeInFadeOut"])
@@ -214,6 +259,20 @@ module Shotstack
     end
 
     # Custom attribute writer method with validation
+    # @param [Object] prompt Value to be assigned
+    def prompt=(prompt)
+      if prompt.nil?
+        fail ArgumentError, 'prompt cannot be nil'
+      end
+
+      if prompt.to_s.length > 4000
+        fail ArgumentError, 'invalid value for "prompt", the character length must be smaller than or equal to 4000.'
+      end
+
+      @prompt = prompt
+    end
+
+    # Custom attribute writer method with validation
     # @param [Object] speed Value to be assigned
     def speed=(speed)
       if speed.nil?
@@ -248,6 +307,11 @@ module Shotstack
       self.class == o.class &&
           type == o.type &&
           src == o.src &&
+          prompt == o.prompt &&
+          voice == o.voice &&
+          language == o.language &&
+          newscaster == o.newscaster &&
+          model == o.model &&
           trim == o.trim &&
           volume == o.volume &&
           speed == o.speed &&
@@ -263,7 +327,7 @@ module Shotstack
     # Calculates hash code according to all attributes.
     # @return [Integer] Hash code
     def hash
-      [type, src, trim, volume, speed, effect].hash
+      [type, src, prompt, voice, language, newscaster, model, trim, volume, speed, effect].hash
     end
 
     # Builds the object from hash
