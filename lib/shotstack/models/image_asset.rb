@@ -14,13 +14,25 @@ require 'date'
 require 'time'
 
 module Shotstack
-  # The ImageAsset is used to create video from images to compose an image. The src must be a publicly accessible URL to an image resource such as a jpg or png file.
+  # The ImageAsset adds an image to a Clip. The image can be sourced from a URL (`src`) or generated from a text prompt (`prompt`). Exactly one of `src` or `prompt` must be provided.  - **Source URL:** set `src` to the publicly accessible URL of a jpg or png file. - **Generated:** set `prompt` to describe the image; the engine generates it   using the provider chosen by `model` and fills `src` in automatically. 
   class ImageAsset
     # The type of asset - set to `image` for images.
     attr_accessor :type
 
-    # The image source URL. The URL must be publicly accessible or include credentials.
+    # The image source URL. The URL must be publicly accessible or include credentials. Provide either `src` or `prompt`, not both.
     attr_accessor :src
+
+    # A text prompt to generate the image from. When set without `src`, the engine generates an image and fills `src` automatically. Use `model` to choose the generator.
+    attr_accessor :prompt
+
+    # The generation model to use when `prompt` is set (e.g. `flux-schnell`, `fal/flux-schnell`, `fal/nano-banana-2`). Defaults to the platform's preferred generator if omitted.
+    attr_accessor :model
+
+    # Output resolution tier for supported image generation models. `1K` (default), `2K`, or `4K`. Only meaningful when `prompt` is set.
+    attr_accessor :resolution
+
+    # Aspect ratio for the generated image. Only meaningful when `prompt` is set and the model supports it.
+    attr_accessor :aspect_ratio
 
     attr_accessor :crop
 
@@ -51,6 +63,10 @@ module Shotstack
       {
         :'type' => :'type',
         :'src' => :'src',
+        :'prompt' => :'prompt',
+        :'model' => :'model',
+        :'resolution' => :'resolution',
+        :'aspect_ratio' => :'aspectRatio',
         :'crop' => :'crop'
       }
     end
@@ -65,6 +81,10 @@ module Shotstack
       {
         :'type' => :'String',
         :'src' => :'String',
+        :'prompt' => :'String',
+        :'model' => :'String',
+        :'resolution' => :'String',
+        :'aspect_ratio' => :'String',
         :'crop' => :'Crop'
       }
     end
@@ -98,8 +118,22 @@ module Shotstack
 
       if attributes.key?(:'src')
         self.src = attributes[:'src']
-      else
-        self.src = nil
+      end
+
+      if attributes.key?(:'prompt')
+        self.prompt = attributes[:'prompt']
+      end
+
+      if attributes.key?(:'model')
+        self.model = attributes[:'model']
+      end
+
+      if attributes.key?(:'resolution')
+        self.resolution = attributes[:'resolution']
+      end
+
+      if attributes.key?(:'aspect_ratio')
+        self.aspect_ratio = attributes[:'aspect_ratio']
       end
 
       if attributes.key?(:'crop')
@@ -116,17 +150,17 @@ module Shotstack
         invalid_properties.push('invalid value for "type", type cannot be nil.')
       end
 
-      if @src.nil?
-        invalid_properties.push('invalid value for "src", src cannot be nil.')
-      end
-
-      if @src.to_s.length < 1
+      if !@src.nil? && @src.to_s.length < 1
         invalid_properties.push('invalid value for "src", the character length must be great than or equal to 1.')
       end
 
       pattern = Regexp.new(/\S/)
-      if @src !~ pattern
+      if !@src.nil? && @src !~ pattern
         invalid_properties.push("invalid value for \"src\", must conform to the pattern #{pattern}.")
+      end
+
+      if !@prompt.nil? && @prompt.to_s.length > 4000
+        invalid_properties.push('invalid value for "prompt", the character length must be smaller than or equal to 4000.')
       end
 
       invalid_properties
@@ -139,9 +173,13 @@ module Shotstack
       return false if @type.nil?
       type_validator = EnumAttributeValidator.new('String', ["image"])
       return false unless type_validator.valid?(@type)
-      return false if @src.nil?
-      return false if @src.to_s.length < 1
-      return false if @src !~ Regexp.new(/\S/)
+      return false if !@src.nil? && @src.to_s.length < 1
+      return false if !@src.nil? && @src !~ Regexp.new(/\S/)
+      return false if !@prompt.nil? && @prompt.to_s.length > 4000
+      resolution_validator = EnumAttributeValidator.new('String', ["1K", "2K", "4K"])
+      return false unless resolution_validator.valid?(@resolution)
+      aspect_ratio_validator = EnumAttributeValidator.new('String', ["1:1", "16:9", "9:16", "4:3", "3:4", "21:9", "9:21"])
+      return false unless aspect_ratio_validator.valid?(@aspect_ratio)
       true
     end
 
@@ -174,6 +212,40 @@ module Shotstack
       @src = src
     end
 
+    # Custom attribute writer method with validation
+    # @param [Object] prompt Value to be assigned
+    def prompt=(prompt)
+      if prompt.nil?
+        fail ArgumentError, 'prompt cannot be nil'
+      end
+
+      if prompt.to_s.length > 4000
+        fail ArgumentError, 'invalid value for "prompt", the character length must be smaller than or equal to 4000.'
+      end
+
+      @prompt = prompt
+    end
+
+    # Custom attribute writer method checking allowed values (enum).
+    # @param [Object] resolution Object to be assigned
+    def resolution=(resolution)
+      validator = EnumAttributeValidator.new('String', ["1K", "2K", "4K"])
+      unless validator.valid?(resolution)
+        fail ArgumentError, "invalid value for \"resolution\", must be one of #{validator.allowable_values}."
+      end
+      @resolution = resolution
+    end
+
+    # Custom attribute writer method checking allowed values (enum).
+    # @param [Object] aspect_ratio Object to be assigned
+    def aspect_ratio=(aspect_ratio)
+      validator = EnumAttributeValidator.new('String', ["1:1", "16:9", "9:16", "4:3", "3:4", "21:9", "9:21"])
+      unless validator.valid?(aspect_ratio)
+        fail ArgumentError, "invalid value for \"aspect_ratio\", must be one of #{validator.allowable_values}."
+      end
+      @aspect_ratio = aspect_ratio
+    end
+
     # Checks equality by comparing each attribute.
     # @param [Object] Object to be compared
     def ==(o)
@@ -181,6 +253,10 @@ module Shotstack
       self.class == o.class &&
           type == o.type &&
           src == o.src &&
+          prompt == o.prompt &&
+          model == o.model &&
+          resolution == o.resolution &&
+          aspect_ratio == o.aspect_ratio &&
           crop == o.crop
     end
 
@@ -193,7 +269,7 @@ module Shotstack
     # Calculates hash code according to all attributes.
     # @return [Integer] Hash code
     def hash
-      [type, src, crop].hash
+      [type, src, prompt, model, resolution, aspect_ratio, crop].hash
     end
 
     # Builds the object from hash

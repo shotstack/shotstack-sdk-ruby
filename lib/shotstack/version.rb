@@ -11,5 +11,5 @@ Generator version: 7.4.0
 =end
 
 module Shotstack
-  VERSION = '1.10.4'
+  VERSION = '1.14.0'
 end
