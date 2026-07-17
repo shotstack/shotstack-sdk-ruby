@@ -14,13 +14,34 @@ require 'date'
 require 'time'
 
 module Shotstack
-  # The VideoAsset is used to create video sequences from video files. The src must be a publicly accessible URL to a video resource such as an mp4 file.
+  # The VideoAsset adds a video to a Clip. The video can be sourced from a URL (`src`) or generated from a text prompt (`prompt`), optionally from a starting image (`inputSrc`). Exactly one of `src` or `prompt` must be provided.  - **Source URL:** set `src` to the URL of an mp4 (or compatible) video file. - **Generated:** set `prompt` to describe the motion. Optionally set `inputSrc`   to a starting image URL (image-to-video). Use `model` to choose the generator   (e.g. `luma-ray-3`, `runpod-itv-mini`). The generated `src` is filled in   automatically. 
   class VideoAsset
     # The type of asset - set to `video` for videos.
     attr_accessor :type
 
-    # The video source URL. The URL must be publicly accessible or include credentials.
+    # The video source URL. The URL must be publicly accessible or include credentials. Provide either `src` or `prompt`, not both.
     attr_accessor :src
+
+    # A text prompt to generate the video from. When set without `src`, the engine generates a video and fills `src` automatically. Optionally pair with `inputSrc` for image-to-video. Use `model` to choose the generator.
+    attr_accessor :prompt
+
+    # Input image URL for image-to-video generation. The image is used as the starting frame; `prompt` describes the motion. Has no effect unless `prompt` is set.
+    attr_accessor :input_src
+
+    # The generation model to use when `prompt` is set (e.g. `luma-ray-3`, `runpod-itv-mini`, `fal/seedance-2.0`). Defaults to the platform's preferred generator if omitted.
+    attr_accessor :model
+
+    # Output resolution for video generation. Only meaningful when `prompt` is set and the model supports it (e.g. `fal/seedance-2.0`).
+    attr_accessor :resolution
+
+    # Target video duration in seconds for generation models that accept it. `\"auto\"` lets the model decide. Only meaningful when `prompt` is set.
+    attr_accessor :duration
+
+    # Aspect ratio for the generated video. Only meaningful when `prompt` is set and the model supports it.
+    attr_accessor :aspect_ratio
+
+    # Set to `true` to request audio generation alongside the video. Only meaningful for video generation models that support it (e.g. `fal/seedance-2.0`).
+    attr_accessor :generate_audio
 
     # Set to `true` to force re-encoding of the video during preprocessing. This can help resolve compatibility issues, fix rotation problems, synchronize audio, or convert formats. The video will be processed to ensure optimal compatibility with the rendering engine.
     attr_accessor :transcode
@@ -33,7 +54,7 @@ module Shotstack
     # Preset volume effects to apply to the video asset <ul>   <li>`fadeIn` - fade volume in only</li>   <li>`fadeOut` - fade volume out only</li>   <li>`fadeInFadeOut` - fade volume in and out</li> </ul>
     attr_accessor :volume_effect
 
-    # Adjust the playback speed of the video clip between 0 (paused) and 10 (10x normal speed) where 1 is normal speed (defaults to 1). Adjusting the speed will also adjust the duration of the clip and may require you to  adjust the Clip length. For example, if you set speed to 0.5, the clip will need to be 2x as long to play the entire video (i.e. original length / 0.5). If you set speed to 2, the clip will need to be half as long to play the entire video (i.e. original length / 2).
+    # Adjust the playback speed of the video clip between 0 (paused) and 10 (10x normal speed) where 1 is normal speed (defaults to 1). Adjusting the speed will also adjust the duration of the clip and may require you to adjust the Clip length. For example, if you set speed to 0.5, the clip will need to be 2x as long to play the entire video (i.e. original length / 0.5). If you set speed to 2, the clip will need to be half as long to play the entire video (i.e. original length / 2).
     attr_accessor :speed
 
     attr_accessor :crop
@@ -67,6 +88,13 @@ module Shotstack
       {
         :'type' => :'type',
         :'src' => :'src',
+        :'prompt' => :'prompt',
+        :'input_src' => :'inputSrc',
+        :'model' => :'model',
+        :'resolution' => :'resolution',
+        :'duration' => :'duration',
+        :'aspect_ratio' => :'aspectRatio',
+        :'generate_audio' => :'generateAudio',
         :'transcode' => :'transcode',
         :'trim' => :'trim',
         :'volume' => :'volume',
@@ -87,6 +115,13 @@ module Shotstack
       {
         :'type' => :'String',
         :'src' => :'String',
+        :'prompt' => :'String',
+        :'input_src' => :'String',
+        :'model' => :'String',
+        :'resolution' => :'String',
+        :'duration' => :'String',
+        :'aspect_ratio' => :'String',
+        :'generate_audio' => :'Boolean',
         :'transcode' => :'Boolean',
         :'trim' => :'Float',
         :'volume' => :'VideoAssetVolume',
@@ -126,8 +161,38 @@ module Shotstack
 
       if attributes.key?(:'src')
         self.src = attributes[:'src']
+      end
+
+      if attributes.key?(:'prompt')
+        self.prompt = attributes[:'prompt']
+      end
+
+      if attributes.key?(:'input_src')
+        self.input_src = attributes[:'input_src']
+      end
+
+      if attributes.key?(:'model')
+        self.model = attributes[:'model']
+      end
+
+      if attributes.key?(:'resolution')
+        self.resolution = attributes[:'resolution']
+      end
+
+      if attributes.key?(:'duration')
+        self.duration = attributes[:'duration']
       else
-        self.src = nil
+        self.duration = 'auto'
+      end
+
+      if attributes.key?(:'aspect_ratio')
+        self.aspect_ratio = attributes[:'aspect_ratio']
+      end
+
+      if attributes.key?(:'generate_audio')
+        self.generate_audio = attributes[:'generate_audio']
+      else
+        self.generate_audio = false
       end
 
       if attributes.key?(:'transcode')
@@ -168,17 +233,21 @@ module Shotstack
         invalid_properties.push('invalid value for "type", type cannot be nil.')
       end
 
-      if @src.nil?
-        invalid_properties.push('invalid value for "src", src cannot be nil.')
-      end
-
-      if @src.to_s.length < 1
+      if !@src.nil? && @src.to_s.length < 1
         invalid_properties.push('invalid value for "src", the character length must be great than or equal to 1.')
       end
 
       pattern = Regexp.new(/\S/)
-      if @src !~ pattern
+      if !@src.nil? && @src !~ pattern
         invalid_properties.push("invalid value for \"src\", must conform to the pattern #{pattern}.")
+      end
+
+      if !@prompt.nil? && @prompt.to_s.length > 4000
+        invalid_properties.push('invalid value for "prompt", the character length must be smaller than or equal to 4000.')
+      end
+
+      if !@input_src.nil? && @input_src.to_s.length < 1
+        invalid_properties.push('invalid value for "input_src", the character length must be great than or equal to 1.')
       end
 
       if !@speed.nil? && @speed > 10
@@ -199,9 +268,16 @@ module Shotstack
       return false if @type.nil?
       type_validator = EnumAttributeValidator.new('String', ["video"])
       return false unless type_validator.valid?(@type)
-      return false if @src.nil?
-      return false if @src.to_s.length < 1
-      return false if @src !~ Regexp.new(/\S/)
+      return false if !@src.nil? && @src.to_s.length < 1
+      return false if !@src.nil? && @src !~ Regexp.new(/\S/)
+      return false if !@prompt.nil? && @prompt.to_s.length > 4000
+      return false if !@input_src.nil? && @input_src.to_s.length < 1
+      resolution_validator = EnumAttributeValidator.new('String', ["480p", "720p", "1080p"])
+      return false unless resolution_validator.valid?(@resolution)
+      duration_validator = EnumAttributeValidator.new('String', ["auto", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15"])
+      return false unless duration_validator.valid?(@duration)
+      aspect_ratio_validator = EnumAttributeValidator.new('String', ["1:1", "16:9", "9:16", "4:3", "3:4", "21:9", "9:21"])
+      return false unless aspect_ratio_validator.valid?(@aspect_ratio)
       volume_effect_validator = EnumAttributeValidator.new('String', ["none", "fadeIn", "fadeOut", "fadeInFadeOut"])
       return false unless volume_effect_validator.valid?(@volume_effect)
       return false if !@speed.nil? && @speed > 10
@@ -236,6 +312,64 @@ module Shotstack
       end
 
       @src = src
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] prompt Value to be assigned
+    def prompt=(prompt)
+      if prompt.nil?
+        fail ArgumentError, 'prompt cannot be nil'
+      end
+
+      if prompt.to_s.length > 4000
+        fail ArgumentError, 'invalid value for "prompt", the character length must be smaller than or equal to 4000.'
+      end
+
+      @prompt = prompt
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] input_src Value to be assigned
+    def input_src=(input_src)
+      if input_src.nil?
+        fail ArgumentError, 'input_src cannot be nil'
+      end
+
+      if input_src.to_s.length < 1
+        fail ArgumentError, 'invalid value for "input_src", the character length must be great than or equal to 1.'
+      end
+
+      @input_src = input_src
+    end
+
+    # Custom attribute writer method checking allowed values (enum).
+    # @param [Object] resolution Object to be assigned
+    def resolution=(resolution)
+      validator = EnumAttributeValidator.new('String', ["480p", "720p", "1080p"])
+      unless validator.valid?(resolution)
+        fail ArgumentError, "invalid value for \"resolution\", must be one of #{validator.allowable_values}."
+      end
+      @resolution = resolution
+    end
+
+    # Custom attribute writer method checking allowed values (enum).
+    # @param [Object] duration Object to be assigned
+    def duration=(duration)
+      validator = EnumAttributeValidator.new('String', ["auto", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15"])
+      unless validator.valid?(duration)
+        fail ArgumentError, "invalid value for \"duration\", must be one of #{validator.allowable_values}."
+      end
+      @duration = duration
+    end
+
+    # Custom attribute writer method checking allowed values (enum).
+    # @param [Object] aspect_ratio Object to be assigned
+    def aspect_ratio=(aspect_ratio)
+      validator = EnumAttributeValidator.new('String', ["1:1", "16:9", "9:16", "4:3", "3:4", "21:9", "9:21"])
+      unless validator.valid?(aspect_ratio)
+        fail ArgumentError, "invalid value for \"aspect_ratio\", must be one of #{validator.allowable_values}."
+      end
+      @aspect_ratio = aspect_ratio
     end
 
     # Custom attribute writer method checking allowed values (enum).
@@ -273,6 +407,13 @@ module Shotstack
       self.class == o.class &&
           type == o.type &&
           src == o.src &&
+          prompt == o.prompt &&
+          input_src == o.input_src &&
+          model == o.model &&
+          resolution == o.resolution &&
+          duration == o.duration &&
+          aspect_ratio == o.aspect_ratio &&
+          generate_audio == o.generate_audio &&
           transcode == o.transcode &&
           trim == o.trim &&
           volume == o.volume &&
@@ -291,7 +432,7 @@ module Shotstack
     # Calculates hash code according to all attributes.
     # @return [Integer] Hash code
     def hash
-      [type, src, transcode, trim, volume, volume_effect, speed, crop, chroma_key].hash
+      [type, src, prompt, input_src, model, resolution, duration, aspect_ratio, generate_audio, transcode, trim, volume, volume_effect, speed, crop, chroma_key].hash
     end
 
     # Builds the object from hash
