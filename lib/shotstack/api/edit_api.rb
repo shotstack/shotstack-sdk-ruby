@@ -85,6 +85,69 @@ module Shotstack
       return data, status_code, headers
     end
 
+    # Get Generation Status
+    # Get the status of an on-demand asset generation job created with the generate endpoint. Jobs are owner-scoped.  **Base URL:** <a href=\"#\">https://api.shotstack.io/edit/{version}</a> 
+    # @param id [String] The generation job id returned by the generate endpoint.
+    # @param [Hash] opts the optional parameters
+    # @return [Object]
+    def get_generate(id, opts = {})
+      data, _status_code, _headers = get_generate_with_http_info(id, opts)
+      data
+    end
+
+    # Get Generation Status
+    # Get the status of an on-demand asset generation job created with the generate endpoint. Jobs are owner-scoped.  **Base URL:** &lt;a href&#x3D;\&quot;#\&quot;&gt;https://api.shotstack.io/edit/{version}&lt;/a&gt; 
+    # @param id [String] The generation job id returned by the generate endpoint.
+    # @param [Hash] opts the optional parameters
+    # @return [Array<(Object, Integer, Hash)>] Object data, response status code and response headers
+    def get_generate_with_http_info(id, opts = {})
+      if @api_client.config.debugging
+        @api_client.config.logger.debug 'Calling API: EditApi.get_generate ...'
+      end
+      # verify the required parameter 'id' is set
+      if @api_client.config.client_side_validation && id.nil?
+        fail ArgumentError, "Missing the required parameter 'id' when calling EditApi.get_generate"
+      end
+      # resource path
+      local_var_path = '/generate/{id}'.sub('{' + 'id' + '}', CGI.escape(id.to_s))
+
+      # query parameters
+      query_params = opts[:query_params] || {}
+
+      # header parameters
+      header_params = opts[:header_params] || {}
+      # HTTP header 'Accept' (if needed)
+      header_params['Accept'] = @api_client.select_header_accept(['application/json'])
+
+      # form parameters
+      form_params = opts[:form_params] || {}
+
+      # http body (model)
+      post_body = opts[:debug_body]
+
+      # return_type
+      return_type = opts[:debug_return_type] || 'Object'
+
+      # auth_names
+      auth_names = opts[:debug_auth_names] || ['DeveloperKey']
+
+      new_options = opts.merge(
+        :operation => :"EditApi.get_generate",
+        :header_params => header_params,
+        :query_params => query_params,
+        :form_params => form_params,
+        :body => post_body,
+        :auth_names => auth_names,
+        :return_type => return_type
+      )
+
+      data, status_code, headers = @api_client.call_api(:GET, local_var_path, new_options)
+      if @api_client.config.debugging
+        @api_client.config.logger.debug "API called: EditApi#get_generate\nData: #{data.inspect}\nStatus code: #{status_code}\nHeaders: #{headers}"
+      end
+      return data, status_code, headers
+    end
+
     # Get Render Status
     # Get the rendering status, temporary asset url and details of a render by ID.  **Base URL:** <a href=\"#\">https://api.shotstack.io/edit/{version}</a> 
     # @param id [String] The id of the timeline render task in UUID format
@@ -280,6 +343,70 @@ module Shotstack
       data, status_code, headers = @api_client.call_api(:GET, local_var_path, new_options)
       if @api_client.config.debugging
         @api_client.config.logger.debug "API called: EditApi#get_templates\nData: #{data.inspect}\nStatus code: #{status_code}\nHeaders: #{headers}"
+      end
+      return data, status_code, headers
+    end
+
+    # Generate Asset
+    # Generate a single image, video or audio asset from a text prompt without rendering a full edit. Submit a prompt-bearing asset; the response is immediate when an identical asset has been generated before (results are cached by prompt, model and options), otherwise the job is queued and can be polled via the status endpoint.  Generation is billed in credits per asset. Identical repeat requests resolve from the cache at no charge.  **Base URL:** <a href=\"#\">https://api.shotstack.io/edit/{version}</a> 
+    # @param [Hash] opts the optional parameters
+    # @option opts [PostGenerateRequest] :post_generate_request A prompt-bearing image, video or audio asset to generate.
+    # @return [PostGenerate200Response]
+    def post_generate(opts = {})
+      data, _status_code, _headers = post_generate_with_http_info(opts)
+      data
+    end
+
+    # Generate Asset
+    # Generate a single image, video or audio asset from a text prompt without rendering a full edit. Submit a prompt-bearing asset; the response is immediate when an identical asset has been generated before (results are cached by prompt, model and options), otherwise the job is queued and can be polled via the status endpoint.  Generation is billed in credits per asset. Identical repeat requests resolve from the cache at no charge.  **Base URL:** &lt;a href&#x3D;\&quot;#\&quot;&gt;https://api.shotstack.io/edit/{version}&lt;/a&gt; 
+    # @param [Hash] opts the optional parameters
+    # @option opts [PostGenerateRequest] :post_generate_request A prompt-bearing image, video or audio asset to generate.
+    # @return [Array<(PostGenerate200Response, Integer, Hash)>] PostGenerate200Response data, response status code and response headers
+    def post_generate_with_http_info(opts = {})
+      if @api_client.config.debugging
+        @api_client.config.logger.debug 'Calling API: EditApi.post_generate ...'
+      end
+      # resource path
+      local_var_path = '/generate'
+
+      # query parameters
+      query_params = opts[:query_params] || {}
+
+      # header parameters
+      header_params = opts[:header_params] || {}
+      # HTTP header 'Accept' (if needed)
+      header_params['Accept'] = @api_client.select_header_accept(['application/json'])
+      # HTTP header 'Content-Type'
+      content_type = @api_client.select_header_content_type(['application/json'])
+      if !content_type.nil?
+          header_params['Content-Type'] = content_type
+      end
+
+      # form parameters
+      form_params = opts[:form_params] || {}
+
+      # http body (model)
+      post_body = opts[:debug_body] || @api_client.object_to_http_body(opts[:'post_generate_request'])
+
+      # return_type
+      return_type = opts[:debug_return_type] || 'PostGenerate200Response'
+
+      # auth_names
+      auth_names = opts[:debug_auth_names] || ['DeveloperKey']
+
+      new_options = opts.merge(
+        :operation => :"EditApi.post_generate",
+        :header_params => header_params,
+        :query_params => query_params,
+        :form_params => form_params,
+        :body => post_body,
+        :auth_names => auth_names,
+        :return_type => return_type
+      )
+
+      data, status_code, headers = @api_client.call_api(:POST, local_var_path, new_options)
+      if @api_client.config.debugging
+        @api_client.config.logger.debug "API called: EditApi#post_generate\nData: #{data.inspect}\nStatus code: #{status_code}\nHeaders: #{headers}"
       end
       return data, status_code, headers
     end
