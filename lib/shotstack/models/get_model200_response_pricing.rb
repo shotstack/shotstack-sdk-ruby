@@ -14,28 +14,21 @@ require 'date'
 require 'time'
 
 module Shotstack
-  # **Notice: The HtmlAsset is deprecated, use the [RichTextAsset](#tocs_richtextasset) instead.**  The HtmlAsset clip type lets you create text based layout and formatting using HTML and CSS. You can also set the height and width of a bounding box for the HTML content to sit within. Text and elements will wrap within the bounding box. 
-  class HtmlAsset
-    # The type of asset - set to `html` for HTML.
-    attr_accessor :type
+  # What one generation with this model costs.
+  class GetModel200ResponsePricing
+    # What one unit is. `render` means the whole generation counts as one unit, whatever its size.
+    attr_accessor :unit
 
-    # The HTML text string. See list of [supported HTML tags](https://shotstack.io/docs/guide/architecting-an-application/html-support/#supported-html-tags).
-    attr_accessor :html
+    attr_accessor :credits
 
-    # The CSS text string to apply styling to the HTML. See list of  [support CSS properties](https://shotstack.io/docs/guide/architecting-an-application/html-support/#supported-css-properties).
-    attr_accessor :css
+    # The options whose values select the rate, outermost first. Absent when `credits` is a single number.
+    attr_accessor :tiered_by
 
-    # Set the width of the HTML asset bounding box in pixels. Text will wrap to fill the bounding box.
-    attr_accessor :width
+    # The fewest units a generation is charged for, when a model has a minimum charge.
+    attr_accessor :min_units
 
-    # Set the width of the HTML asset bounding box in pixels. Text and elements will be masked if they exceed the  height of the bounding box.
-    attr_accessor :height
-
-    # Apply a background color behind the HTML bounding box using. Set the text color using hexadecimal  color notation. Transparency is supported by setting the first two characters of the hex string  (opposite to HTML), i.e. #80ffffff will be white with 50% transparency.
-    attr_accessor :background
-
-    # Place the HTML in one of nine predefined positions within the HTML area. <ul>   <li>`top` - top (center)</li>   <li>`topRight` - top right</li>   <li>`right` - right (center)</li>   <li>`bottomRight` - bottom right</li>   <li>`bottom` - bottom (center)</li>   <li>`bottomLeft` - bottom left</li>   <li>`left` - left (center)</li>   <li>`topLeft` - top left</li>   <li>`center` - center</li> </ul>
-    attr_accessor :position
+    # The date this rate took effect, or `legacy` for a rate that predates dated pricing.
+    attr_accessor :effective_from
 
     class EnumAttributeValidator
       attr_reader :datatype
@@ -62,13 +55,11 @@ module Shotstack
     # Attribute mapping from ruby-style variable name to JSON key.
     def self.attribute_map
       {
-        :'type' => :'type',
-        :'html' => :'html',
-        :'css' => :'css',
-        :'width' => :'width',
-        :'height' => :'height',
-        :'background' => :'background',
-        :'position' => :'position'
+        :'unit' => :'unit',
+        :'credits' => :'credits',
+        :'tiered_by' => :'tieredBy',
+        :'min_units' => :'minUnits',
+        :'effective_from' => :'effectiveFrom'
       }
     end
 
@@ -80,13 +71,11 @@ module Shotstack
     # Attribute type mapping.
     def self.openapi_types
       {
-        :'type' => :'String',
-        :'html' => :'String',
-        :'css' => :'String',
-        :'width' => :'Integer',
-        :'height' => :'Integer',
-        :'background' => :'String',
-        :'position' => :'String'
+        :'unit' => :'String',
+        :'credits' => :'GetModel200ResponsePricingCredits',
+        :'tiered_by' => :'Array<String>',
+        :'min_units' => :'Float',
+        :'effective_from' => :'String'
       }
     end
 
@@ -100,47 +89,43 @@ module Shotstack
     # @param [Hash] attributes Model attributes in the form of hash
     def initialize(attributes = {})
       if (!attributes.is_a?(Hash))
-        fail ArgumentError, "The input argument (attributes) must be a hash in `Shotstack::HtmlAsset` initialize method"
+        fail ArgumentError, "The input argument (attributes) must be a hash in `Shotstack::GetModel200ResponsePricing` initialize method"
       end
 
       # check to see if the attribute exists and convert string to symbol for hash key
       attributes = attributes.each_with_object({}) { |(k, v), h|
         if (!self.class.attribute_map.key?(k.to_sym))
-          fail ArgumentError, "`#{k}` is not a valid attribute in `Shotstack::HtmlAsset`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
+          fail ArgumentError, "`#{k}` is not a valid attribute in `Shotstack::GetModel200ResponsePricing`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
         end
         h[k.to_sym] = v
       }
 
-      if attributes.key?(:'type')
-        self.type = attributes[:'type']
+      if attributes.key?(:'unit')
+        self.unit = attributes[:'unit']
       else
-        self.type = 'html'
+        self.unit = nil
       end
 
-      if attributes.key?(:'html')
-        self.html = attributes[:'html']
+      if attributes.key?(:'credits')
+        self.credits = attributes[:'credits']
       else
-        self.html = nil
+        self.credits = nil
       end
 
-      if attributes.key?(:'css')
-        self.css = attributes[:'css']
+      if attributes.key?(:'tiered_by')
+        if (value = attributes[:'tiered_by']).is_a?(Array)
+          self.tiered_by = value
+        end
       end
 
-      if attributes.key?(:'width')
-        self.width = attributes[:'width']
+      if attributes.key?(:'min_units')
+        self.min_units = attributes[:'min_units']
       end
 
-      if attributes.key?(:'height')
-        self.height = attributes[:'height']
-      end
-
-      if attributes.key?(:'background')
-        self.background = attributes[:'background']
-      end
-
-      if attributes.key?(:'position')
-        self.position = attributes[:'position']
+      if attributes.key?(:'effective_from')
+        self.effective_from = attributes[:'effective_from']
+      else
+        self.effective_from = nil
       end
     end
 
@@ -149,12 +134,16 @@ module Shotstack
     def list_invalid_properties
       warn '[DEPRECATED] the `list_invalid_properties` method is obsolete'
       invalid_properties = Array.new
-      if @type.nil?
-        invalid_properties.push('invalid value for "type", type cannot be nil.')
+      if @unit.nil?
+        invalid_properties.push('invalid value for "unit", unit cannot be nil.')
       end
 
-      if @html.nil?
-        invalid_properties.push('invalid value for "html", html cannot be nil.')
+      if @credits.nil?
+        invalid_properties.push('invalid value for "credits", credits cannot be nil.')
+      end
+
+      if @effective_from.nil?
+        invalid_properties.push('invalid value for "effective_from", effective_from cannot be nil.')
       end
 
       invalid_properties
@@ -164,33 +153,22 @@ module Shotstack
     # @return true if the model is valid
     def valid?
       warn '[DEPRECATED] the `valid?` method is obsolete'
-      return false if @type.nil?
-      type_validator = EnumAttributeValidator.new('String', ["html"])
-      return false unless type_validator.valid?(@type)
-      return false if @html.nil?
-      position_validator = EnumAttributeValidator.new('String', ["top", "topRight", "right", "bottomRight", "bottom", "bottomLeft", "left", "topLeft", "center"])
-      return false unless position_validator.valid?(@position)
+      return false if @unit.nil?
+      unit_validator = EnumAttributeValidator.new('String', ["render", "second", "minute", "thousandCharacters"])
+      return false unless unit_validator.valid?(@unit)
+      return false if @credits.nil?
+      return false if @effective_from.nil?
       true
     end
 
     # Custom attribute writer method checking allowed values (enum).
-    # @param [Object] type Object to be assigned
-    def type=(type)
-      validator = EnumAttributeValidator.new('String', ["html"])
-      unless validator.valid?(type)
-        fail ArgumentError, "invalid value for \"type\", must be one of #{validator.allowable_values}."
+    # @param [Object] unit Object to be assigned
+    def unit=(unit)
+      validator = EnumAttributeValidator.new('String', ["render", "second", "minute", "thousandCharacters"])
+      unless validator.valid?(unit)
+        fail ArgumentError, "invalid value for \"unit\", must be one of #{validator.allowable_values}."
       end
-      @type = type
-    end
-
-    # Custom attribute writer method checking allowed values (enum).
-    # @param [Object] position Object to be assigned
-    def position=(position)
-      validator = EnumAttributeValidator.new('String', ["top", "topRight", "right", "bottomRight", "bottom", "bottomLeft", "left", "topLeft", "center"])
-      unless validator.valid?(position)
-        fail ArgumentError, "invalid value for \"position\", must be one of #{validator.allowable_values}."
-      end
-      @position = position
+      @unit = unit
     end
 
     # Checks equality by comparing each attribute.
@@ -198,13 +176,11 @@ module Shotstack
     def ==(o)
       return true if self.equal?(o)
       self.class == o.class &&
-          type == o.type &&
-          html == o.html &&
-          css == o.css &&
-          width == o.width &&
-          height == o.height &&
-          background == o.background &&
-          position == o.position
+          unit == o.unit &&
+          credits == o.credits &&
+          tiered_by == o.tiered_by &&
+          min_units == o.min_units &&
+          effective_from == o.effective_from
     end
 
     # @see the `==` method
@@ -216,7 +192,7 @@ module Shotstack
     # Calculates hash code according to all attributes.
     # @return [Integer] Hash code
     def hash
-      [type, html, css, width, height, background, position].hash
+      [unit, credits, tiered_by, min_units, effective_from].hash
     end
 
     # Builds the object from hash

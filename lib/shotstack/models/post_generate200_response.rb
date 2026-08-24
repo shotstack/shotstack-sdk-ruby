@@ -14,28 +14,19 @@ require 'date'
 require 'time'
 
 module Shotstack
-  # **Notice: The HtmlAsset is deprecated, use the [RichTextAsset](#tocs_richtextasset) instead.**  The HtmlAsset clip type lets you create text based layout and formatting using HTML and CSS. You can also set the height and width of a bounding box for the HTML content to sit within. Text and elements will wrap within the bounding box. 
-  class HtmlAsset
-    # The type of asset - set to `html` for HTML.
-    attr_accessor :type
+  # The status of an on-demand asset generation job. Completed jobs include the public URL of the generated asset.
+  class PostGenerate200Response
+    # The generation job id. Deterministic for a given owner and asset payload (or idempotency key), so identical requests return the same job and cached result.
+    attr_accessor :id
 
-    # The HTML text string. See list of [supported HTML tags](https://shotstack.io/docs/guide/architecting-an-application/html-support/#supported-html-tags).
-    attr_accessor :html
+    # The status of the generation job.
+    attr_accessor :status
 
-    # The CSS text string to apply styling to the HTML. See list of  [support CSS properties](https://shotstack.io/docs/guide/architecting-an-application/html-support/#supported-css-properties).
-    attr_accessor :css
+    # The public URL of the generated asset. Present only when `status` is `done`.
+    attr_accessor :url
 
-    # Set the width of the HTML asset bounding box in pixels. Text will wrap to fill the bounding box.
-    attr_accessor :width
-
-    # Set the width of the HTML asset bounding box in pixels. Text and elements will be masked if they exceed the  height of the bounding box.
-    attr_accessor :height
-
-    # Apply a background color behind the HTML bounding box using. Set the text color using hexadecimal  color notation. Transparency is supported by setting the first two characters of the hex string  (opposite to HTML), i.e. #80ffffff will be white with 50% transparency.
-    attr_accessor :background
-
-    # Place the HTML in one of nine predefined positions within the HTML area. <ul>   <li>`top` - top (center)</li>   <li>`topRight` - top right</li>   <li>`right` - right (center)</li>   <li>`bottomRight` - bottom right</li>   <li>`bottom` - bottom (center)</li>   <li>`bottomLeft` - bottom left</li>   <li>`left` - left (center)</li>   <li>`topLeft` - top left</li>   <li>`center` - center</li> </ul>
-    attr_accessor :position
+    # A human readable error message. Present only when `status` is `failed`.
+    attr_accessor :error
 
     class EnumAttributeValidator
       attr_reader :datatype
@@ -62,13 +53,10 @@ module Shotstack
     # Attribute mapping from ruby-style variable name to JSON key.
     def self.attribute_map
       {
-        :'type' => :'type',
-        :'html' => :'html',
-        :'css' => :'css',
-        :'width' => :'width',
-        :'height' => :'height',
-        :'background' => :'background',
-        :'position' => :'position'
+        :'id' => :'id',
+        :'status' => :'status',
+        :'url' => :'url',
+        :'error' => :'error'
       }
     end
 
@@ -80,13 +68,10 @@ module Shotstack
     # Attribute type mapping.
     def self.openapi_types
       {
-        :'type' => :'String',
-        :'html' => :'String',
-        :'css' => :'String',
-        :'width' => :'Integer',
-        :'height' => :'Integer',
-        :'background' => :'String',
-        :'position' => :'String'
+        :'id' => :'String',
+        :'status' => :'String',
+        :'url' => :'String',
+        :'error' => :'String'
       }
     end
 
@@ -100,47 +85,35 @@ module Shotstack
     # @param [Hash] attributes Model attributes in the form of hash
     def initialize(attributes = {})
       if (!attributes.is_a?(Hash))
-        fail ArgumentError, "The input argument (attributes) must be a hash in `Shotstack::HtmlAsset` initialize method"
+        fail ArgumentError, "The input argument (attributes) must be a hash in `Shotstack::PostGenerate200Response` initialize method"
       end
 
       # check to see if the attribute exists and convert string to symbol for hash key
       attributes = attributes.each_with_object({}) { |(k, v), h|
         if (!self.class.attribute_map.key?(k.to_sym))
-          fail ArgumentError, "`#{k}` is not a valid attribute in `Shotstack::HtmlAsset`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
+          fail ArgumentError, "`#{k}` is not a valid attribute in `Shotstack::PostGenerate200Response`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
         end
         h[k.to_sym] = v
       }
 
-      if attributes.key?(:'type')
-        self.type = attributes[:'type']
+      if attributes.key?(:'id')
+        self.id = attributes[:'id']
       else
-        self.type = 'html'
+        self.id = nil
       end
 
-      if attributes.key?(:'html')
-        self.html = attributes[:'html']
+      if attributes.key?(:'status')
+        self.status = attributes[:'status']
       else
-        self.html = nil
+        self.status = nil
       end
 
-      if attributes.key?(:'css')
-        self.css = attributes[:'css']
+      if attributes.key?(:'url')
+        self.url = attributes[:'url']
       end
 
-      if attributes.key?(:'width')
-        self.width = attributes[:'width']
-      end
-
-      if attributes.key?(:'height')
-        self.height = attributes[:'height']
-      end
-
-      if attributes.key?(:'background')
-        self.background = attributes[:'background']
-      end
-
-      if attributes.key?(:'position')
-        self.position = attributes[:'position']
+      if attributes.key?(:'error')
+        self.error = attributes[:'error']
       end
     end
 
@@ -149,12 +122,12 @@ module Shotstack
     def list_invalid_properties
       warn '[DEPRECATED] the `list_invalid_properties` method is obsolete'
       invalid_properties = Array.new
-      if @type.nil?
-        invalid_properties.push('invalid value for "type", type cannot be nil.')
+      if @id.nil?
+        invalid_properties.push('invalid value for "id", id cannot be nil.')
       end
 
-      if @html.nil?
-        invalid_properties.push('invalid value for "html", html cannot be nil.')
+      if @status.nil?
+        invalid_properties.push('invalid value for "status", status cannot be nil.')
       end
 
       invalid_properties
@@ -164,33 +137,21 @@ module Shotstack
     # @return true if the model is valid
     def valid?
       warn '[DEPRECATED] the `valid?` method is obsolete'
-      return false if @type.nil?
-      type_validator = EnumAttributeValidator.new('String', ["html"])
-      return false unless type_validator.valid?(@type)
-      return false if @html.nil?
-      position_validator = EnumAttributeValidator.new('String', ["top", "topRight", "right", "bottomRight", "bottom", "bottomLeft", "left", "topLeft", "center"])
-      return false unless position_validator.valid?(@position)
+      return false if @id.nil?
+      return false if @status.nil?
+      status_validator = EnumAttributeValidator.new('String', ["queued", "processing", "done", "failed"])
+      return false unless status_validator.valid?(@status)
       true
     end
 
     # Custom attribute writer method checking allowed values (enum).
-    # @param [Object] type Object to be assigned
-    def type=(type)
-      validator = EnumAttributeValidator.new('String', ["html"])
-      unless validator.valid?(type)
-        fail ArgumentError, "invalid value for \"type\", must be one of #{validator.allowable_values}."
+    # @param [Object] status Object to be assigned
+    def status=(status)
+      validator = EnumAttributeValidator.new('String', ["queued", "processing", "done", "failed"])
+      unless validator.valid?(status)
+        fail ArgumentError, "invalid value for \"status\", must be one of #{validator.allowable_values}."
       end
-      @type = type
-    end
-
-    # Custom attribute writer method checking allowed values (enum).
-    # @param [Object] position Object to be assigned
-    def position=(position)
-      validator = EnumAttributeValidator.new('String', ["top", "topRight", "right", "bottomRight", "bottom", "bottomLeft", "left", "topLeft", "center"])
-      unless validator.valid?(position)
-        fail ArgumentError, "invalid value for \"position\", must be one of #{validator.allowable_values}."
-      end
-      @position = position
+      @status = status
     end
 
     # Checks equality by comparing each attribute.
@@ -198,13 +159,10 @@ module Shotstack
     def ==(o)
       return true if self.equal?(o)
       self.class == o.class &&
-          type == o.type &&
-          html == o.html &&
-          css == o.css &&
-          width == o.width &&
-          height == o.height &&
-          background == o.background &&
-          position == o.position
+          id == o.id &&
+          status == o.status &&
+          url == o.url &&
+          error == o.error
     end
 
     # @see the `==` method
@@ -216,7 +174,7 @@ module Shotstack
     # Calculates hash code according to all attributes.
     # @return [Integer] Hash code
     def hash
-      [type, html, css, width, height, background, position].hash
+      [id, status, url, error].hash
     end
 
     # Builds the object from hash
