@@ -14,7 +14,7 @@ require 'date'
 require 'time'
 
 module Shotstack
-  # The TextToSpeechAsset lets you generate a voice over from text using a text-to-speech service. The generated audio can be trimmed, faded and have its volume and speed adjusted using the same properties available on the AudioAsset.
+  # **Notice: TextToSpeechAsset is deprecated. Use [AudioAsset](#tocs_audioasset) with `prompt` (the spoken text) and `voice` instead.** This type continues to function and is internally rewritten to AudioAsset; no behaviour change for existing integrations.  The TextToSpeechAsset lets you generate a voice over from text using a text-to-speech service. The generated audio can be trimmed, faded and have its volume and speed adjusted using the same properties available on the AudioAsset. 
   class TextToSpeechAsset
     # The type of asset - set to `text-to-speech` for text-to-speech.
     attr_accessor :type
