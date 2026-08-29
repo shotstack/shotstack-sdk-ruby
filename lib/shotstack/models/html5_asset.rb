@@ -14,28 +14,19 @@ require 'date'
 require 'time'
 
 module Shotstack
-  # **Notice: The HtmlAsset is deprecated, use the [RichTextAsset](#tocs_richtextasset) instead.**  The HtmlAsset clip type lets you create text based layout and formatting using HTML and CSS. You can also set the height and width of a bounding box for the HTML content to sit within. Text and elements will wrap within the bounding box. 
-  class HtmlAsset
-    # The type of asset - set to `html` for HTML.
+  # The Html5Asset renders full HTML5/CSS3/JS. 
+  class Html5Asset
+    # The type of asset - set to `html5` for HTML5/CSS3/JS.
     attr_accessor :type
 
-    # The HTML text string. See list of [supported HTML tags](https://shotstack.io/docs/guide/architecting-an-application/html-support/#supported-html-tags).
+    # The HTML markup for the asset. Max 1,000,000 characters.
     attr_accessor :html
 
-    # The CSS text string to apply styling to the HTML. See list of  [support CSS properties](https://shotstack.io/docs/guide/architecting-an-application/html-support/#supported-css-properties).
+    # The CSS string applied to the HTML. Max 500,000 characters.
     attr_accessor :css
 
-    # Set the width of the HTML asset bounding box in pixels. Text will wrap to fill the bounding box.
-    attr_accessor :width
-
-    # Set the width of the HTML asset bounding box in pixels. Text and elements will be masked if they exceed the  height of the bounding box.
-    attr_accessor :height
-
-    # Apply a background color behind the HTML bounding box using. Set the text color using hexadecimal  color notation. Transparency is supported by setting the first two characters of the hex string  (opposite to HTML), i.e. #80ffffff will be white with 50% transparency.
-    attr_accessor :background
-
-    # Place the HTML in one of nine predefined positions within the HTML area. <ul>   <li>`top` - top (center)</li>   <li>`topRight` - top right</li>   <li>`right` - right (center)</li>   <li>`bottomRight` - bottom right</li>   <li>`bottom` - bottom (center)</li>   <li>`bottomLeft` - bottom left</li>   <li>`left` - left (center)</li>   <li>`topLeft` - top left</li>   <li>`center` - center</li> </ul>
-    attr_accessor :position
+    # Optional JavaScript. Use for chart libraries, animations, or DOM manipulation. `gsap`, `d3`, `anime` and `lottie` are always available. CSS animations, transitions, and `Element.animate()` are also captured automatically. Max 500,000 characters. 
+    attr_accessor :js
 
     class EnumAttributeValidator
       attr_reader :datatype
@@ -65,10 +56,7 @@ module Shotstack
         :'type' => :'type',
         :'html' => :'html',
         :'css' => :'css',
-        :'width' => :'width',
-        :'height' => :'height',
-        :'background' => :'background',
-        :'position' => :'position'
+        :'js' => :'js'
       }
     end
 
@@ -83,10 +71,7 @@ module Shotstack
         :'type' => :'String',
         :'html' => :'String',
         :'css' => :'String',
-        :'width' => :'Integer',
-        :'height' => :'Integer',
-        :'background' => :'String',
-        :'position' => :'String'
+        :'js' => :'String'
       }
     end
 
@@ -100,13 +85,13 @@ module Shotstack
     # @param [Hash] attributes Model attributes in the form of hash
     def initialize(attributes = {})
       if (!attributes.is_a?(Hash))
-        fail ArgumentError, "The input argument (attributes) must be a hash in `Shotstack::HtmlAsset` initialize method"
+        fail ArgumentError, "The input argument (attributes) must be a hash in `Shotstack::Html5Asset` initialize method"
       end
 
       # check to see if the attribute exists and convert string to symbol for hash key
       attributes = attributes.each_with_object({}) { |(k, v), h|
         if (!self.class.attribute_map.key?(k.to_sym))
-          fail ArgumentError, "`#{k}` is not a valid attribute in `Shotstack::HtmlAsset`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
+          fail ArgumentError, "`#{k}` is not a valid attribute in `Shotstack::Html5Asset`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
         end
         h[k.to_sym] = v
       }
@@ -114,7 +99,7 @@ module Shotstack
       if attributes.key?(:'type')
         self.type = attributes[:'type']
       else
-        self.type = 'html'
+        self.type = 'html5'
       end
 
       if attributes.key?(:'html')
@@ -127,20 +112,8 @@ module Shotstack
         self.css = attributes[:'css']
       end
 
-      if attributes.key?(:'width')
-        self.width = attributes[:'width']
-      end
-
-      if attributes.key?(:'height')
-        self.height = attributes[:'height']
-      end
-
-      if attributes.key?(:'background')
-        self.background = attributes[:'background']
-      end
-
-      if attributes.key?(:'position')
-        self.position = attributes[:'position']
+      if attributes.key?(:'js')
+        self.js = attributes[:'js']
       end
     end
 
@@ -157,6 +130,18 @@ module Shotstack
         invalid_properties.push('invalid value for "html", html cannot be nil.')
       end
 
+      if @html.to_s.length > 1000000
+        invalid_properties.push('invalid value for "html", the character length must be smaller than or equal to 1000000.')
+      end
+
+      if !@css.nil? && @css.to_s.length > 500000
+        invalid_properties.push('invalid value for "css", the character length must be smaller than or equal to 500000.')
+      end
+
+      if !@js.nil? && @js.to_s.length > 500000
+        invalid_properties.push('invalid value for "js", the character length must be smaller than or equal to 500000.')
+      end
+
       invalid_properties
     end
 
@@ -165,32 +150,65 @@ module Shotstack
     def valid?
       warn '[DEPRECATED] the `valid?` method is obsolete'
       return false if @type.nil?
-      type_validator = EnumAttributeValidator.new('String', ["html"])
+      type_validator = EnumAttributeValidator.new('String', ["html5"])
       return false unless type_validator.valid?(@type)
       return false if @html.nil?
-      position_validator = EnumAttributeValidator.new('String', ["top", "topRight", "right", "bottomRight", "bottom", "bottomLeft", "left", "topLeft", "center"])
-      return false unless position_validator.valid?(@position)
+      return false if @html.to_s.length > 1000000
+      return false if !@css.nil? && @css.to_s.length > 500000
+      return false if !@js.nil? && @js.to_s.length > 500000
       true
     end
 
     # Custom attribute writer method checking allowed values (enum).
     # @param [Object] type Object to be assigned
     def type=(type)
-      validator = EnumAttributeValidator.new('String', ["html"])
+      validator = EnumAttributeValidator.new('String', ["html5"])
       unless validator.valid?(type)
         fail ArgumentError, "invalid value for \"type\", must be one of #{validator.allowable_values}."
       end
       @type = type
     end
 
-    # Custom attribute writer method checking allowed values (enum).
-    # @param [Object] position Object to be assigned
-    def position=(position)
-      validator = EnumAttributeValidator.new('String', ["top", "topRight", "right", "bottomRight", "bottom", "bottomLeft", "left", "topLeft", "center"])
-      unless validator.valid?(position)
-        fail ArgumentError, "invalid value for \"position\", must be one of #{validator.allowable_values}."
+    # Custom attribute writer method with validation
+    # @param [Object] html Value to be assigned
+    def html=(html)
+      if html.nil?
+        fail ArgumentError, 'html cannot be nil'
       end
-      @position = position
+
+      if html.to_s.length > 1000000
+        fail ArgumentError, 'invalid value for "html", the character length must be smaller than or equal to 1000000.'
+      end
+
+      @html = html
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] css Value to be assigned
+    def css=(css)
+      if css.nil?
+        fail ArgumentError, 'css cannot be nil'
+      end
+
+      if css.to_s.length > 500000
+        fail ArgumentError, 'invalid value for "css", the character length must be smaller than or equal to 500000.'
+      end
+
+      @css = css
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] js Value to be assigned
+    def js=(js)
+      if js.nil?
+        fail ArgumentError, 'js cannot be nil'
+      end
+
+      if js.to_s.length > 500000
+        fail ArgumentError, 'invalid value for "js", the character length must be smaller than or equal to 500000.'
+      end
+
+      @js = js
     end
 
     # Checks equality by comparing each attribute.
@@ -201,10 +219,7 @@ module Shotstack
           type == o.type &&
           html == o.html &&
           css == o.css &&
-          width == o.width &&
-          height == o.height &&
-          background == o.background &&
-          position == o.position
+          js == o.js
     end
 
     # @see the `==` method
@@ -216,7 +231,7 @@ module Shotstack
     # Calculates hash code according to all attributes.
     # @return [Integer] Hash code
     def hash
-      [type, html, css, width, height, background, position].hash
+      [type, html, css, js].hash
     end
 
     # Builds the object from hash

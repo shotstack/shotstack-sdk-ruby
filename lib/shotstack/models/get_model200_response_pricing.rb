@@ -14,45 +14,21 @@ require 'date'
 require 'time'
 
 module Shotstack
-  # The response data returned with the [RenderResponse](#tocs_renderresponse) including status and URL.
-  class RenderResponseData
-    # The id of the render task in UUID format.
-    attr_accessor :id
+  # What one generation with this model costs.
+  class GetModel200ResponsePricing
+    # What one unit is. `render` means the whole generation counts as one unit, whatever its size.
+    attr_accessor :unit
 
-    # The owner id of the render task.
-    attr_accessor :owner
+    attr_accessor :credits
 
-    # The customer subscription plan.
-    attr_accessor :plan
+    # The options whose values select the rate, outermost first. Absent when `credits` is a single number.
+    attr_accessor :tiered_by
 
-    # The status of the render task. <ul>   <li>`queued` - render is queued waiting to be rendered</li>   <li>`fetching` - assets are being fetched</li>   <li>`preprocessing` - video assets are being processed for compatibility</li>   <li>`rendering` - the asset is being rendered</li>   <li>`generating` - AI/media generation is in progress</li>   <li>`saving` - the final asset is being saved to storage</li>   <li>`done` - the asset is ready to be downloaded</li>   <li>`failed` - there was an error rendering the asset</li> </ul>
-    attr_accessor :status
+    # The fewest units a generation is charged for, when a model has a minimum charge.
+    attr_accessor :min_units
 
-    # An error message, only displayed if an error occurred.
-    attr_accessor :error
-
-    # The output video or audio length in seconds.
-    attr_accessor :duration
-
-    # The time taken to render the asset in milliseconds.
-    attr_accessor :render_time
-
-    # The URL of the final asset. This will only be available if status is done. This is a temporary URL and will be deleted after 24 hours. By default all assets are copied to the Shotstack hosting and CDN destination.
-    attr_accessor :url
-
-    # The URL of the poster image if requested. This will only be available if status is done.
-    attr_accessor :poster
-
-    # The URL of the thumbnail image if requested. This will only be available if status is done.
-    attr_accessor :thumbnail
-
-    attr_accessor :data
-
-    # The time the render task was initially queued.
-    attr_accessor :created
-
-    # The time the render status was last updated.
-    attr_accessor :updated
+    # The date this rate took effect, or `legacy` for a rate that predates dated pricing.
+    attr_accessor :effective_from
 
     class EnumAttributeValidator
       attr_reader :datatype
@@ -79,19 +55,11 @@ module Shotstack
     # Attribute mapping from ruby-style variable name to JSON key.
     def self.attribute_map
       {
-        :'id' => :'id',
-        :'owner' => :'owner',
-        :'plan' => :'plan',
-        :'status' => :'status',
-        :'error' => :'error',
-        :'duration' => :'duration',
-        :'render_time' => :'renderTime',
-        :'url' => :'url',
-        :'poster' => :'poster',
-        :'thumbnail' => :'thumbnail',
-        :'data' => :'data',
-        :'created' => :'created',
-        :'updated' => :'updated'
+        :'unit' => :'unit',
+        :'credits' => :'credits',
+        :'tiered_by' => :'tieredBy',
+        :'min_units' => :'minUnits',
+        :'effective_from' => :'effectiveFrom'
       }
     end
 
@@ -103,27 +71,17 @@ module Shotstack
     # Attribute type mapping.
     def self.openapi_types
       {
-        :'id' => :'String',
-        :'owner' => :'String',
-        :'plan' => :'String',
-        :'status' => :'String',
-        :'error' => :'String',
-        :'duration' => :'Float',
-        :'render_time' => :'Float',
-        :'url' => :'String',
-        :'poster' => :'String',
-        :'thumbnail' => :'String',
-        :'data' => :'Edit',
-        :'created' => :'String',
-        :'updated' => :'String'
+        :'unit' => :'String',
+        :'credits' => :'GetModel200ResponsePricingCredits',
+        :'tiered_by' => :'Array<String>',
+        :'min_units' => :'Float',
+        :'effective_from' => :'String'
       }
     end
 
     # List of attributes with nullable: true
     def self.openapi_nullable
       Set.new([
-        :'poster',
-        :'thumbnail',
       ])
     end
 
@@ -131,73 +89,43 @@ module Shotstack
     # @param [Hash] attributes Model attributes in the form of hash
     def initialize(attributes = {})
       if (!attributes.is_a?(Hash))
-        fail ArgumentError, "The input argument (attributes) must be a hash in `Shotstack::RenderResponseData` initialize method"
+        fail ArgumentError, "The input argument (attributes) must be a hash in `Shotstack::GetModel200ResponsePricing` initialize method"
       end
 
       # check to see if the attribute exists and convert string to symbol for hash key
       attributes = attributes.each_with_object({}) { |(k, v), h|
         if (!self.class.attribute_map.key?(k.to_sym))
-          fail ArgumentError, "`#{k}` is not a valid attribute in `Shotstack::RenderResponseData`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
+          fail ArgumentError, "`#{k}` is not a valid attribute in `Shotstack::GetModel200ResponsePricing`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
         end
         h[k.to_sym] = v
       }
 
-      if attributes.key?(:'id')
-        self.id = attributes[:'id']
+      if attributes.key?(:'unit')
+        self.unit = attributes[:'unit']
       else
-        self.id = nil
+        self.unit = nil
       end
 
-      if attributes.key?(:'owner')
-        self.owner = attributes[:'owner']
+      if attributes.key?(:'credits')
+        self.credits = attributes[:'credits']
       else
-        self.owner = nil
+        self.credits = nil
       end
 
-      if attributes.key?(:'plan')
-        self.plan = attributes[:'plan']
+      if attributes.key?(:'tiered_by')
+        if (value = attributes[:'tiered_by']).is_a?(Array)
+          self.tiered_by = value
+        end
       end
 
-      if attributes.key?(:'status')
-        self.status = attributes[:'status']
+      if attributes.key?(:'min_units')
+        self.min_units = attributes[:'min_units']
+      end
+
+      if attributes.key?(:'effective_from')
+        self.effective_from = attributes[:'effective_from']
       else
-        self.status = nil
-      end
-
-      if attributes.key?(:'error')
-        self.error = attributes[:'error']
-      end
-
-      if attributes.key?(:'duration')
-        self.duration = attributes[:'duration']
-      end
-
-      if attributes.key?(:'render_time')
-        self.render_time = attributes[:'render_time']
-      end
-
-      if attributes.key?(:'url')
-        self.url = attributes[:'url']
-      end
-
-      if attributes.key?(:'poster')
-        self.poster = attributes[:'poster']
-      end
-
-      if attributes.key?(:'thumbnail')
-        self.thumbnail = attributes[:'thumbnail']
-      end
-
-      if attributes.key?(:'data')
-        self.data = attributes[:'data']
-      end
-
-      if attributes.key?(:'created')
-        self.created = attributes[:'created']
-      end
-
-      if attributes.key?(:'updated')
-        self.updated = attributes[:'updated']
+        self.effective_from = nil
       end
     end
 
@@ -206,16 +134,16 @@ module Shotstack
     def list_invalid_properties
       warn '[DEPRECATED] the `list_invalid_properties` method is obsolete'
       invalid_properties = Array.new
-      if @id.nil?
-        invalid_properties.push('invalid value for "id", id cannot be nil.')
+      if @unit.nil?
+        invalid_properties.push('invalid value for "unit", unit cannot be nil.')
       end
 
-      if @owner.nil?
-        invalid_properties.push('invalid value for "owner", owner cannot be nil.')
+      if @credits.nil?
+        invalid_properties.push('invalid value for "credits", credits cannot be nil.')
       end
 
-      if @status.nil?
-        invalid_properties.push('invalid value for "status", status cannot be nil.')
+      if @effective_from.nil?
+        invalid_properties.push('invalid value for "effective_from", effective_from cannot be nil.')
       end
 
       invalid_properties
@@ -225,22 +153,22 @@ module Shotstack
     # @return true if the model is valid
     def valid?
       warn '[DEPRECATED] the `valid?` method is obsolete'
-      return false if @id.nil?
-      return false if @owner.nil?
-      return false if @status.nil?
-      status_validator = EnumAttributeValidator.new('String', ["queued", "fetching", "preprocessing", "rendering", "generating", "saving", "done", "failed"])
-      return false unless status_validator.valid?(@status)
+      return false if @unit.nil?
+      unit_validator = EnumAttributeValidator.new('String', ["render", "second", "minute", "thousandCharacters"])
+      return false unless unit_validator.valid?(@unit)
+      return false if @credits.nil?
+      return false if @effective_from.nil?
       true
     end
 
     # Custom attribute writer method checking allowed values (enum).
-    # @param [Object] status Object to be assigned
-    def status=(status)
-      validator = EnumAttributeValidator.new('String', ["queued", "fetching", "preprocessing", "rendering", "generating", "saving", "done", "failed"])
-      unless validator.valid?(status)
-        fail ArgumentError, "invalid value for \"status\", must be one of #{validator.allowable_values}."
+    # @param [Object] unit Object to be assigned
+    def unit=(unit)
+      validator = EnumAttributeValidator.new('String', ["render", "second", "minute", "thousandCharacters"])
+      unless validator.valid?(unit)
+        fail ArgumentError, "invalid value for \"unit\", must be one of #{validator.allowable_values}."
       end
-      @status = status
+      @unit = unit
     end
 
     # Checks equality by comparing each attribute.
@@ -248,19 +176,11 @@ module Shotstack
     def ==(o)
       return true if self.equal?(o)
       self.class == o.class &&
-          id == o.id &&
-          owner == o.owner &&
-          plan == o.plan &&
-          status == o.status &&
-          error == o.error &&
-          duration == o.duration &&
-          render_time == o.render_time &&
-          url == o.url &&
-          poster == o.poster &&
-          thumbnail == o.thumbnail &&
-          data == o.data &&
-          created == o.created &&
-          updated == o.updated
+          unit == o.unit &&
+          credits == o.credits &&
+          tiered_by == o.tiered_by &&
+          min_units == o.min_units &&
+          effective_from == o.effective_from
     end
 
     # @see the `==` method
@@ -272,7 +192,7 @@ module Shotstack
     # Calculates hash code according to all attributes.
     # @return [Integer] Hash code
     def hash
-      [id, owner, plan, status, error, duration, render_time, url, poster, thumbnail, data, created, updated].hash
+      [unit, credits, tiered_by, min_units, effective_from].hash
     end
 
     # Builds the object from hash
