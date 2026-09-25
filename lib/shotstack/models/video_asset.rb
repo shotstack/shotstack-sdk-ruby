@@ -14,13 +14,22 @@ require 'date'
 require 'time'
 
 module Shotstack
-  # The VideoAsset is used to create video sequences from video files. The src must be a publicly accessible URL to a video resource such as an mp4 file.
+  # The VideoAsset adds a video to a Clip. The video can be sourced from a URL (`src`), generated from a text prompt (`prompt`), or both. At least one of `src` or `prompt` must be provided.  - **Source URL:** set `src` to the URL of an mp4 (or compatible) video file. - **Generated:** set `prompt` to describe the motion. Choose a generator   with `model` and configure it with model-specific `options`. Models that   animate a starting image take it as `options.inputSrc`; the default model   generates from the prompt alone. The generated `src` is filled in   automatically. - **Both:** `src` acts as a preview placeholder while `prompt` drives   generation — the video is regenerated from the prompt at render time.   Unchanged prompts and options resolve from the generation cache. 
   class VideoAsset
     # The type of asset - set to `video` for videos.
     attr_accessor :type
 
-    # The video source URL. The URL must be publicly accessible or include credentials.
+    # The video source URL. The URL must be publicly accessible or include credentials. When `prompt` is also set, `src` serves as a preview placeholder and the video is regenerated from the prompt at render time.
     attr_accessor :src
+
+    # A text prompt to generate the video from. The engine generates a video at render time and fills `src` automatically; an existing `src` is treated as a preview placeholder and replaced. Use `model` to choose the generator and `options` to configure it. A starting image goes in `options.inputSrc`, on the models that accept one.
+    attr_accessor :prompt
+
+    # The generation model to use when `prompt` is set (e.g. `seedance-2.0-text-to-video`). Defaults to `seedance-2.0-text-to-video` if omitted. `GET /models` lists what is available and the options each accepts.
+    attr_accessor :model
+
+    # Model-specific generation settings. Valid keys and values depend on the chosen `model` and are defined by the model registry. Omitted options use the model's defaults. Unknown or invalid options are rejected.
+    attr_accessor :options
 
     # Set to `true` to force re-encoding of the video during preprocessing. This can help resolve compatibility issues, fix rotation problems, synchronize audio, or convert formats. The video will be processed to ensure optimal compatibility with the rendering engine.
     attr_accessor :transcode
@@ -33,7 +42,7 @@ module Shotstack
     # Preset volume effects to apply to the video asset <ul>   <li>`fadeIn` - fade volume in only</li>   <li>`fadeOut` - fade volume out only</li>   <li>`fadeInFadeOut` - fade volume in and out</li> </ul>
     attr_accessor :volume_effect
 
-    # Adjust the playback speed of the video clip between 0 (paused) and 10 (10x normal speed) where 1 is normal speed (defaults to 1). Adjusting the speed will also adjust the duration of the clip and may require you to  adjust the Clip length. For example, if you set speed to 0.5, the clip will need to be 2x as long to play the entire video (i.e. original length / 0.5). If you set speed to 2, the clip will need to be half as long to play the entire video (i.e. original length / 2).
+    # Adjust the playback speed of the video clip between 0 (paused) and 10 (10x normal speed) where 1 is normal speed (defaults to 1). Adjusting the speed will also adjust the duration of the clip and may require you to adjust the Clip length. For example, if you set speed to 0.5, the clip will need to be 2x as long to play the entire video (i.e. original length / 0.5). If you set speed to 2, the clip will need to be half as long to play the entire video (i.e. original length / 2).
     attr_accessor :speed
 
     attr_accessor :crop
@@ -67,6 +76,9 @@ module Shotstack
       {
         :'type' => :'type',
         :'src' => :'src',
+        :'prompt' => :'prompt',
+        :'model' => :'model',
+        :'options' => :'options',
         :'transcode' => :'transcode',
         :'trim' => :'trim',
         :'volume' => :'volume',
@@ -87,6 +99,9 @@ module Shotstack
       {
         :'type' => :'String',
         :'src' => :'String',
+        :'prompt' => :'String',
+        :'model' => :'String',
+        :'options' => :'Hash<String, Object>',
         :'transcode' => :'Boolean',
         :'trim' => :'Float',
         :'volume' => :'VideoAssetVolume',
@@ -126,8 +141,20 @@ module Shotstack
 
       if attributes.key?(:'src')
         self.src = attributes[:'src']
-      else
-        self.src = nil
+      end
+
+      if attributes.key?(:'prompt')
+        self.prompt = attributes[:'prompt']
+      end
+
+      if attributes.key?(:'model')
+        self.model = attributes[:'model']
+      end
+
+      if attributes.key?(:'options')
+        if (value = attributes[:'options']).is_a?(Hash)
+          self.options = value
+        end
       end
 
       if attributes.key?(:'transcode')
@@ -168,17 +195,17 @@ module Shotstack
         invalid_properties.push('invalid value for "type", type cannot be nil.')
       end
 
-      if @src.nil?
-        invalid_properties.push('invalid value for "src", src cannot be nil.')
-      end
-
-      if @src.to_s.length < 1
+      if !@src.nil? && @src.to_s.length < 1
         invalid_properties.push('invalid value for "src", the character length must be great than or equal to 1.')
       end
 
       pattern = Regexp.new(/\S/)
-      if @src !~ pattern
+      if !@src.nil? && @src !~ pattern
         invalid_properties.push("invalid value for \"src\", must conform to the pattern #{pattern}.")
+      end
+
+      if !@prompt.nil? && @prompt.to_s.length > 4000
+        invalid_properties.push('invalid value for "prompt", the character length must be smaller than or equal to 4000.')
       end
 
       if !@speed.nil? && @speed > 10
@@ -199,9 +226,9 @@ module Shotstack
       return false if @type.nil?
       type_validator = EnumAttributeValidator.new('String', ["video"])
       return false unless type_validator.valid?(@type)
-      return false if @src.nil?
-      return false if @src.to_s.length < 1
-      return false if @src !~ Regexp.new(/\S/)
+      return false if !@src.nil? && @src.to_s.length < 1
+      return false if !@src.nil? && @src !~ Regexp.new(/\S/)
+      return false if !@prompt.nil? && @prompt.to_s.length > 4000
       volume_effect_validator = EnumAttributeValidator.new('String', ["none", "fadeIn", "fadeOut", "fadeInFadeOut"])
       return false unless volume_effect_validator.valid?(@volume_effect)
       return false if !@speed.nil? && @speed > 10
@@ -236,6 +263,20 @@ module Shotstack
       end
 
       @src = src
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] prompt Value to be assigned
+    def prompt=(prompt)
+      if prompt.nil?
+        fail ArgumentError, 'prompt cannot be nil'
+      end
+
+      if prompt.to_s.length > 4000
+        fail ArgumentError, 'invalid value for "prompt", the character length must be smaller than or equal to 4000.'
+      end
+
+      @prompt = prompt
     end
 
     # Custom attribute writer method checking allowed values (enum).
@@ -273,6 +314,9 @@ module Shotstack
       self.class == o.class &&
           type == o.type &&
           src == o.src &&
+          prompt == o.prompt &&
+          model == o.model &&
+          options == o.options &&
           transcode == o.transcode &&
           trim == o.trim &&
           volume == o.volume &&
@@ -291,7 +335,7 @@ module Shotstack
     # Calculates hash code according to all attributes.
     # @return [Integer] Hash code
     def hash
-      [type, src, transcode, trim, volume, volume_effect, speed, crop, chroma_key].hash
+      [type, src, prompt, model, options, transcode, trim, volume, volume_effect, speed, crop, chroma_key].hash
     end
 
     # Builds the object from hash
