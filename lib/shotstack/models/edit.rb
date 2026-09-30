@@ -26,7 +26,7 @@ module Shotstack
     # An optional webhook callback URL used to receive status notifications when a render completes or fails. Notifications are also sent when a rendered video is sent to an output  [destination](https://shotstack.io/docs/guide/serving-assets/destinations/). See [webhooks](https://shotstack.io/docs/guide/architecting-an-application/webhooks/) for more details.
     attr_accessor :callback
 
-    # **Notice: This option is now deprecated and will be removed. Disk types are handled automatically. Setting a disk type has no effect.**  The disk type to use for storing footage and assets for each render. See [disk types](https://shotstack.io/docs/guide/architecting-an-application/disk-types/) for more details. <ul>   <li>`local` - optimized for high speed rendering with up to 512MB storage</li>   <li>`mount` - optimized for larger file sizes and longer videos with 5GB for source footage and 512MB for output render</li> </ul> 
+    # **Notice: This option is now deprecated and will be removed. Disk types are handled automatically. Setting a disk type has no effect.**  The disk type to use for storing footage and assets for each render. <ul>   <li>`local` - optimized for high speed rendering with up to 512MB storage</li>   <li>`mount` - optimized for larger file sizes and longer videos with 5GB for source footage and 512MB for output render</li> </ul> 
     attr_accessor :disk
 
     # The render instance type to use for processing the edit. <ul>   <li>`s1` - standard instance (default)</li>   <li>`s2` - standard instance with more resources</li>   <li>`a1` - accelerated instance for faster rendering</li> </ul>
