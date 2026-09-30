@@ -14,7 +14,7 @@ require 'date'
 require 'time'
 
 module Shotstack
-  # The ImageToVideoAsset lets you create a video from an image and a text prompt.
+  # **Notice: ImageToVideoAsset is deprecated. Use [VideoAsset](#tocs_videoasset) with `prompt`, a `model` that accepts a starting image, and that image in `options.inputSrc` — for example `seedance-2.0-image-to-video`.** This type continues to function and is internally rewritten to VideoAsset; no behaviour change for existing integrations.  The ImageToVideoAsset lets you create a video from an image and a text prompt. 
   class ImageToVideoAsset
     # The type of asset to generate - set to `image-to-video` for image-to-video.
     attr_accessor :type
