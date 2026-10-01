@@ -14,7 +14,7 @@ require 'date'
 require 'time'
 
 module Shotstack
-  # Pass additional options to control how Mux processes video. Currently supports playback_policy and passthrough options.
+  # **Notice: MuxDestinationOptions, like the Mux destination, is deprecated.** It continues to work, with no behaviour change for existing integrations. Pass additional options to control how Mux processes video. Currently supports playback_policy and passthrough options.
   class MuxDestinationOptions
     # Sets the Mux `playback_policy` option. Value is an array of strings - use `public`, `signed`, or both.
     attr_accessor :playback_policy

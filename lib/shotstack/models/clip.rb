@@ -16,6 +16,9 @@ require 'time'
 module Shotstack
   # A clip is a container for a specific type of asset, i.e. a title, image, video, audio or html. You use a Clip to define when an asset will display on the timeline, how long it will play for and transitions, filters and effects to apply to it.
   class Clip
+    # Optional client-generated identifier. Used by client SDKs (e.g. the Shotstack Studio SDK) to reference a clip across edits without relying on its position in the timeline. The render API does not use this field and it does not appear in render output.
+    attr_accessor :id
+
     attr_accessor :asset
 
     attr_accessor :start
@@ -78,6 +81,7 @@ module Shotstack
     # Attribute mapping from ruby-style variable name to JSON key.
     def self.attribute_map
       {
+        :'id' => :'id',
         :'asset' => :'asset',
         :'start' => :'start',
         :'length' => :'length',
@@ -104,6 +108,7 @@ module Shotstack
     # Attribute type mapping.
     def self.openapi_types
       {
+        :'id' => :'String',
         :'asset' => :'Asset',
         :'start' => :'ClipStart',
         :'length' => :'ClipLength',
@@ -142,6 +147,10 @@ module Shotstack
         end
         h[k.to_sym] = v
       }
+
+      if attributes.key?(:'id')
+        self.id = attributes[:'id']
+      end
 
       if attributes.key?(:'asset')
         self.asset = attributes[:'asset']
@@ -370,6 +379,7 @@ module Shotstack
     def ==(o)
       return true if self.equal?(o)
       self.class == o.class &&
+          id == o.id &&
           asset == o.asset &&
           start == o.start &&
           length == o.length &&
@@ -396,7 +406,7 @@ module Shotstack
     # Calculates hash code according to all attributes.
     # @return [Integer] Hash code
     def hash
-      [asset, start, length, fit, scale, width, height, position, offset, transition, effect, filter, opacity, transform, _alias].hash
+      [id, asset, start, length, fit, scale, width, height, position, offset, transition, effect, filter, opacity, transform, _alias].hash
     end
 
     # Builds the object from hash
