@@ -94,7 +94,7 @@ module Shotstack
         :'stroke' => :'RichTextStroke',
         :'shadow' => :'RichTextShadow',
         :'background' => :'RichTextBackground',
-        :'border' => :'RichTextAssetBorder',
+        :'border' => :'RichTextBorder',
         :'padding' => :'RichTextAssetPadding',
         :'align' => :'RichTextAlignment',
         :'animation' => :'RichTextAnimation'
