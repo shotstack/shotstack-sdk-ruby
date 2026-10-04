@@ -28,7 +28,7 @@ module Shotstack
     # The original render id that created the asset in UUID format. Multiple assets can share the same render id.
     attr_accessor :render_id
 
-    # The third party id of an asset transferred to an external provider, i.e. Mux, YouTube or S3. If the provider is Shotstack, the providerID is the same as the asset id.
+    # The third party id of an asset transferred to an external provider, such as Vimeo or S3. If the provider is Shotstack, the providerID is the same as the asset id.
     attr_accessor :provider_id
 
     # The asset file name.
