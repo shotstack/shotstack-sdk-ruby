@@ -25,6 +25,9 @@ module Shotstack
     # The weight of the font. Can be a number (100-900) or a string ('normal', 'bold', etc.). 100 is lightest, 900 is heaviest (boldest).
     attr_accessor :weight
 
+    # The font style.
+    attr_accessor :style
+
     # The text color using hexadecimal color notation.
     attr_accessor :color
 
@@ -36,12 +39,35 @@ module Shotstack
 
     attr_accessor :stroke
 
+    class EnumAttributeValidator
+      attr_reader :datatype
+      attr_reader :allowable_values
+
+      def initialize(datatype, allowable_values)
+        @allowable_values = allowable_values.map do |value|
+          case datatype.to_s
+          when /Integer/i
+            value.to_i
+          when /Float/i
+            value.to_f
+          else
+            value
+          end
+        end
+      end
+
+      def valid?(value)
+        !value || allowable_values.include?(value)
+      end
+    end
+
     # Attribute mapping from ruby-style variable name to JSON key.
     def self.attribute_map
       {
         :'family' => :'family',
         :'size' => :'size',
         :'weight' => :'weight',
+        :'style' => :'style',
         :'color' => :'color',
         :'opacity' => :'opacity',
         :'background' => :'background',
@@ -60,6 +86,7 @@ module Shotstack
         :'family' => :'String',
         :'size' => :'Integer',
         :'weight' => :'Object',
+        :'style' => :'String',
         :'color' => :'String',
         :'opacity' => :'Float',
         :'background' => :'String',
@@ -103,6 +130,12 @@ module Shotstack
 
       if attributes.key?(:'weight')
         self.weight = attributes[:'weight']
+      end
+
+      if attributes.key?(:'style')
+        self.style = attributes[:'style']
+      else
+        self.style = 'normal'
       end
 
       if attributes.key?(:'color')
@@ -166,6 +199,8 @@ module Shotstack
       warn '[DEPRECATED] the `valid?` method is obsolete'
       return false if !@size.nil? && @size > 500
       return false if !@size.nil? && @size < 1
+      style_validator = EnumAttributeValidator.new('String', ["normal", "italic"])
+      return false unless style_validator.valid?(@style)
       return false if !@color.nil? && @color !~ Regexp.new(/^#[A-Fa-f0-9]{6}$/)
       return false if !@opacity.nil? && @opacity > 1
       return false if !@opacity.nil? && @opacity < 0
@@ -189,6 +224,16 @@ module Shotstack
       end
 
       @size = size
+    end
+
+    # Custom attribute writer method checking allowed values (enum).
+    # @param [Object] style Object to be assigned
+    def style=(style)
+      validator = EnumAttributeValidator.new('String', ["normal", "italic"])
+      unless validator.valid?(style)
+        fail ArgumentError, "invalid value for \"style\", must be one of #{validator.allowable_values}."
+      end
+      @style = style
     end
 
     # Custom attribute writer method with validation
@@ -247,6 +292,7 @@ module Shotstack
           family == o.family &&
           size == o.size &&
           weight == o.weight &&
+          style == o.style &&
           color == o.color &&
           opacity == o.opacity &&
           background == o.background &&
@@ -262,7 +308,7 @@ module Shotstack
     # Calculates hash code according to all attributes.
     # @return [Integer] Hash code
     def hash
-      [family, size, weight, color, opacity, background, stroke].hash
+      [family, size, weight, style, color, opacity, background, stroke].hash
     end
 
     # Builds the object from hash
