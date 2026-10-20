@@ -14,27 +14,17 @@ require 'date'
 require 'time'
 
 module Shotstack
-  # Padding properties for individual sides of the text bounding box.
-  class RichTextAssetPaddingOneOf
-    # Top padding in pixels.
-    attr_accessor :top
+  class GenerationRequest
+    attr_accessor :asset
 
-    # Right padding in pixels.
-    attr_accessor :right
-
-    # Bottom padding in pixels.
-    attr_accessor :bottom
-
-    # Left padding in pixels.
-    attr_accessor :left
+    # The length, in seconds, of the clip the asset fills. A model that generates to a duration takes it from this value in place of its own duration option. Other models ignore it.
+    attr_accessor :length
 
     # Attribute mapping from ruby-style variable name to JSON key.
     def self.attribute_map
       {
-        :'top' => :'top',
-        :'right' => :'right',
-        :'bottom' => :'bottom',
-        :'left' => :'left'
+        :'asset' => :'asset',
+        :'length' => :'length'
       }
     end
 
@@ -46,10 +36,8 @@ module Shotstack
     # Attribute type mapping.
     def self.openapi_types
       {
-        :'top' => :'Float',
-        :'right' => :'Float',
-        :'bottom' => :'Float',
-        :'left' => :'Float'
+        :'asset' => :'GenerationAsset',
+        :'length' => :'Float'
       }
     end
 
@@ -63,39 +51,25 @@ module Shotstack
     # @param [Hash] attributes Model attributes in the form of hash
     def initialize(attributes = {})
       if (!attributes.is_a?(Hash))
-        fail ArgumentError, "The input argument (attributes) must be a hash in `Shotstack::RichTextAssetPaddingOneOf` initialize method"
+        fail ArgumentError, "The input argument (attributes) must be a hash in `Shotstack::GenerationRequest` initialize method"
       end
 
       # check to see if the attribute exists and convert string to symbol for hash key
       attributes = attributes.each_with_object({}) { |(k, v), h|
         if (!self.class.attribute_map.key?(k.to_sym))
-          fail ArgumentError, "`#{k}` is not a valid attribute in `Shotstack::RichTextAssetPaddingOneOf`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
+          fail ArgumentError, "`#{k}` is not a valid attribute in `Shotstack::GenerationRequest`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
         end
         h[k.to_sym] = v
       }
 
-      if attributes.key?(:'top')
-        self.top = attributes[:'top']
+      if attributes.key?(:'asset')
+        self.asset = attributes[:'asset']
       else
-        self.top = 0
+        self.asset = nil
       end
 
-      if attributes.key?(:'right')
-        self.right = attributes[:'right']
-      else
-        self.right = 0
-      end
-
-      if attributes.key?(:'bottom')
-        self.bottom = attributes[:'bottom']
-      else
-        self.bottom = 0
-      end
-
-      if attributes.key?(:'left')
-        self.left = attributes[:'left']
-      else
-        self.left = 0
+      if attributes.key?(:'length')
+        self.length = attributes[:'length']
       end
     end
 
@@ -104,20 +78,12 @@ module Shotstack
     def list_invalid_properties
       warn '[DEPRECATED] the `list_invalid_properties` method is obsolete'
       invalid_properties = Array.new
-      if !@top.nil? && @top < 0
-        invalid_properties.push('invalid value for "top", must be greater than or equal to 0.')
+      if @asset.nil?
+        invalid_properties.push('invalid value for "asset", asset cannot be nil.')
       end
 
-      if !@right.nil? && @right < 0
-        invalid_properties.push('invalid value for "right", must be greater than or equal to 0.')
-      end
-
-      if !@bottom.nil? && @bottom < 0
-        invalid_properties.push('invalid value for "bottom", must be greater than or equal to 0.')
-      end
-
-      if !@left.nil? && @left < 0
-        invalid_properties.push('invalid value for "left", must be greater than or equal to 0.')
+      if !@length.nil? && @length <= 0
+        invalid_properties.push('invalid value for "length", must be greater than 0.')
       end
 
       invalid_properties
@@ -127,67 +93,23 @@ module Shotstack
     # @return true if the model is valid
     def valid?
       warn '[DEPRECATED] the `valid?` method is obsolete'
-      return false if !@top.nil? && @top < 0
-      return false if !@right.nil? && @right < 0
-      return false if !@bottom.nil? && @bottom < 0
-      return false if !@left.nil? && @left < 0
+      return false if @asset.nil?
+      return false if !@length.nil? && @length <= 0
       true
     end
 
     # Custom attribute writer method with validation
-    # @param [Object] top Value to be assigned
-    def top=(top)
-      if top.nil?
-        fail ArgumentError, 'top cannot be nil'
+    # @param [Object] length Value to be assigned
+    def length=(length)
+      if length.nil?
+        fail ArgumentError, 'length cannot be nil'
       end
 
-      if top < 0
-        fail ArgumentError, 'invalid value for "top", must be greater than or equal to 0.'
+      if length <= 0
+        fail ArgumentError, 'invalid value for "length", must be greater than 0.'
       end
 
-      @top = top
-    end
-
-    # Custom attribute writer method with validation
-    # @param [Object] right Value to be assigned
-    def right=(right)
-      if right.nil?
-        fail ArgumentError, 'right cannot be nil'
-      end
-
-      if right < 0
-        fail ArgumentError, 'invalid value for "right", must be greater than or equal to 0.'
-      end
-
-      @right = right
-    end
-
-    # Custom attribute writer method with validation
-    # @param [Object] bottom Value to be assigned
-    def bottom=(bottom)
-      if bottom.nil?
-        fail ArgumentError, 'bottom cannot be nil'
-      end
-
-      if bottom < 0
-        fail ArgumentError, 'invalid value for "bottom", must be greater than or equal to 0.'
-      end
-
-      @bottom = bottom
-    end
-
-    # Custom attribute writer method with validation
-    # @param [Object] left Value to be assigned
-    def left=(left)
-      if left.nil?
-        fail ArgumentError, 'left cannot be nil'
-      end
-
-      if left < 0
-        fail ArgumentError, 'invalid value for "left", must be greater than or equal to 0.'
-      end
-
-      @left = left
+      @length = length
     end
 
     # Checks equality by comparing each attribute.
@@ -195,10 +117,8 @@ module Shotstack
     def ==(o)
       return true if self.equal?(o)
       self.class == o.class &&
-          top == o.top &&
-          right == o.right &&
-          bottom == o.bottom &&
-          left == o.left
+          asset == o.asset &&
+          length == o.length
     end
 
     # @see the `==` method
@@ -210,7 +130,7 @@ module Shotstack
     # Calculates hash code according to all attributes.
     # @return [Integer] Hash code
     def hash
-      [top, right, bottom, left].hash
+      [asset, length].hash
     end
 
     # Builds the object from hash
