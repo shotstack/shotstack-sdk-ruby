@@ -14,12 +14,12 @@ require 'date'
 require 'time'
 
 module Shotstack
-  # The output format, render range and type of media to generate.
+  # The output format, render range and type of media to generate. For all formats except `mp3`, either `resolution` or `size` (with both `width` and `height`) must be specified. A custom `size` can be up to 3840px on each side, or 1920px for `gif`. Video can be up to 3840 × 2160 pixels (8,294,400) in any shape, for example 2160 × 3840 for vertical 4K; larger sizes are rejected. Video above 1920 × 1080 pixels, including the `4k` resolution, needs a plan that includes 4K.
   class Output
     # The output format and type of media file to generate. <ul>   <li>`mp4` - mp4 video file</li>   <li>`gif` - animated gif</li>   <li>`jpg` - jpg image file</li>   <li>`png` - png image file</li>   <li>`bmp` - bmp image file</li>   <li>`mp3` - mp3 audio file (audio only)</li> </ul>
     attr_accessor :format
 
-    # The preset output resolution of the video or image. For custom sizes use the `size` property. <ul>   <li>`preview` - 512px x 288px @ 15fps</li>   <li>`mobile` - 640px x 360px @ 25fps</li>   <li>`sd` - 1024px x 576px @ 25fps</li>   <li>`hd` - 1280px x 720px @ 25fps</li>   <li>`1080` - 1920px x 1080px @ 25fps</li>   <li>`4k` - 3840px x 2160px @ 25fps</li> </ul>
+    # The preset output resolution of the video or image. For custom sizes use the `size` property. Either `resolution` or `size` (with both `width` and `height`) must be specified for all formats except `mp3`. <ul>   <li>`preview` - 512px x 288px @ 15fps</li>   <li>`mobile` - 640px x 360px @ 25fps</li>   <li>`sd` - 1024px x 576px @ 25fps</li>   <li>`hd` - 1280px x 720px @ 25fps</li>   <li>`1080` - 1920px x 1080px @ 25fps</li>   <li>`4k` - 3840px x 2160px @ 25fps</li> </ul>
     attr_accessor :resolution
 
     # The aspect ratio (shape) of the video or image. Useful for social media output formats. Options are: <ul>   <li>`16:9` (default) - regular landscape/horizontal aspect ratio</li>   <li>`9:16` - vertical/portrait aspect ratio</li>   <li>`1:1` - square aspect ratio</li>   <li>`4:5` - short vertical/portrait aspect ratio</li>   <li>`4:3` - legacy TV aspect ratio</li> </ul>
