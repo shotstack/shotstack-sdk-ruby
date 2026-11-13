@@ -21,7 +21,7 @@ module Shotstack
       def openapi_one_of
         [
           :'Float',
-          :'RichTextAssetPaddingOneOf'
+          :'RichTextPadding'
         ]
       end
 

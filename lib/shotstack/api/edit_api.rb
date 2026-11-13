@@ -85,6 +85,196 @@ module Shotstack
       return data, status_code, headers
     end
 
+    # Get Generation Status
+    # Get the status of an on-demand asset generation job created with the generate endpoint. Jobs are owner-scoped.  **Base URL:** <a href=\"#\">https://api.shotstack.io/edit/{version}</a> 
+    # @param id [String] The generation job id returned by the generate endpoint.
+    # @param [Hash] opts the optional parameters
+    # @return [GenerationResponse]
+    def get_generate(id, opts = {})
+      data, _status_code, _headers = get_generate_with_http_info(id, opts)
+      data
+    end
+
+    # Get Generation Status
+    # Get the status of an on-demand asset generation job created with the generate endpoint. Jobs are owner-scoped.  **Base URL:** &lt;a href&#x3D;\&quot;#\&quot;&gt;https://api.shotstack.io/edit/{version}&lt;/a&gt; 
+    # @param id [String] The generation job id returned by the generate endpoint.
+    # @param [Hash] opts the optional parameters
+    # @return [Array<(GenerationResponse, Integer, Hash)>] GenerationResponse data, response status code and response headers
+    def get_generate_with_http_info(id, opts = {})
+      if @api_client.config.debugging
+        @api_client.config.logger.debug 'Calling API: EditApi.get_generate ...'
+      end
+      # verify the required parameter 'id' is set
+      if @api_client.config.client_side_validation && id.nil?
+        fail ArgumentError, "Missing the required parameter 'id' when calling EditApi.get_generate"
+      end
+      # resource path
+      local_var_path = '/generate/{id}'.sub('{' + 'id' + '}', CGI.escape(id.to_s))
+
+      # query parameters
+      query_params = opts[:query_params] || {}
+
+      # header parameters
+      header_params = opts[:header_params] || {}
+      # HTTP header 'Accept' (if needed)
+      header_params['Accept'] = @api_client.select_header_accept(['application/json'])
+
+      # form parameters
+      form_params = opts[:form_params] || {}
+
+      # http body (model)
+      post_body = opts[:debug_body]
+
+      # return_type
+      return_type = opts[:debug_return_type] || 'GenerationResponse'
+
+      # auth_names
+      auth_names = opts[:debug_auth_names] || ['DeveloperKey']
+
+      new_options = opts.merge(
+        :operation => :"EditApi.get_generate",
+        :header_params => header_params,
+        :query_params => query_params,
+        :form_params => form_params,
+        :body => post_body,
+        :auth_names => auth_names,
+        :return_type => return_type
+      )
+
+      data, status_code, headers = @api_client.call_api(:GET, local_var_path, new_options)
+      if @api_client.config.debugging
+        @api_client.config.logger.debug "API called: EditApi#get_generate\nData: #{data.inspect}\nStatus code: #{status_code}\nHeaders: #{headers}"
+      end
+      return data, status_code, headers
+    end
+
+    # Get Generation Model
+    # Get one generation model, including the JSON Schema for the options it accepts. Use `POST /generate/quote` for a credit estimate.  **Base URL:** <a href=\"#\">https://api.shotstack.io/edit/{version}</a> 
+    # @param id [String] The model identifier, as returned by the list endpoint.
+    # @param [Hash] opts the optional parameters
+    # @return [GenerationModel]
+    def get_model(id, opts = {})
+      data, _status_code, _headers = get_model_with_http_info(id, opts)
+      data
+    end
+
+    # Get Generation Model
+    # Get one generation model, including the JSON Schema for the options it accepts. Use &#x60;POST /generate/quote&#x60; for a credit estimate.  **Base URL:** &lt;a href&#x3D;\&quot;#\&quot;&gt;https://api.shotstack.io/edit/{version}&lt;/a&gt; 
+    # @param id [String] The model identifier, as returned by the list endpoint.
+    # @param [Hash] opts the optional parameters
+    # @return [Array<(GenerationModel, Integer, Hash)>] GenerationModel data, response status code and response headers
+    def get_model_with_http_info(id, opts = {})
+      if @api_client.config.debugging
+        @api_client.config.logger.debug 'Calling API: EditApi.get_model ...'
+      end
+      # verify the required parameter 'id' is set
+      if @api_client.config.client_side_validation && id.nil?
+        fail ArgumentError, "Missing the required parameter 'id' when calling EditApi.get_model"
+      end
+      # resource path
+      local_var_path = '/models/{id}'.sub('{' + 'id' + '}', CGI.escape(id.to_s))
+
+      # query parameters
+      query_params = opts[:query_params] || {}
+
+      # header parameters
+      header_params = opts[:header_params] || {}
+      # HTTP header 'Accept' (if needed)
+      header_params['Accept'] = @api_client.select_header_accept(['application/json'])
+
+      # form parameters
+      form_params = opts[:form_params] || {}
+
+      # http body (model)
+      post_body = opts[:debug_body]
+
+      # return_type
+      return_type = opts[:debug_return_type] || 'GenerationModel'
+
+      # auth_names
+      auth_names = opts[:debug_auth_names] || ['DeveloperKey']
+
+      new_options = opts.merge(
+        :operation => :"EditApi.get_model",
+        :header_params => header_params,
+        :query_params => query_params,
+        :form_params => form_params,
+        :body => post_body,
+        :auth_names => auth_names,
+        :return_type => return_type
+      )
+
+      data, status_code, headers = @api_client.call_api(:GET, local_var_path, new_options)
+      if @api_client.config.debugging
+        @api_client.config.logger.debug "API called: EditApi#get_model\nData: #{data.inspect}\nStatus code: #{status_code}\nHeaders: #{headers}"
+      end
+      return data, status_code, headers
+    end
+
+    # List Generation Models
+    # List the generation models available for `prompt`-bearing image, video and audio assets generated from a prompt or, for some models, a source file, with the options each accepts. Use `POST /generate/quote` for a credit estimate.  Use this to populate a model picker and render its option fields, rather than hard coding a model list. A newly launched model appears here without any change on your side. Each entry carries the asset type it generates, so filter the list client side when a picker only needs one kind.  Option schemas are omitted by default. Request them with `expand=options`.  Each model's `available` reflects the plan of the account behind the calling API key, so offer only the models it marks available.  **Base URL:** <a href=\"#\">https://api.shotstack.io/edit/{version}</a> 
+    # @param [Hash] opts the optional parameters
+    # @option opts [String] :expand Set to &#x60;options&#x60; to include each model&#39;s option schema in the list. Omitted by default to keep the response small.
+    # @return [GenerationModelListResponse]
+    def get_models(opts = {})
+      data, _status_code, _headers = get_models_with_http_info(opts)
+      data
+    end
+
+    # List Generation Models
+    # List the generation models available for &#x60;prompt&#x60;-bearing image, video and audio assets generated from a prompt or, for some models, a source file, with the options each accepts. Use &#x60;POST /generate/quote&#x60; for a credit estimate.  Use this to populate a model picker and render its option fields, rather than hard coding a model list. A newly launched model appears here without any change on your side. Each entry carries the asset type it generates, so filter the list client side when a picker only needs one kind.  Option schemas are omitted by default. Request them with &#x60;expand&#x3D;options&#x60;.  Each model&#39;s &#x60;available&#x60; reflects the plan of the account behind the calling API key, so offer only the models it marks available.  **Base URL:** &lt;a href&#x3D;\&quot;#\&quot;&gt;https://api.shotstack.io/edit/{version}&lt;/a&gt; 
+    # @param [Hash] opts the optional parameters
+    # @option opts [String] :expand Set to &#x60;options&#x60; to include each model&#39;s option schema in the list. Omitted by default to keep the response small.
+    # @return [Array<(GenerationModelListResponse, Integer, Hash)>] GenerationModelListResponse data, response status code and response headers
+    def get_models_with_http_info(opts = {})
+      if @api_client.config.debugging
+        @api_client.config.logger.debug 'Calling API: EditApi.get_models ...'
+      end
+      allowable_values = ["options"]
+      if @api_client.config.client_side_validation && opts[:'expand'] && !allowable_values.include?(opts[:'expand'])
+        fail ArgumentError, "invalid value for \"expand\", must be one of #{allowable_values}"
+      end
+      # resource path
+      local_var_path = '/models'
+
+      # query parameters
+      query_params = opts[:query_params] || {}
+      query_params[:'expand'] = opts[:'expand'] if !opts[:'expand'].nil?
+
+      # header parameters
+      header_params = opts[:header_params] || {}
+      # HTTP header 'Accept' (if needed)
+      header_params['Accept'] = @api_client.select_header_accept(['application/json'])
+
+      # form parameters
+      form_params = opts[:form_params] || {}
+
+      # http body (model)
+      post_body = opts[:debug_body]
+
+      # return_type
+      return_type = opts[:debug_return_type] || 'GenerationModelListResponse'
+
+      # auth_names
+      auth_names = opts[:debug_auth_names] || ['DeveloperKey']
+
+      new_options = opts.merge(
+        :operation => :"EditApi.get_models",
+        :header_params => header_params,
+        :query_params => query_params,
+        :form_params => form_params,
+        :body => post_body,
+        :auth_names => auth_names,
+        :return_type => return_type
+      )
+
+      data, status_code, headers = @api_client.call_api(:GET, local_var_path, new_options)
+      if @api_client.config.debugging
+        @api_client.config.logger.debug "API called: EditApi#get_models\nData: #{data.inspect}\nStatus code: #{status_code}\nHeaders: #{headers}"
+      end
+      return data, status_code, headers
+    end
+
     # Get Render Status
     # Get the rendering status, temporary asset url and details of a render by ID.  **Base URL:** <a href=\"#\">https://api.shotstack.io/edit/{version}</a> 
     # @param id [String] The id of the timeline render task in UUID format
@@ -284,8 +474,147 @@ module Shotstack
       return data, status_code, headers
     end
 
+    # Generate Asset
+    # Generate a single image, video or audio asset from a prompt or, for some models, a source file, without rendering a full edit. Submit an asset with a prompt or source file; the response is immediate when an identical asset has been generated before (results are cached by prompt, model and options), otherwise the job is queued and can be polled via the status endpoint.  Generation is billed in credits per asset. Identical repeat requests resolve from the cache at no charge.  **Base URL:** <a href=\"#\">https://api.shotstack.io/edit/{version}</a> 
+    # @param generation_request [GenerationRequest] The asset to generate and, for models that generate to a duration, the length of the clip it fills.
+    # @param [Hash] opts the optional parameters
+    # @option opts [String] :idempotency_key A key that makes this request its own generation. Retrying with the same key returns the job it first created instead of generating and billing again, and a new key generates afresh even when the asset matches an earlier one. Without a key, identical assets share one cached result. For 24 hours a key reused for a different asset is rejected; after that it returns its first result.
+    # @return [GenerationResponse]
+    def post_generate(generation_request, opts = {})
+      data, _status_code, _headers = post_generate_with_http_info(generation_request, opts)
+      data
+    end
+
+    # Generate Asset
+    # Generate a single image, video or audio asset from a prompt or, for some models, a source file, without rendering a full edit. Submit an asset with a prompt or source file; the response is immediate when an identical asset has been generated before (results are cached by prompt, model and options), otherwise the job is queued and can be polled via the status endpoint.  Generation is billed in credits per asset. Identical repeat requests resolve from the cache at no charge.  **Base URL:** &lt;a href&#x3D;\&quot;#\&quot;&gt;https://api.shotstack.io/edit/{version}&lt;/a&gt; 
+    # @param generation_request [GenerationRequest] The asset to generate and, for models that generate to a duration, the length of the clip it fills.
+    # @param [Hash] opts the optional parameters
+    # @option opts [String] :idempotency_key A key that makes this request its own generation. Retrying with the same key returns the job it first created instead of generating and billing again, and a new key generates afresh even when the asset matches an earlier one. Without a key, identical assets share one cached result. For 24 hours a key reused for a different asset is rejected; after that it returns its first result.
+    # @return [Array<(GenerationResponse, Integer, Hash)>] GenerationResponse data, response status code and response headers
+    def post_generate_with_http_info(generation_request, opts = {})
+      if @api_client.config.debugging
+        @api_client.config.logger.debug 'Calling API: EditApi.post_generate ...'
+      end
+      # verify the required parameter 'generation_request' is set
+      if @api_client.config.client_side_validation && generation_request.nil?
+        fail ArgumentError, "Missing the required parameter 'generation_request' when calling EditApi.post_generate"
+      end
+      # resource path
+      local_var_path = '/generate'
+
+      # query parameters
+      query_params = opts[:query_params] || {}
+
+      # header parameters
+      header_params = opts[:header_params] || {}
+      # HTTP header 'Accept' (if needed)
+      header_params['Accept'] = @api_client.select_header_accept(['application/json'])
+      # HTTP header 'Content-Type'
+      content_type = @api_client.select_header_content_type(['application/json'])
+      if !content_type.nil?
+          header_params['Content-Type'] = content_type
+      end
+      header_params[:'Idempotency-Key'] = opts[:'idempotency_key'] if !opts[:'idempotency_key'].nil?
+
+      # form parameters
+      form_params = opts[:form_params] || {}
+
+      # http body (model)
+      post_body = opts[:debug_body] || @api_client.object_to_http_body(generation_request)
+
+      # return_type
+      return_type = opts[:debug_return_type] || 'GenerationResponse'
+
+      # auth_names
+      auth_names = opts[:debug_auth_names] || ['DeveloperKey']
+
+      new_options = opts.merge(
+        :operation => :"EditApi.post_generate",
+        :header_params => header_params,
+        :query_params => query_params,
+        :form_params => form_params,
+        :body => post_body,
+        :auth_names => auth_names,
+        :return_type => return_type
+      )
+
+      data, status_code, headers = @api_client.call_api(:POST, local_var_path, new_options)
+      if @api_client.config.debugging
+        @api_client.config.logger.debug "API called: EditApi#post_generate\nData: #{data.inspect}\nStatus code: #{status_code}\nHeaders: #{headers}"
+      end
+      return data, status_code, headers
+    end
+
+    # Quote Generation
+    # Estimate credits for the same asset and clip length accepted by `POST /generate`. Requires an API key and the same model access as generation. Invalid options and disallowed source URLs are rejected. No provider request, job, quota usage or credit reservation is created. A quote does not guarantee an available balance or quota.  Prices are evaluated at request time. Request another quote when settings change; generation uses the current price when submitted.  **Base URL:** <a href=\"#\">https://api.shotstack.io/edit/{version}</a> 
+    # @param generation_request [GenerationRequest] 
+    # @param [Hash] opts the optional parameters
+    # @return [GenerationQuote]
+    def post_generate_quote(generation_request, opts = {})
+      data, _status_code, _headers = post_generate_quote_with_http_info(generation_request, opts)
+      data
+    end
+
+    # Quote Generation
+    # Estimate credits for the same asset and clip length accepted by &#x60;POST /generate&#x60;. Requires an API key and the same model access as generation. Invalid options and disallowed source URLs are rejected. No provider request, job, quota usage or credit reservation is created. A quote does not guarantee an available balance or quota.  Prices are evaluated at request time. Request another quote when settings change; generation uses the current price when submitted.  **Base URL:** &lt;a href&#x3D;\&quot;#\&quot;&gt;https://api.shotstack.io/edit/{version}&lt;/a&gt; 
+    # @param generation_request [GenerationRequest] 
+    # @param [Hash] opts the optional parameters
+    # @return [Array<(GenerationQuote, Integer, Hash)>] GenerationQuote data, response status code and response headers
+    def post_generate_quote_with_http_info(generation_request, opts = {})
+      if @api_client.config.debugging
+        @api_client.config.logger.debug 'Calling API: EditApi.post_generate_quote ...'
+      end
+      # verify the required parameter 'generation_request' is set
+      if @api_client.config.client_side_validation && generation_request.nil?
+        fail ArgumentError, "Missing the required parameter 'generation_request' when calling EditApi.post_generate_quote"
+      end
+      # resource path
+      local_var_path = '/generate/quote'
+
+      # query parameters
+      query_params = opts[:query_params] || {}
+
+      # header parameters
+      header_params = opts[:header_params] || {}
+      # HTTP header 'Accept' (if needed)
+      header_params['Accept'] = @api_client.select_header_accept(['application/json'])
+      # HTTP header 'Content-Type'
+      content_type = @api_client.select_header_content_type(['application/json'])
+      if !content_type.nil?
+          header_params['Content-Type'] = content_type
+      end
+
+      # form parameters
+      form_params = opts[:form_params] || {}
+
+      # http body (model)
+      post_body = opts[:debug_body] || @api_client.object_to_http_body(generation_request)
+
+      # return_type
+      return_type = opts[:debug_return_type] || 'GenerationQuote'
+
+      # auth_names
+      auth_names = opts[:debug_auth_names] || ['DeveloperKey']
+
+      new_options = opts.merge(
+        :operation => :"EditApi.post_generate_quote",
+        :header_params => header_params,
+        :query_params => query_params,
+        :form_params => form_params,
+        :body => post_body,
+        :auth_names => auth_names,
+        :return_type => return_type
+      )
+
+      data, status_code, headers = @api_client.call_api(:POST, local_var_path, new_options)
+      if @api_client.config.debugging
+        @api_client.config.logger.debug "API called: EditApi#post_generate_quote\nData: #{data.inspect}\nStatus code: #{status_code}\nHeaders: #{headers}"
+      end
+      return data, status_code, headers
+    end
+
     # Render Asset
-    # Queue and render the contents of an [Edit](#tocs_edit) as a video, image or audio file.  **Rendering Process:** 1. **Validation**: The edit JSON is validated 2. **Download**: All assets are downloaded and cached   3. **Preprocessing**: Video assets are automatically processed to fix compatibility issues 4. **Rendering**: The timeline is rendered using the processed assets 5. **Output**: The final media file is generated and stored  **Video Preprocessing:** Video assets undergo automatic preprocessing to ensure compatibility. You can force  preprocessing by setting `\"transcode\": true` on video assets. See [Preprocessing](#preprocessing)  for more details.  **Base URL:** <a href=\"#\">https://api.shotstack.io/edit/{version}</a> 
+    # Queue and render the contents of an [Edit](#tocs_edit) as a video, image or audio file.  **Rendering Process:** 1. **Validation**: The edit JSON is validated 2. **Download**: All assets are downloaded and cached   3. **Preprocessing**: Video assets are automatically processed to fix compatibility issues 4. **Rendering**: The timeline is rendered using the processed assets 5. **Output**: The final media file is generated and stored  **Video Preprocessing:** Video assets undergo automatic preprocessing to ensure compatibility. You can force  preprocessing by setting `\"transcode\": true` on video assets. See [VideoAsset](#tocs_videoasset)  for more details.  **Base URL:** <a href=\"#\">https://api.shotstack.io/edit/{version}</a> 
     # @param edit [Edit] The video, image or audio edit specified using JSON.
     # @param [Hash] opts the optional parameters
     # @return [QueuedResponse]
@@ -295,7 +624,7 @@ module Shotstack
     end
 
     # Render Asset
-    # Queue and render the contents of an [Edit](#tocs_edit) as a video, image or audio file.  **Rendering Process:** 1. **Validation**: The edit JSON is validated 2. **Download**: All assets are downloaded and cached   3. **Preprocessing**: Video assets are automatically processed to fix compatibility issues 4. **Rendering**: The timeline is rendered using the processed assets 5. **Output**: The final media file is generated and stored  **Video Preprocessing:** Video assets undergo automatic preprocessing to ensure compatibility. You can force  preprocessing by setting &#x60;\&quot;transcode\&quot;: true&#x60; on video assets. See [Preprocessing](#preprocessing)  for more details.  **Base URL:** &lt;a href&#x3D;\&quot;#\&quot;&gt;https://api.shotstack.io/edit/{version}&lt;/a&gt; 
+    # Queue and render the contents of an [Edit](#tocs_edit) as a video, image or audio file.  **Rendering Process:** 1. **Validation**: The edit JSON is validated 2. **Download**: All assets are downloaded and cached   3. **Preprocessing**: Video assets are automatically processed to fix compatibility issues 4. **Rendering**: The timeline is rendered using the processed assets 5. **Output**: The final media file is generated and stored  **Video Preprocessing:** Video assets undergo automatic preprocessing to ensure compatibility. You can force  preprocessing by setting &#x60;\&quot;transcode\&quot;: true&#x60; on video assets. See [VideoAsset](#tocs_videoasset)  for more details.  **Base URL:** &lt;a href&#x3D;\&quot;#\&quot;&gt;https://api.shotstack.io/edit/{version}&lt;/a&gt; 
     # @param edit [Edit] The video, image or audio edit specified using JSON.
     # @param [Hash] opts the optional parameters
     # @return [Array<(QueuedResponse, Integer, Hash)>] QueuedResponse data, response status code and response headers
