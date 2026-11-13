@@ -14,7 +14,7 @@ require 'date'
 require 'time'
 
 module Shotstack
-  # A music or audio file in mp3 format that plays for the duration of the rendered video or the length of the audio file, which ever is shortest.
+  # **Notice: The Soundtrack is deprecated, use an [AudioAsset](#tocs_audioasset) clip on its own track instead.** This type continues to function; no behaviour change for existing integrations. A music or audio file in mp3 format that plays for the duration of the rendered video or the length of the audio file, which ever is shortest.
   class Soundtrack
     # The URL of the mp3 audio file. The URL must be publicly accessible or include credentials.
     attr_accessor :src

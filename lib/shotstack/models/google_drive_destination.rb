@@ -71,8 +71,6 @@ module Shotstack
 
       if attributes.key?(:'options')
         self.options = attributes[:'options']
-      else
-        self.options = nil
       end
     end
 
@@ -85,10 +83,6 @@ module Shotstack
         invalid_properties.push('invalid value for "provider", provider cannot be nil.')
       end
 
-      if @options.nil?
-        invalid_properties.push('invalid value for "options", options cannot be nil.')
-      end
-
       invalid_properties
     end
 
@@ -97,7 +91,6 @@ module Shotstack
     def valid?
       warn '[DEPRECATED] the `valid?` method is obsolete'
       return false if @provider.nil?
-      return false if @options.nil?
       true
     end
 

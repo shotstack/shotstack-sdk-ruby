@@ -14,7 +14,7 @@ require 'date'
 require 'time'
 
 module Shotstack
-  # **Notice: The HtmlAsset is deprecated, use the [TextAsset](#tocs_textasset) instead.**  The HtmlAsset clip type lets you create text based layout and formatting using HTML and CSS. You can also set the height and width of a bounding box for the HTML content to sit within. Text and elements will wrap within the bounding box. 
+  # **Notice: The HtmlAsset is deprecated, use the [RichTextAsset](#tocs_richtextasset) instead.**  The HtmlAsset clip type lets you create text based layout and formatting using HTML and CSS. You can also set the height and width of a bounding box for the HTML content to sit within. Text and elements will wrap within the bounding box. 
   class HtmlAsset
     # The type of asset - set to `html` for HTML.
     attr_accessor :type

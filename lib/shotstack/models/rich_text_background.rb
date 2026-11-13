@@ -25,12 +25,20 @@ module Shotstack
     # The border radius of the background box in pixels. Must be 0 or greater.
     attr_accessor :border_radius
 
+    # When true, the background pill shrinks to fit the rendered text bounding box plus the asset's padding (and stroke width, if present), producing a pill or badge effect. When false (default), the background fills the full asset content area. Available on rich-text and rich-caption assets only; not supported on legacy `type: text`. 
+    attr_accessor :wrap
+
+    # Inner padding in pixels between the wrap pill edge and the rendered text. Only takes effect when `wrap: true`. When omitted, the renderer applies a sensible default proportional to the font size (approximately 12% of the active page font size on rich-caption assets). Set to 0 for a pill that hugs the text exactly. Available on rich-text and rich-caption assets only. 
+    attr_accessor :padding
+
     # Attribute mapping from ruby-style variable name to JSON key.
     def self.attribute_map
       {
         :'color' => :'color',
         :'opacity' => :'opacity',
-        :'border_radius' => :'borderRadius'
+        :'border_radius' => :'borderRadius',
+        :'wrap' => :'wrap',
+        :'padding' => :'padding'
       }
     end
 
@@ -44,7 +52,9 @@ module Shotstack
       {
         :'color' => :'String',
         :'opacity' => :'Float',
-        :'border_radius' => :'Float'
+        :'border_radius' => :'Float',
+        :'wrap' => :'Boolean',
+        :'padding' => :'Integer'
       }
     end
 
@@ -84,6 +94,16 @@ module Shotstack
       else
         self.border_radius = 0
       end
+
+      if attributes.key?(:'wrap')
+        self.wrap = attributes[:'wrap']
+      else
+        self.wrap = false
+      end
+
+      if attributes.key?(:'padding')
+        self.padding = attributes[:'padding']
+      end
     end
 
     # Show invalid properties with the reasons. Usually used together with valid?
@@ -108,6 +128,14 @@ module Shotstack
         invalid_properties.push('invalid value for "border_radius", must be greater than or equal to 0.')
       end
 
+      if !@padding.nil? && @padding > 200
+        invalid_properties.push('invalid value for "padding", must be smaller than or equal to 200.')
+      end
+
+      if !@padding.nil? && @padding < 0
+        invalid_properties.push('invalid value for "padding", must be greater than or equal to 0.')
+      end
+
       invalid_properties
     end
 
@@ -119,6 +147,8 @@ module Shotstack
       return false if !@opacity.nil? && @opacity > 1
       return false if !@opacity.nil? && @opacity < 0
       return false if !@border_radius.nil? && @border_radius < 0
+      return false if !@padding.nil? && @padding > 200
+      return false if !@padding.nil? && @padding < 0
       true
     end
 
@@ -169,6 +199,24 @@ module Shotstack
       @border_radius = border_radius
     end
 
+    # Custom attribute writer method with validation
+    # @param [Object] padding Value to be assigned
+    def padding=(padding)
+      if padding.nil?
+        fail ArgumentError, 'padding cannot be nil'
+      end
+
+      if padding > 200
+        fail ArgumentError, 'invalid value for "padding", must be smaller than or equal to 200.'
+      end
+
+      if padding < 0
+        fail ArgumentError, 'invalid value for "padding", must be greater than or equal to 0.'
+      end
+
+      @padding = padding
+    end
+
     # Checks equality by comparing each attribute.
     # @param [Object] Object to be compared
     def ==(o)
@@ -176,7 +224,9 @@ module Shotstack
       self.class == o.class &&
           color == o.color &&
           opacity == o.opacity &&
-          border_radius == o.border_radius
+          border_radius == o.border_radius &&
+          wrap == o.wrap &&
+          padding == o.padding
     end
 
     # @see the `==` method
@@ -188,7 +238,7 @@ module Shotstack
     # Calculates hash code according to all attributes.
     # @return [Integer] Hash code
     def hash
-      [color, opacity, border_radius].hash
+      [color, opacity, border_radius, wrap, padding].hash
     end
 
     # Builds the object from hash

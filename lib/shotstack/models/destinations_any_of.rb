@@ -14,7 +14,7 @@ require 'date'
 require 'time'
 
 module Shotstack
-  # Send videos to TikTok. TikTok credentials are required and added via the [dashboard](https://dashboard.shotstack.io/integrations/tiktok), not in the request.
+  # **Notice: The TikTok destination is deprecated.** It continues to work, with no behaviour change for existing integrations. Send videos to TikTok. TikTok credentials are required and added via the [dashboard](https://dashboard.shotstack.io/integrations/tiktok), not in the request.
   class DestinationsAnyOf
     # The destination to send video to - set to `tiktok` for TikTok.
     attr_accessor :provider

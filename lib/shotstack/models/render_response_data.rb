@@ -25,7 +25,7 @@ module Shotstack
     # The customer subscription plan.
     attr_accessor :plan
 
-    # The status of the render task. <ul>   <li>`queued` - render is queued waiting to be rendered</li>   <li>`fetching` - assets are being fetched</li>   <li>`preprocessing` - video assets are being processed for compatibility</li>   <li>`rendering` - the asset is being rendered</li>   <li>`saving` - the final asset is being saved to storage</li>   <li>`done` - the asset is ready to be downloaded</li>   <li>`failed` - there was an error rendering the asset</li> </ul>
+    # The status of the render task. <ul>   <li>`queued` - render is queued waiting to be rendered</li>   <li>`fetching` - assets are being fetched</li>   <li>`preprocessing` - video assets are being processed for compatibility</li>   <li>`rendering` - the asset is being rendered</li>   <li>`generating` - AI/media generation is in progress</li>   <li>`saving` - the final asset is being saved to storage</li>   <li>`done` - the asset is ready to be downloaded</li>   <li>`failed` - there was an error rendering the asset</li> </ul>
     attr_accessor :status
 
     # An error message, only displayed if an error occurred.
@@ -37,7 +37,7 @@ module Shotstack
     # The time taken to render the asset in milliseconds.
     attr_accessor :render_time
 
-    # The URL of the final asset. This will only be available if status is done. This is a temporary URL and will be deleted after 24 hours. By default all assets are copied to the Shotstack hosting and CDN destination.
+    # A temporary download link to the final asset. This will only be available if status is done. By default all assets are also copied to the [Shotstack hosting and CDN](https://shotstack.io/docs/guide/serving-assets/hosting/) destination, where they stay until you delete them. Serve the asset to your users from its CDN URL, `https://cdn.shotstack.io/au/{version}/{owner}/{id}.{format}`, not from this link, which expires after 24 hours.
     attr_accessor :url
 
     # The URL of the poster image if requested. This will only be available if status is done.
@@ -228,7 +228,7 @@ module Shotstack
       return false if @id.nil?
       return false if @owner.nil?
       return false if @status.nil?
-      status_validator = EnumAttributeValidator.new('String', ["queued", "fetching", "preprocessing", "rendering", "saving", "done", "failed"])
+      status_validator = EnumAttributeValidator.new('String', ["queued", "fetching", "preprocessing", "rendering", "generating", "saving", "done", "failed"])
       return false unless status_validator.valid?(@status)
       true
     end
@@ -236,7 +236,7 @@ module Shotstack
     # Custom attribute writer method checking allowed values (enum).
     # @param [Object] status Object to be assigned
     def status=(status)
-      validator = EnumAttributeValidator.new('String', ["queued", "fetching", "preprocessing", "rendering", "saving", "done", "failed"])
+      validator = EnumAttributeValidator.new('String', ["queued", "fetching", "preprocessing", "rendering", "generating", "saving", "done", "failed"])
       unless validator.valid?(status)
         fail ArgumentError, "invalid value for \"status\", must be one of #{validator.allowable_values}."
       end

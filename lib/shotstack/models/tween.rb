@@ -14,7 +14,7 @@ require 'date'
 require 'time'
 
 module Shotstack
-  # Use a Tween to [animate properties over time](/docs/guide/architecting-an-application/animations/). The following properties are currently supported and can be animated:   <ul>     <li>Opacity - animate the transparency of a clip.</li>     <li>Offset - animate the x and y position of a clip.</li>     <li>Rotation - animate the rotation of a clip.</li>     <li>Skew - animate the horizontal and vertical shearing effect.</li>     <li>Volume - animate the audio volume of a clip.</li>   </ul>
+  # Use a Tween to [animate properties over time](/docs/guide/architecting-an-application/animations/). The following properties are currently supported and can be animated:   <ul>     <li>Opacity - animate the transparency of a clip.</li>     <li>Offset - animate the x and y position of a clip.</li>     <li>Scale - animate the size of a clip.</li>     <li>Rotation - animate the rotation of a clip.</li>     <li>Skew - animate the horizontal and vertical shearing effect.</li>     <li>Volume - animate the audio volume of a clip.</li>     <li>Speed - animate the playback speed of a video clip.</li>   </ul>
   class Tween
     # The initial property value at the start of the animation.
     attr_accessor :from
