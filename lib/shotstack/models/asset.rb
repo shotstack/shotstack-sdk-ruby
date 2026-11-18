@@ -22,6 +22,7 @@ module Shotstack
         [
           :'AudioAsset',
           :'CaptionAsset',
+          :'Html5Asset',
           :'HtmlAsset',
           :'ImageAsset',
           :'ImageToVideoAsset',
@@ -49,6 +50,7 @@ module Shotstack
           :'audio' => :'AudioAsset',
           :'caption' => :'CaptionAsset',
           :'html' => :'HtmlAsset',
+          :'html5' => :'Html5Asset',
           :'image' => :'ImageAsset',
           :'image-to-video' => :'ImageToVideoAsset',
           :'luma' => :'LumaAsset',
