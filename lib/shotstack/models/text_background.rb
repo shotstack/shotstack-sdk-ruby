@@ -28,13 +28,17 @@ module Shotstack
     # The border radius of the background box in pixels for rounded corners.
     attr_accessor :border_radius
 
+    # Not supported on legacy `text` assets. Accepted here only so validators can emit a clear migration error pointing users to `rich-text` or `rich-caption`, which support background wrapping natively.
+    attr_accessor :wrap
+
     # Attribute mapping from ruby-style variable name to JSON key.
     def self.attribute_map
       {
         :'color' => :'color',
         :'opacity' => :'opacity',
         :'padding' => :'padding',
-        :'border_radius' => :'borderRadius'
+        :'border_radius' => :'borderRadius',
+        :'wrap' => :'wrap'
       }
     end
 
@@ -49,7 +53,8 @@ module Shotstack
         :'color' => :'String',
         :'opacity' => :'Float',
         :'padding' => :'Float',
-        :'border_radius' => :'Float'
+        :'border_radius' => :'Float',
+        :'wrap' => :'Boolean'
       }
     end
 
@@ -88,6 +93,10 @@ module Shotstack
 
       if attributes.key?(:'border_radius')
         self.border_radius = attributes[:'border_radius']
+      end
+
+      if attributes.key?(:'wrap')
+        self.wrap = attributes[:'wrap']
       end
     end
 
@@ -210,7 +219,8 @@ module Shotstack
           color == o.color &&
           opacity == o.opacity &&
           padding == o.padding &&
-          border_radius == o.border_radius
+          border_radius == o.border_radius &&
+          wrap == o.wrap
     end
 
     # @see the `==` method
@@ -222,7 +232,7 @@ module Shotstack
     # Calculates hash code according to all attributes.
     # @return [Integer] Hash code
     def hash
-      [color, opacity, padding, border_radius].hash
+      [color, opacity, padding, border_radius, wrap].hash
     end
 
     # Builds the object from hash
