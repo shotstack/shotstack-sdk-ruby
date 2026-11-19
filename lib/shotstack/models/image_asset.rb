@@ -14,13 +14,22 @@ require 'date'
 require 'time'
 
 module Shotstack
-  # The ImageAsset is used to create video from images to compose an image. The src must be a publicly accessible URL to an image resource such as a jpg or png file.
+  # The ImageAsset adds an image to a Clip. The image can be sourced from a URL (`src`), generated from a text prompt (`prompt`), or both. At least one of `src` or `prompt` must be provided.  - **Source URL:** set `src` to the publicly accessible URL of a jpg or png file. - **Generated:** set `prompt` to describe the image. Choose a generator with   `model` and configure it with model-specific `options`; the engine fills   `src` in automatically. - **Both:** `src` acts as a preview placeholder while `prompt` drives   generation — the image is regenerated from the prompt at render time.   Unchanged prompts and options resolve from the generation cache. 
   class ImageAsset
     # The type of asset - set to `image` for images.
     attr_accessor :type
 
-    # The image source URL. The URL must be publicly accessible or include credentials.
+    # The image source URL. The URL must be publicly accessible or include credentials. When `prompt` is also set, `src` serves as a preview placeholder and the image is regenerated from the prompt at render time.
     attr_accessor :src
+
+    # A text prompt to generate the image from. The engine generates an image at render time and fills `src` automatically; an existing `src` is treated as a preview placeholder and replaced. Use `model` to choose the generator and `options` to configure it.
+    attr_accessor :prompt
+
+    # The generation model to use when `prompt` is set (e.g. `flux-schnell`, `nano-banana-2`). Defaults to `nano-banana-2` if omitted. Each model's available options are defined by the model registry.
+    attr_accessor :model
+
+    # Model-specific generation settings. Valid keys and values depend on the chosen `model` and are defined by the model registry. Omitted options use the model's defaults. Unknown or invalid options are rejected.
+    attr_accessor :options
 
     attr_accessor :crop
 
@@ -51,6 +60,9 @@ module Shotstack
       {
         :'type' => :'type',
         :'src' => :'src',
+        :'prompt' => :'prompt',
+        :'model' => :'model',
+        :'options' => :'options',
         :'crop' => :'crop'
       }
     end
@@ -65,6 +77,9 @@ module Shotstack
       {
         :'type' => :'String',
         :'src' => :'String',
+        :'prompt' => :'String',
+        :'model' => :'String',
+        :'options' => :'Hash<String, Object>',
         :'crop' => :'Crop'
       }
     end
@@ -98,8 +113,20 @@ module Shotstack
 
       if attributes.key?(:'src')
         self.src = attributes[:'src']
-      else
-        self.src = nil
+      end
+
+      if attributes.key?(:'prompt')
+        self.prompt = attributes[:'prompt']
+      end
+
+      if attributes.key?(:'model')
+        self.model = attributes[:'model']
+      end
+
+      if attributes.key?(:'options')
+        if (value = attributes[:'options']).is_a?(Hash)
+          self.options = value
+        end
       end
 
       if attributes.key?(:'crop')
@@ -116,17 +143,17 @@ module Shotstack
         invalid_properties.push('invalid value for "type", type cannot be nil.')
       end
 
-      if @src.nil?
-        invalid_properties.push('invalid value for "src", src cannot be nil.')
-      end
-
-      if @src.to_s.length < 1
+      if !@src.nil? && @src.to_s.length < 1
         invalid_properties.push('invalid value for "src", the character length must be great than or equal to 1.')
       end
 
       pattern = Regexp.new(/\S/)
-      if @src !~ pattern
+      if !@src.nil? && @src !~ pattern
         invalid_properties.push("invalid value for \"src\", must conform to the pattern #{pattern}.")
+      end
+
+      if !@prompt.nil? && @prompt.to_s.length > 4000
+        invalid_properties.push('invalid value for "prompt", the character length must be smaller than or equal to 4000.')
       end
 
       invalid_properties
@@ -139,9 +166,9 @@ module Shotstack
       return false if @type.nil?
       type_validator = EnumAttributeValidator.new('String', ["image"])
       return false unless type_validator.valid?(@type)
-      return false if @src.nil?
-      return false if @src.to_s.length < 1
-      return false if @src !~ Regexp.new(/\S/)
+      return false if !@src.nil? && @src.to_s.length < 1
+      return false if !@src.nil? && @src !~ Regexp.new(/\S/)
+      return false if !@prompt.nil? && @prompt.to_s.length > 4000
       true
     end
 
@@ -174,6 +201,20 @@ module Shotstack
       @src = src
     end
 
+    # Custom attribute writer method with validation
+    # @param [Object] prompt Value to be assigned
+    def prompt=(prompt)
+      if prompt.nil?
+        fail ArgumentError, 'prompt cannot be nil'
+      end
+
+      if prompt.to_s.length > 4000
+        fail ArgumentError, 'invalid value for "prompt", the character length must be smaller than or equal to 4000.'
+      end
+
+      @prompt = prompt
+    end
+
     # Checks equality by comparing each attribute.
     # @param [Object] Object to be compared
     def ==(o)
@@ -181,6 +222,9 @@ module Shotstack
       self.class == o.class &&
           type == o.type &&
           src == o.src &&
+          prompt == o.prompt &&
+          model == o.model &&
+          options == o.options &&
           crop == o.crop
     end
 
@@ -193,7 +237,7 @@ module Shotstack
     # Calculates hash code according to all attributes.
     # @return [Integer] Hash code
     def hash
-      [type, src, crop].hash
+      [type, src, prompt, model, options, crop].hash
     end
 
     # Builds the object from hash

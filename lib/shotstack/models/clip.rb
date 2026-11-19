@@ -16,6 +16,9 @@ require 'time'
 module Shotstack
   # A clip is a container for a specific type of asset, i.e. a title, image, video, audio or html. You use a Clip to define when an asset will display on the timeline, how long it will play for and transitions, filters and effects to apply to it.
   class Clip
+    # Optional client-generated identifier. Used by client SDKs (e.g. the Shotstack Studio SDK) to reference a clip across edits without relying on its position in the timeline. The render API does not use this field and it does not appear in render output.
+    attr_accessor :id
+
     attr_accessor :asset
 
     attr_accessor :start
@@ -45,6 +48,9 @@ module Shotstack
 
     # A filter effect to apply to the Clip. <ul>   <li>`none` - no filter applied</li>   <li>`blur` - blur the scene</li>   <li>`boost` - boost contrast and saturation</li>   <li>`contrast` - increase contrast</li>   <li>`darken` - darken the scene</li>   <li>`greyscale` - remove colour</li>   <li>`lighten` - lighten the scene</li>   <li>`muted` - reduce saturation and contrast</li>   <li>`negative` - negative colors</li> </ul>
     attr_accessor :filter
+
+    # A list of filters to apply to the Clip, in the order they appear. Each filter has a `type` and its own properties. The same type can be used more than once and numeric properties can be animated with [Tween](./#tocs_tween) objects. If `filter` is also set, the filters in this list are applied before it.
+    attr_accessor :filters
 
     attr_accessor :opacity
 
@@ -78,6 +84,7 @@ module Shotstack
     # Attribute mapping from ruby-style variable name to JSON key.
     def self.attribute_map
       {
+        :'id' => :'id',
         :'asset' => :'asset',
         :'start' => :'start',
         :'length' => :'length',
@@ -90,6 +97,7 @@ module Shotstack
         :'transition' => :'transition',
         :'effect' => :'effect',
         :'filter' => :'filter',
+        :'filters' => :'filters',
         :'opacity' => :'opacity',
         :'transform' => :'transform',
         :'_alias' => :'alias'
@@ -104,6 +112,7 @@ module Shotstack
     # Attribute type mapping.
     def self.openapi_types
       {
+        :'id' => :'String',
         :'asset' => :'Asset',
         :'start' => :'ClipStart',
         :'length' => :'ClipLength',
@@ -116,6 +125,7 @@ module Shotstack
         :'transition' => :'Transition',
         :'effect' => :'String',
         :'filter' => :'String',
+        :'filters' => :'Array<Filter>',
         :'opacity' => :'ClipOpacity',
         :'transform' => :'Transformation',
         :'_alias' => :'String'
@@ -142,6 +152,10 @@ module Shotstack
         end
         h[k.to_sym] = v
       }
+
+      if attributes.key?(:'id')
+        self.id = attributes[:'id']
+      end
 
       if attributes.key?(:'asset')
         self.asset = attributes[:'asset']
@@ -195,6 +209,12 @@ module Shotstack
 
       if attributes.key?(:'filter')
         self.filter = attributes[:'filter']
+      end
+
+      if attributes.key?(:'filters')
+        if (value = attributes[:'filters']).is_a?(Array)
+          self.filters = value
+        end
       end
 
       if attributes.key?(:'opacity')
@@ -370,6 +390,7 @@ module Shotstack
     def ==(o)
       return true if self.equal?(o)
       self.class == o.class &&
+          id == o.id &&
           asset == o.asset &&
           start == o.start &&
           length == o.length &&
@@ -382,6 +403,7 @@ module Shotstack
           transition == o.transition &&
           effect == o.effect &&
           filter == o.filter &&
+          filters == o.filters &&
           opacity == o.opacity &&
           transform == o.transform &&
           _alias == o._alias
@@ -396,7 +418,7 @@ module Shotstack
     # Calculates hash code according to all attributes.
     # @return [Integer] Hash code
     def hash
-      [asset, start, length, fit, scale, width, height, position, offset, transition, effect, filter, opacity, transform, _alias].hash
+      [id, asset, start, length, fit, scale, width, height, position, offset, transition, effect, filter, filters, opacity, transform, _alias].hash
     end
 
     # Builds the object from hash

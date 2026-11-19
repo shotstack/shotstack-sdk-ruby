@@ -154,7 +154,7 @@ module Shotstack
     end
 
     # Get Asset by Render ID
-    # A render may generate more than one file, such as a video, thumbnail and poster image. When the assets are created the only known id is the render id returned by the original [render request](#render-video), status  request or webhook. This endpoint lets you look up one or more assets by the render id.  **Base URL:** <a href=\"#\">https://api.shotstack.io/serve/{version}</a> 
+    # A render may generate more than one file, such as a video, thumbnail and poster image. When the assets are created the only known id is the render id returned by the original [render request](#render-asset), status  request or webhook. This endpoint lets you look up one or more assets by the render id.  **Base URL:** <a href=\"#\">https://api.shotstack.io/serve/{version}</a> 
     # @param id [String] The render id associated with the asset in UUID format
     # @param [Hash] opts the optional parameters
     # @return [AssetRenderResponse]
@@ -164,7 +164,7 @@ module Shotstack
     end
 
     # Get Asset by Render ID
-    # A render may generate more than one file, such as a video, thumbnail and poster image. When the assets are created the only known id is the render id returned by the original [render request](#render-video), status  request or webhook. This endpoint lets you look up one or more assets by the render id.  **Base URL:** &lt;a href&#x3D;\&quot;#\&quot;&gt;https://api.shotstack.io/serve/{version}&lt;/a&gt; 
+    # A render may generate more than one file, such as a video, thumbnail and poster image. When the assets are created the only known id is the render id returned by the original [render request](#render-asset), status  request or webhook. This endpoint lets you look up one or more assets by the render id.  **Base URL:** &lt;a href&#x3D;\&quot;#\&quot;&gt;https://api.shotstack.io/serve/{version}&lt;/a&gt; 
     # @param id [String] The render id associated with the asset in UUID format
     # @param [Hash] opts the optional parameters
     # @return [Array<(AssetRenderResponse, Integer, Hash)>] AssetRenderResponse data, response status code and response headers
