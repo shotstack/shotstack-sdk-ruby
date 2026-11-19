@@ -14,7 +14,7 @@ require 'date'
 require 'time'
 
 module Shotstack
-  # The TextToImageAsset lets you create a dynamic image from a text prompt.
+  # **Notice: TextToImageAsset is deprecated. Use [ImageAsset](#tocs_imageasset) with `prompt` instead.** This type continues to function and is internally rewritten to ImageAsset; no behaviour change for existing integrations.  The TextToImageAsset lets you create a dynamic image from a text prompt. 
   class TextToImageAsset
     # The type of asset to generate - set to `text-to-image` for text-to-image.
     attr_accessor :type
