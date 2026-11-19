@@ -19,7 +19,7 @@ module Shotstack
     # The destination to send assets to - set to `shotstack` for Shotstack hosting and CDN.
     attr_accessor :provider
 
-    # Set to `true` to [opt-out](https://shotstack.io/docs/guide/serving-assets/self-host/) from the Shotstack hosting and CDN service. All files must be downloaded within 24 hours of rendering.
+    # Set to `true` to [opt-out](https://shotstack.io/docs/guide/serving-assets/self-host/) from the Shotstack hosting and CDN service. By default files are hosted and stay until you delete them. If you opt out, the file is not hosted and must be downloaded from the render status `url` within 24 hours of rendering.
     attr_accessor :exclude
 
     # Attribute mapping from ruby-style variable name to JSON key.
